@@ -48,16 +48,17 @@ abstractions.
   </organization>
 
   <dependencies>
-    <!-- Extends Jackson core; but also has slight dep to mapper -->
+    <!-- Extends Jackson core; uses SnakeYAML for parsing, generation -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>2.0.0</version>
     </dependency>
+
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.0.0</version>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.10</version>
     </dependency>
 
      <!-- and for testing, JUnit (or TestNG?) is needed -->
