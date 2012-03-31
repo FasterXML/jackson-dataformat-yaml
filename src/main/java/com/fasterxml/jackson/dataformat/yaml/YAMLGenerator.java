@@ -76,6 +76,11 @@ public class YAMLGenerator extends GeneratorBase
     /* Which flow style to use for Base64? Folded looks good for now
      */
     private final static Character STYLE_BASE64 = Character.valueOf('>');
+
+    private final static String TAG_ARRAY = "a";
+    private final static String TAG_OBJECT = "o";
+
+    private final static String BOGUS_TAG = "s";
     
     /*
     /**********************************************************
@@ -271,7 +276,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
-        _emitter.emit(new SequenceStartEvent(null, null, false, null, null,
+        _emitter.emit(new SequenceStartEvent(null, TAG_ARRAY, false, null, null,
                 _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
     }
     
@@ -290,7 +295,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
-        _emitter.emit(new MappingStartEvent(null, null, false, null, null,
+        _emitter.emit(new MappingStartEvent(null, TAG_OBJECT, false, null, null,
                 _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
     }
 
@@ -526,9 +531,8 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     // not sure what we need; but all our output is explicit so:
-    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(false, false);
-    
-    private final static String BOGUS_TAG = "a";
+//    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(false, false);
+    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(true, true);
     
     protected void _simpleScalar(String value) throws IOException
     {
