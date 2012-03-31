@@ -143,6 +143,34 @@ abstractions.
                 </executions>
         </plugin>
 
+      <plugin>
+        <!--  We will shade SnakeYAML, to simplify deployment, avoid version conflicts -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.yaml:snakeyaml</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.yaml.snakeyaml</pattern>
+                  <shadedPattern>com.fasterxml.jackson.dataformat.yaml.snakeyaml</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
         <!-- Plus, let's make jars OSGi bundles as well  -->
         <plugin>
           <groupId>org.apache.felix</groupId>
@@ -154,6 +182,10 @@ abstractions.
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
               <Bundle-Vendor>fasterml.com</Bundle-Vendor>
               <Import-Package>
+org.yaml.snakeyaml.error,
+org.yaml.snakeyaml.events,
+org.yaml.snakeyaml.parser,
+org.yaml.snakeyaml.reader,
 com.fasterxml.jackson.core,
 com.fasterxml.jackson.core.base,
 com.fasterxml.jackson.core.format,
@@ -161,11 +193,8 @@ com.fasterxml.jackson.core.io,
 com.fasterxml.jackson.core.json,
 com.fasterxml.jackson.core.type,
 com.fasterxml.jackson.core.util,
-com.fasterxml.jackson.databind,
-com.fasterxml.jackson.databind.introspect,
 </Import-Package>
               <Private-Package>
-com.fasterxml.jackson.dataformat.yaml.impl
 </Private-Package>
               <Export-Package>
 com.fasterxml.jackson.dataformat.yaml
