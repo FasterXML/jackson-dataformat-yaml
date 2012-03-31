@@ -4,6 +4,11 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.events.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.GeneratorBase;
@@ -65,6 +70,12 @@ public class YAMLGenerator extends GeneratorBase
     protected int _yamlFeatures;
 
     protected Writer _writer;
+
+    protected DumperOptions _outputOptions;
+
+    /* Which flow style to use for Base64? Folded looks good for now
+     */
+    private final static Character STYLE_BASE64 = Character.valueOf('>');
     
     /*
     /**********************************************************
@@ -72,6 +83,7 @@ public class YAMLGenerator extends GeneratorBase
     /**********************************************************
      */
 
+    protected Emitter _emitter;
     
     /*
     /**********************************************************
@@ -81,12 +93,26 @@ public class YAMLGenerator extends GeneratorBase
     
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out)
+        throws IOException
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
         _yamlFeatures = yamlFeatures;
-//        _writer = new CsvWriter(ctxt, out, columnSeparator, quoteChar, linefeed);
         _writer = out;
+        _outputOptions = new DumperOptions();
+        // let's produce canonical output?
+        _outputOptions.setCanonical(true);
+        _emitter = new Emitter(_writer, _outputOptions);
+
+        // should we start output now, or try to defer?
+        _emitter.emit(new StreamStartEvent(null, null));
+
+        Integer[] version = null;
+        if (_outputOptions.getVersion() != null) {
+            version = _outputOptions.getVersion().getArray();
+        }
+        _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ false,
+                version, /*tags*/ Collections.<String,String>emptyMap()));
     }
 
     /*                                                                                       
@@ -107,8 +133,7 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     /**
-     * No way (or need) to indent anything, so let's block any attempts.
-     * (should we throw an exception instead?)
+     * Not sure what to do here; could reset indentation to some value maybe?
      */
     @Override
     public YAMLGenerator useDefaultPrettyPrinter()
@@ -117,8 +142,8 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     /**
-     * No way (or need) to indent anything, so let's block any attempts.
-     * (should we throw an exception instead?)
+     * Not sure what to do here; will always indent, but uses
+     * YAML-specific settings etc.
      */
     @Override
     public YAMLGenerator setPrettyPrinter(PrettyPrinter pp) {
@@ -181,7 +206,7 @@ public class YAMLGenerator extends GeneratorBase
     private final void _writeFieldName(String name)
         throws IOException, JsonGenerationException
     {
-        // TODO
+        _simpleScalar(name);
     }
     
     /*
@@ -228,6 +253,8 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     public void close() throws IOException
     {
+        _emitter.emit(new DocumentEndEvent(null, null, false));
+        _emitter.emit(new StreamEndEvent(null, null));
         super.close();
         _writer.close();
     }
@@ -238,20 +265,16 @@ public class YAMLGenerator extends GeneratorBase
     /**********************************************************
      */
 
+    
     @Override
     public final void writeStartArray() throws IOException, JsonGenerationException
     {
         _verifyValueWrite("start an array");
-        /* Ok to create root-level array to contain Objects/Arrays, but
-         * can not nest arrays in objects
-         */
-        if (_writeContext.inObject()) {
-            _reportError("YAML generator does not support Array values for properties");
-        }
         _writeContext = _writeContext.createChildArrayContext();
-        // and that's about it, really
+        _emitter.emit(new SequenceStartEvent(null, null, false, null, null,
+                _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
     }
-
+    
     @Override
     public final void writeEndArray() throws IOException, JsonGenerationException
     {
@@ -259,19 +282,16 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not an ARRAY but "+_writeContext.getTypeDesc());
         }
         _writeContext = _writeContext.getParent();
+        _emitter.emit(new SequenceEndEvent(null, null));
     }
 
     @Override
     public final void writeStartObject() throws IOException, JsonGenerationException
     {
         _verifyValueWrite("start an object");
-        /* No nesting for objects; can write Objects inside logical
-         * root-level arrays.
-         */
-        if (_writeContext.inObject()) {
-            _reportError("YAML generator does not support Object values for properties");
-        }
         _writeContext = _writeContext.createChildObjectContext();
+        _emitter.emit(new MappingStartEvent(null, null, false, null, null,
+                _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
     }
 
     @Override
@@ -281,6 +301,7 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not an object but "+_writeContext.getTypeDesc());
         }
         _writeContext = _writeContext.getParent();
+        _emitter.emit(new MappingEndEvent(null, null));
     }
     
     /*
@@ -297,22 +318,21 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write String value");
-        // !!! TODO
+        // use whatever default flow/style is in use...
+        _styledScalar(text);
     }
 
     @Override
     public void writeString(char[] text, int offset, int len) throws IOException, JsonGenerationException
     {
-        _verifyValueWrite("write String value");
-        // !!! TODO
+        writeString(new String(text, offset, len));
     }
 
     @Override
     public final void writeString(SerializableString sstr)
         throws IOException, JsonGenerationException
     {
-        _verifyValueWrite("write String value");
-        // !!! TODO
+        writeString(sstr.toString());
     }
 
     @Override
@@ -375,7 +395,7 @@ public class YAMLGenerator extends GeneratorBase
     /* Output method implementations, base64-encoded binary
     /**********************************************************
      */
-
+    
     @Override
     public void writeBinary(Base64Variant b64variant, byte[] data, int offset, int len) throws IOException, JsonGenerationException
     {
@@ -388,9 +408,8 @@ public class YAMLGenerator extends GeneratorBase
         if (offset > 0 || (offset+len) != data.length) {
             data = Arrays.copyOfRange(data, offset, offset+len);
         }
-        @SuppressWarnings("unused")
         String encoded = b64variant.encode(data);
-        // !!! TODO
+        _styledScalar(encoded, STYLE_BASE64);
     }
 
     /*
@@ -403,22 +422,21 @@ public class YAMLGenerator extends GeneratorBase
     public void writeBoolean(boolean state) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write boolean value");
-        // !!! TODO
+        _simpleScalar(state ? "true" : "false");
     }
 
     @Override
     public void writeNull() throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write null value");
-        // !!! TODO: empty String vs String null?
-        // !!! TODO
+        _simpleScalar("null");
     }
 
     @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(String.valueOf(i));
     }
 
     @Override
@@ -430,7 +448,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(String.valueOf(l));
     }
 
     @Override
@@ -441,21 +459,21 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(String.valueOf(v.toString()));
     }
     
     @Override
     public void writeNumber(double d) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(String.valueOf(d));
     }    
 
     @Override
     public void writeNumber(float f) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(String.valueOf(f));
     }
 
     @Override
@@ -466,7 +484,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(dec.toString());
     }
 
     @Override
@@ -477,7 +495,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        // !!! TODO
+        _simpleScalar(encodedValue);
     }
 
     /*
@@ -499,5 +517,37 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     protected void _releaseBuffers() {
         // nothing special to do...
+    }
+
+    /*
+    /**********************************************************
+    /* Internal methods
+    /**********************************************************
+     */
+
+    // not sure what we need; but all our output is explicit so:
+    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(false, false);
+    
+    private final static String BOGUS_TAG = "a";
+    
+    protected void _simpleScalar(String value) throws IOException
+    {
+        _emitter.emit(_scalarEvent(value, null));
+    }
+
+    protected void _styledScalar(String value) throws IOException
+    {
+        _emitter.emit(_scalarEvent(value, _outputOptions.getDefaultScalarStyle().getChar()));
+    }
+
+    protected void _styledScalar(String value, Character style) throws IOException
+    {
+        _emitter.emit(_scalarEvent(value, style));
+    }
+    
+    protected ScalarEvent _scalarEvent(String value, Character style)
+    {
+        return new ScalarEvent(null, BOGUS_TAG, NOT_IMPLICIT, value,
+                null, null, style);
     }
 }
