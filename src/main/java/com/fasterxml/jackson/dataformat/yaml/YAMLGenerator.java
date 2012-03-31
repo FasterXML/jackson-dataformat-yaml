@@ -73,14 +73,12 @@ public class YAMLGenerator extends GeneratorBase
 
     protected DumperOptions _outputOptions;
 
-    /* Which flow style to use for Base64? Folded looks good for now
+    /* Which flow style to use for Base64? Maybe basic quoted?
      */
-    private final static Character STYLE_BASE64 = Character.valueOf('>');
+    private final static Character STYLE_BASE64 = Character.valueOf('"');
 
-    private final static String TAG_ARRAY = "a";
-    private final static String TAG_OBJECT = "o";
-
-    private final static String BOGUS_TAG = "s";
+    private final static String TAG_ARRAY = "array";
+    private final static String TAG_OBJECT = "object";
     
     /*
     /**********************************************************
@@ -211,7 +209,7 @@ public class YAMLGenerator extends GeneratorBase
     private final void _writeFieldName(String name)
         throws IOException, JsonGenerationException
     {
-        _simpleScalar(name);
+        _simpleScalar(name, "string");
     }
     
     /*
@@ -324,7 +322,7 @@ public class YAMLGenerator extends GeneratorBase
         }
         _verifyValueWrite("write String value");
         // use whatever default flow/style is in use...
-        _styledScalar(text);
+        _styledScalar(text, "string");
     }
 
     @Override
@@ -414,7 +412,7 @@ public class YAMLGenerator extends GeneratorBase
             data = Arrays.copyOfRange(data, offset, offset+len);
         }
         String encoded = b64variant.encode(data);
-        _styledScalar(encoded, STYLE_BASE64);
+        _styledScalar(encoded, "byte[]", STYLE_BASE64);
     }
 
     /*
@@ -427,21 +425,21 @@ public class YAMLGenerator extends GeneratorBase
     public void writeBoolean(boolean state) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write boolean value");
-        _simpleScalar(state ? "true" : "false");
+        _simpleScalar(state ? "true" : "false", "bool");
     }
 
     @Override
     public void writeNull() throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write null value");
-        _simpleScalar("null");
+        _simpleScalar("null", "null");
     }
 
     @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(i));
+        _simpleScalar(String.valueOf(i), "int");
     }
 
     @Override
@@ -453,7 +451,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(l));
+        _simpleScalar(String.valueOf(l), "long");
     }
 
     @Override
@@ -464,21 +462,21 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(v.toString()));
+        _simpleScalar(String.valueOf(v.toString()), "java.math.BigInteger");
     }
     
     @Override
     public void writeNumber(double d) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(d));
+        _simpleScalar(String.valueOf(d), "double");
     }    
 
     @Override
     public void writeNumber(float f) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(f));
+        _simpleScalar(String.valueOf(f), "float");
     }
 
     @Override
@@ -489,7 +487,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(dec.toString());
+        _simpleScalar(dec.toString(), "java.math.BigDecimal");
     }
 
     @Override
@@ -500,7 +498,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(encodedValue);
+        _simpleScalar(encodedValue, "byte[]");
     }
 
     /*
@@ -530,28 +528,29 @@ public class YAMLGenerator extends GeneratorBase
     /**********************************************************
      */
 
-    // not sure what we need; but all our output is explicit so:
-//    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(false, false);
-    private final static ImplicitTuple NOT_IMPLICIT = new ImplicitTuple(true, true);
+    // Implicit means that tags won't be shown, right?
+    private final static ImplicitTuple DEFAULT_IMPLICIT = new ImplicitTuple(true, true);
     
-    protected void _simpleScalar(String value) throws IOException
+    protected void _simpleScalar(String value, String type) throws IOException
     {
-        _emitter.emit(_scalarEvent(value, null));
+        _emitter.emit(_scalarEvent(value, type, null));
     }
 
-    protected void _styledScalar(String value) throws IOException
+    protected void _styledScalar(String value, String type) throws IOException
     {
-        _emitter.emit(_scalarEvent(value, _outputOptions.getDefaultScalarStyle().getChar()));
+        _emitter.emit(_scalarEvent(value, type,
+                _outputOptions.getDefaultScalarStyle().getChar()));
     }
 
-    protected void _styledScalar(String value, Character style) throws IOException
+    protected void _styledScalar(String value, String type, Character style) throws IOException
     {
-        _emitter.emit(_scalarEvent(value, style));
+        _emitter.emit(_scalarEvent(value, type, style));
     }
     
-    protected ScalarEvent _scalarEvent(String value, Character style)
+    protected ScalarEvent _scalarEvent(String value, String tag, Character style)
     {
-        return new ScalarEvent(null, BOGUS_TAG, NOT_IMPLICIT, value,
+        // 'type' can be used as 'tag'... but should we?
+        return new ScalarEvent(null, null, DEFAULT_IMPLICIT, value,
                 null, null, style);
     }
 }
