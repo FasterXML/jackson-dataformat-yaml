@@ -64,6 +64,8 @@ public class YAMLGenerator extends GeneratorBase
      */
     protected int _yamlFeatures;
 
+    protected Writer _writer;
+    
     /*
     /**********************************************************
     /* Output state
@@ -84,6 +86,7 @@ public class YAMLGenerator extends GeneratorBase
         _ioContext = ctxt;
         _yamlFeatures = yamlFeatures;
 //        _writer = new CsvWriter(ctxt, out, columnSeparator, quoteChar, linefeed);
+        _writer = out;
     }
 
     /*                                                                                       
@@ -124,7 +127,7 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public Object getOutputTarget() {
-        return _writer.getOutputTarget();
+        return _writer;
     }
 
     @Override
@@ -219,17 +222,14 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     public final void flush() throws IOException
     {
-        _writer.flush(isEnabled(JsonGenerator.Feature.FLUSH_PASSED_TO_STREAM));
+        _writer.flush();
     }
     
     @Override
     public void close() throws IOException
     {
         super.close();
-
-        // Let's mark row as closed, if we had any...
-        finishRow();
-        _writer.close(_ioContext.isResourceManaged() || isEnabled(JsonGenerator.Feature.AUTO_CLOSE_TARGET));
+        _writer.close();
     }
 
     /*
@@ -259,8 +259,6 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not an ARRAY but "+_writeContext.getTypeDesc());
         }
         _writeContext = _writeContext.getParent();
-        // not 100% fool-proof, but chances are row should be done now
-        finishRow();
     }
 
     @Override
@@ -283,8 +281,6 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not an object but "+_writeContext.getTypeDesc());
         }
         _writeContext = _writeContext.getParent();
-        // not 100% fool-proof, but chances are row should be done now
-        finishRow();
     }
     
     /*
@@ -301,14 +297,14 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write String value");
-        _writer.write(_columnIndex(), text);
+        // !!! TODO
     }
 
     @Override
     public void writeString(char[] text, int offset, int len) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write String value");
-        _writer.write(_columnIndex(), text, offset, len);
+        // !!! TODO
     }
 
     @Override
@@ -316,7 +312,7 @@ public class YAMLGenerator extends GeneratorBase
         throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write String value");
-        _writer.write(_columnIndex(), sstr.getValue());
+        // !!! TODO
     }
 
     @Override
@@ -392,8 +388,9 @@ public class YAMLGenerator extends GeneratorBase
         if (offset > 0 || (offset+len) != data.length) {
             data = Arrays.copyOfRange(data, offset, offset+len);
         }
+        @SuppressWarnings("unused")
         String encoded = b64variant.encode(data);
-        _writer.write(_columnIndex(), encoded);
+        // !!! TODO
     }
 
     /*
@@ -406,7 +403,7 @@ public class YAMLGenerator extends GeneratorBase
     public void writeBoolean(boolean state) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write boolean value");
-        _writer.write(_columnIndex(), state);
+        // !!! TODO
     }
 
     @Override
@@ -414,14 +411,14 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("write null value");
         // !!! TODO: empty String vs String null?
-        _writer.write(_columnIndex(), "");
+        // !!! TODO
     }
 
     @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), i);
+        // !!! TODO
     }
 
     @Override
@@ -433,7 +430,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), l);
+        // !!! TODO
     }
 
     @Override
@@ -444,21 +441,21 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), v.toString());
+        // !!! TODO
     }
     
     @Override
     public void writeNumber(double d) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), d);
+        // !!! TODO
     }    
 
     @Override
     public void writeNumber(float f) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), (double) f);
+        // !!! TODO
     }
 
     @Override
@@ -469,7 +466,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), dec.toString());
+        // !!! TODO
     }
 
     @Override
@@ -480,7 +477,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _writer.write(_columnIndex(), encodedValue);
+        // !!! TODO
     }
 
     /*
@@ -500,14 +497,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    protected void _releaseBuffers()
-    {
-        _writer._releaseBuffers();
+    protected void _releaseBuffers() {
+        // nothing special to do...
     }
-
-    /*
-    /**********************************************************
-    /* Internal methods
-    /**********************************************************
-     */
 }
