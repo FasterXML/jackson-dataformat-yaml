@@ -19,10 +19,28 @@ public class SimpleGenerationTest extends ModuleTestBase
         gen.close();
         
         String yaml = w.toString();
-        
-        System.out.println("YAML/1 -> "+yaml);
+
+        // !!! TODO: verify
+        System.out.println("YAML/array -> "+yaml);
     }
 
+    public void testStreamingObject() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        StringWriter w = new StringWriter();
+        JsonGenerator gen = f.createJsonGenerator(w);
+        gen.writeStartObject();
+        gen.writeStringField("name", "Brad");
+        gen.writeNumberField("age", 39);
+        gen.writeEndObject();
+        gen.close();
+        
+        String yaml = w.toString();
+        
+        // !!! TODO: verify
+        System.out.println("YAML/object -> "+yaml);
+    }
+    
     public void testBasicPOJO() throws Exception
     {
 //        public FiveMinuteUser(String first, String last, boolean verified, Gender g, byte[] data)
