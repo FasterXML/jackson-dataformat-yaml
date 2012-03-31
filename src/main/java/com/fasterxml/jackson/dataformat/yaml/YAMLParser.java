@@ -310,6 +310,11 @@ public class YAMLParser
             if (evt.is(Event.ID.Scalar)) {
                 ScalarEvent scalar = (ScalarEvent) evt;
                 _textValue = scalar.getValue();
+                
+                // TODO: perhaps try making use of tag, for type resolution?
+                // (note, tho, that tags are usually implicit and ignored)
+//                String typeTag = scalar.getTag();
+                
                 // any way to figure out actual type? No?
                 return (_currToken = JsonToken.VALUE_STRING);
             }
