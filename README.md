@@ -1,7 +1,7 @@
 # Overview
 
 This project contains [Jackson](http://http://wiki.fasterxml.com/JacksonHome) extension component for reading and writing [YAML](http://en.wikipedia.org/wiki/YAML) encoded data.
-SnakeYAML](http://code.google.com/p/snakeyaml/) library is used for low-level YAML parsing.
+[SnakeYAML](http://code.google.com/p/snakeyaml/) library is used for low-level YAML parsing.
 This project adds necessary abstractions on top to make things work with other Jackson functionality.
 
 Project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt).
@@ -10,8 +10,14 @@ Project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LI
 
 Project is in its prototype phase, so:
 
-* Basic parsing seems to work, as per simplest of unit tests
-* YAML generation is NOT supported yet (need to find out suitable abstraction at SnakeYAML; not as obvious as with parsing)
+* Basic parsing seems to work, as per simplest of unit tests; including type auto-detection (i.e. underlying `JsonParser` tries to detect implied types)
+* Basic generation: not configurable, produces visually ok block format
+* Even format auto-detection works
+
+Missing are:
+
+* Configurability: might make sense to esp. allow configuration of generation details
+* Support for YAML tags (which theoretically could help with typing), aliases and anchors (which would be good for Object Id, refs): ideally these would be supported, but it will be challenging due to conceptual diffs
 
 No Maven artifacts have been pushed; will do that if and once project gets bit more solid, independently tested.
 
