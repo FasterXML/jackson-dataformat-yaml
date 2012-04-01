@@ -103,10 +103,10 @@ public class YAMLGenerator extends GeneratorBase
         _yamlFeatures = yamlFeatures;
         _writer = out;
         _outputOptions = new DumperOptions();
-        // let's produce canonical output?
+        // let's produce canonical output? (somehow, if not setting to true, we get NPE)
         _outputOptions.setCanonical(true);
         _emitter = new Emitter(_writer, _outputOptions);
-
+        
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
 
@@ -274,8 +274,10 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
-        _emitter.emit(new SequenceStartEvent(null, TAG_ARRAY, false, null, null,
-                _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
+        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
+        // note: can NOT be implicit, to avoid having to specify tag
+        _emitter.emit(new SequenceStartEvent(/*anchor*/null, /*tag*/null,
+                /*implicit*/ true,  null, null, style));
     }
     
     @Override
@@ -293,8 +295,10 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
-        _emitter.emit(new MappingStartEvent(null, TAG_OBJECT, false, null, null,
-                _outputOptions.getDefaultFlowStyle().getStyleBoolean()));
+        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
+        // note: can NOT be implicit, to avoid having to specify tag
+        _emitter.emit(new MappingStartEvent(/* anchor */null, null, //TAG_OBJECT,
+                /*implicit*/true, null, null, style));
     }
 
     @Override
