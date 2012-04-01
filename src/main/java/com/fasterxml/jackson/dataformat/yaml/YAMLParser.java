@@ -1,6 +1,9 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.events.Event;
@@ -57,6 +60,13 @@ public class YAMLParser
         public int getMask() { return _mask; }
     }
 
+    // note: does NOT include '0', handled separately
+    protected final static Pattern PATTERN_INT = Pattern.compile(
+            "-?[1-9][0-9]*");
+
+    protected final static Pattern PATTERN_FLOAT = Pattern.compile(
+            "[-+]?([0-9][0-9_]*)?\\.[0-9.]*([eE][-+][0-9]+)?");
+    
     /*
     /**********************************************************************
     /* Configuration
@@ -308,15 +318,7 @@ public class YAMLParser
 
             // scalar values are probably the commonest:
             if (evt.is(Event.ID.Scalar)) {
-                ScalarEvent scalar = (ScalarEvent) evt;
-                _textValue = scalar.getValue();
-                
-                // TODO: perhaps try making use of tag, for type resolution?
-                // (note, tho, that tags are usually implicit and ignored)
-//                String typeTag = scalar.getTag();
-                
-                // any way to figure out actual type? No?
-                return (_currToken = JsonToken.VALUE_STRING);
+                return (_currToken = _decodeScalar((ScalarEvent) evt));
             }
 
             // followed by maps, then arrays
@@ -366,6 +368,107 @@ public class YAMLParser
         }
     }
     
+    protected JsonToken _decodeScalar(ScalarEvent scalar)
+    {
+        String value = scalar.getValue();
+        _textValue = value;
+        // we may get an explicit tag, if so, use for corroborating...
+        String typeTag = scalar.getTag();
+        if (typeTag == null) { // no, implicit
+            if (value.length() > 0) {
+                char c = value.charAt(0);
+                switch (c) {
+                case 'n':
+                    if ("null".equals(value)) {
+                        return JsonToken.VALUE_NULL;
+                    }
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                case '+':
+                case '-':
+                case '.':
+                    return _decodeNumberScalar(value);
+                }
+                Boolean B = _matchYAMLBoolean(value);
+                if (B != null) {
+                    return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
+                }
+            }
+        } else { // yes, got type tag
+            // canonical values by YAML are actually 'y' and 'n'; but plenty more unofficial:
+            if ("bool".equals(typeTag)) { // must be "true" or "false"
+                Boolean B = _matchYAMLBoolean(value);
+                if (B != null) {
+                    return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
+                }
+            } else if ("int".equals(typeTag)) {
+                return JsonToken.VALUE_NUMBER_INT;
+            } else if ("float".equals(typeTag)) {
+                return JsonToken.VALUE_NUMBER_FLOAT;
+            } else if ("null".equals(typeTag)) {
+                return JsonToken.VALUE_NULL;
+            }
+        }
+        
+        // any way to figure out actual type? No?
+        return (_currToken = JsonToken.VALUE_STRING);
+    }
+
+    protected Boolean _matchYAMLBoolean(String value)
+    {
+        switch (value.length()) {
+        case 1:
+            switch (value.charAt(0)) {
+            case 'y': case 'Y': return Boolean.TRUE;
+            case 'n': case 'N': return Boolean.FALSE;
+            }
+            break;
+        case 2:
+            if ("no".equalsIgnoreCase(value)) return Boolean.FALSE;
+            if ("on".equalsIgnoreCase(value)) return Boolean.TRUE;
+            break;
+        case 3:
+            if ("yes".equalsIgnoreCase(value)) return Boolean.TRUE;
+            if ("off".equalsIgnoreCase(value)) return Boolean.FALSE;
+            break;
+        case 4:
+            if ("true".equalsIgnoreCase(value)) return Boolean.TRUE;
+            break;
+        case 5:
+            if ("false".equalsIgnoreCase(value)) return Boolean.FALSE;
+            break;
+        }
+        return null;
+    }
+
+    protected JsonToken _decodeNumberScalar(String value)
+    {
+        if ("0".equals(value)) { // special case for regexp (can't take minus etc)
+            _numberNegative = false;
+            _numberInt = 0;
+            _numTypesValid = NR_INT;
+            return JsonToken.VALUE_NUMBER_INT;
+        }
+        if (PATTERN_INT.matcher(value).matches()) {
+            _numberNegative = value.charAt(0) == '-';
+            _numTypesValid = 0;
+            return JsonToken.VALUE_NUMBER_INT;
+        }
+        if (PATTERN_FLOAT.matcher(value).matches()) {
+            _numTypesValid = 0;
+            return JsonToken.VALUE_NUMBER_FLOAT;
+        }
+        return null;
+    }   
+
     /*
     /**********************************************************
     /* String value handling
@@ -388,6 +491,9 @@ public class YAMLParser
             return _currentFieldName;
         }
         if (_currToken != null) {
+            if (_currToken.isScalarValue()) {
+                return _textValue;
+            }
             return _currToken.asString();
         }
         return null;
@@ -449,20 +555,71 @@ public class YAMLParser
     /* Number accessors
     /**********************************************************************
      */
-
-    /*
-    /**********************************************************************
-    /* Helper methods from base class
-    /**********************************************************************
-     */
-
-    /*
+    
     @Override
-    protected void _handleEOF() throws JsonParseException {
-        // I don't think there's problem with EOFs usually; except maybe in quoted stuff?
-        _reportInvalidEOF(": expected closing quote character");
+    protected void _parseNumericValue(int expType)
+        throws IOException, JsonParseException
+    {
+        // Int or float?
+        if (_currToken == JsonToken.VALUE_NUMBER_INT) {
+            int len = _textValue.length();
+            if (_numberNegative) {
+                len--;
+            }
+            if (len <= 9) { // definitely fits in int
+                _numberInt = Integer.parseInt(_textValue);
+                _numTypesValid = NR_INT;
+                return;
+            }
+            if (len <= 18) { // definitely fits AND is easy to parse using 2 int parse calls
+                long l = Long.parseLong(_textValue);
+                // [JACKSON-230] Could still fit in int, need to check
+                if (len == 10) {
+                    if (_numberNegative) {
+                        if (l >= Integer.MIN_VALUE) {
+                            _numberInt = (int) l;
+                            _numTypesValid = NR_INT;
+                            return;
+                        }
+                    } else {
+                        if (l <= Integer.MAX_VALUE) {
+                            _numberInt = (int) l;
+                            _numTypesValid = NR_INT;
+                            return;
+                        }
+                    }
+                }
+                _numberLong = l;
+                _numTypesValid = NR_LONG;
+                return;
+            }
+            // !!! TODO: implement proper bounds checks; now we'll just use BigInteger for convenience
+            try {
+                _numberBigInt = new BigInteger(_textValue);
+                _numTypesValid = NR_BIGINT;
+            } catch (NumberFormatException nex) {
+                // Can this ever occur? Due to overflow, maybe?
+                _wrapError("Malformed numeric value '"+_textValue+"'", nex);
+            }
+        }
+        if (_currToken == JsonToken.VALUE_NUMBER_FLOAT) {
+            try {
+                if (expType == NR_BIGDECIMAL) {
+                    _numberBigDecimal = new BigDecimal(_textValue);
+                    _numTypesValid = NR_BIGDECIMAL;
+                } else {
+                    // Otherwise double has to do
+                    _numberDouble = Double.parseDouble(_textValue);
+                    _numTypesValid = NR_DOUBLE;
+                }
+            } catch (NumberFormatException nex) {
+                // Can this ever occur? Due to overflow, maybe?
+                _wrapError("Malformed numeric value '"+_textBuffer.contentsAsString()+"'", nex);
+            }
+            return;
+        }
+        _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
     }
-    */
 
     /*
     /**********************************************************************

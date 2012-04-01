@@ -27,7 +27,7 @@ public class SimpleParseTest extends ModuleTestBase
         String json = jsonMapper.writeValueAsString(result);
         String EXP = "{\"template\":\"Hello, %s!\",\"database\":{"
                 +"\"driverClass\":\"org.h2.Driver\",\"user\":\"scott\",\"password\":\"tiger\","
-                +"\"extra\":[\"1\",\"2\"]}}";
+                +"\"extra\":[1,2]}}";
         assertEquals(EXP, json);
     }
 
