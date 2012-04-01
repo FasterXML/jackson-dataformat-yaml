@@ -26,8 +26,12 @@ public class YAMLFactory extends JsonFactory
     /**
      * Bitfield (set of flags) of all generator features that are enabled
      * by default.
-     */
+     */    
     final static int DEFAULT_YAML_GENERATOR_FEATURE_FLAGS = YAMLGenerator.Feature.collectDefaults();
+
+    final static byte UTF8_BOM_1 = (byte) 0xEF;
+    final static byte UTF8_BOM_2 = (byte) 0xBB;
+    final static byte UTF8_BOM_3 = (byte) 0xBF;
     
     /*
     /**********************************************************************
@@ -87,7 +91,37 @@ public class YAMLFactory extends JsonFactory
     @Override
     public MatchStrength hasFormat(InputAccessor acc) throws IOException
     {
-        // !!! TBI -- but how? Pretty hard to reliably recognize...
+        /* Actually quite possible to do, thanks to (optional) "---"
+         * indicator we may be getting...
+         */
+        if (!acc.hasMoreBytes()) {
+            return MatchStrength.INCONCLUSIVE;
+        }
+        byte b = acc.nextByte();
+        // Very first thing, a UTF-8 BOM?
+        if (b == UTF8_BOM_1) { // yes, looks like UTF-8 BOM
+            if (!acc.hasMoreBytes()) {
+                return MatchStrength.INCONCLUSIVE;
+            }
+            if (acc.nextByte() != UTF8_BOM_2) {
+                return MatchStrength.NO_MATCH;
+            }
+            if (!acc.hasMoreBytes()) {
+                return MatchStrength.INCONCLUSIVE;
+            }
+            if (acc.nextByte() != UTF8_BOM_3) {
+                return MatchStrength.NO_MATCH;
+            }
+            if (!acc.hasMoreBytes()) {
+                return MatchStrength.INCONCLUSIVE;
+            }
+            b = acc.nextByte();
+        }
+        // as far as I know, leading space is NOT allowed before "---" marker?
+        if (b == '-' && (acc.hasMoreBytes() && acc.nextByte() == '-')
+                && (acc.hasMoreBytes() && acc.nextByte() == '-')) {
+            return MatchStrength.FULL_MATCH;
+        }
         return MatchStrength.INCONCLUSIVE;
     }
     
@@ -357,6 +391,9 @@ public class YAMLFactory extends JsonFactory
     protected Reader _createReader(byte[] data, int offset, int len,
             JsonEncoding enc, IOContext ctxt) throws IOException
     {
+        if (enc == null) {
+            enc = JsonEncoding.UTF8;
+        }
         // 29-Mar-2012, tatu: let's not yet bother with custom UTF8 reader        
         /*        
         // default to UTF-8 if encoding missing
