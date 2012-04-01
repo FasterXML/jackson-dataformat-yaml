@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.events.*;
 
@@ -73,12 +74,16 @@ public class YAMLGenerator extends GeneratorBase
 
     protected DumperOptions _outputOptions;
 
-    /* Which flow style to use for Base64? Maybe basic quoted?
-     */
+    // for field names, leave out quotes
+    private final static Character STYLE_NAME = null;
+    
+    // numbers, booleans, should use implicit
+    private final static Character STYLE_SCALAR = null;
+    // Strings quoted for fun
+    private final static Character STYLE_STRING = Character.valueOf('"');
+        
+    // Which flow style to use for Base64? Maybe basic quoted?
     private final static Character STYLE_BASE64 = Character.valueOf('"');
-
-    private final static String TAG_ARRAY = "array";
-    private final static String TAG_OBJECT = "object";
     
     /*
     /**********************************************************
@@ -103,8 +108,10 @@ public class YAMLGenerator extends GeneratorBase
         _yamlFeatures = yamlFeatures;
         _writer = out;
         _outputOptions = new DumperOptions();
-        // let's produce canonical output? (somehow, if not setting to true, we get NPE)
-        _outputOptions.setCanonical(true);
+        // would we want canonical?
+        _outputOptions.setCanonical(false);
+        // if not, MUST specify flow styles
+        _outputOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
         _emitter = new Emitter(_writer, _outputOptions);
         
         // should we start output now, or try to defer?
@@ -209,7 +216,7 @@ public class YAMLGenerator extends GeneratorBase
     private final void _writeFieldName(String name)
         throws IOException, JsonGenerationException
     {
-        _simpleScalar(name, "string");
+        _writeScalar(name, "string", STYLE_NAME);
     }
     
     /*
@@ -267,7 +274,6 @@ public class YAMLGenerator extends GeneratorBase
     /* Public API: structural output
     /**********************************************************
      */
-
     
     @Override
     public final void writeStartArray() throws IOException, JsonGenerationException
@@ -325,8 +331,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write String value");
-        // use whatever default flow/style is in use...
-        _styledScalar(text, "string");
+        _writeScalar(text, "string", STYLE_STRING);
     }
 
     @Override
@@ -416,7 +421,7 @@ public class YAMLGenerator extends GeneratorBase
             data = Arrays.copyOfRange(data, offset, offset+len);
         }
         String encoded = b64variant.encode(data);
-        _styledScalar(encoded, "byte[]", STYLE_BASE64);
+        _writeScalar(encoded, "byte[]", STYLE_BASE64);
     }
 
     /*
@@ -429,21 +434,22 @@ public class YAMLGenerator extends GeneratorBase
     public void writeBoolean(boolean state) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write boolean value");
-        _simpleScalar(state ? "true" : "false", "bool");
+        _writeScalar(state ? "true" : "false", "bool", STYLE_SCALAR);
     }
 
     @Override
     public void writeNull() throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write null value");
-        _simpleScalar("null", "null");
+        // no real type for this, is there?
+        _writeScalar("null", "object", STYLE_SCALAR);
     }
 
     @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(i), "int");
+        _writeScalar(String.valueOf(i), "int", STYLE_SCALAR);
     }
 
     @Override
@@ -455,7 +461,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(l), "long");
+        _writeScalar(String.valueOf(l), "long", STYLE_SCALAR);
     }
 
     @Override
@@ -466,21 +472,21 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(v.toString()), "java.math.BigInteger");
+        _writeScalar(String.valueOf(v.toString()), "java.math.BigInteger", STYLE_SCALAR);
     }
     
     @Override
     public void writeNumber(double d) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(d), "double");
+        _writeScalar(String.valueOf(d), "double", STYLE_SCALAR);
     }    
 
     @Override
     public void writeNumber(float f) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
-        _simpleScalar(String.valueOf(f), "float");
+        _writeScalar(String.valueOf(f), "float", STYLE_SCALAR);
     }
 
     @Override
@@ -491,7 +497,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(dec.toString(), "java.math.BigDecimal");
+        _writeScalar(dec.toString(), "java.math.BigDecimal", STYLE_SCALAR);
     }
 
     @Override
@@ -502,7 +508,7 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write number");
-        _simpleScalar(encodedValue, "byte[]");
+        _writeScalar(encodedValue, "number", STYLE_SCALAR);
     }
 
     /*
@@ -532,21 +538,10 @@ public class YAMLGenerator extends GeneratorBase
     /**********************************************************
      */
 
-    // Implicit means that tags won't be shown, right?
+    // Implicit means that (type) tags won't be shown, right?
     private final static ImplicitTuple DEFAULT_IMPLICIT = new ImplicitTuple(true, true);
-    
-    protected void _simpleScalar(String value, String type) throws IOException
-    {
-        _emitter.emit(_scalarEvent(value, type, null));
-    }
 
-    protected void _styledScalar(String value, String type) throws IOException
-    {
-        _emitter.emit(_scalarEvent(value, type,
-                _outputOptions.getDefaultScalarStyle().getChar()));
-    }
-
-    protected void _styledScalar(String value, String type, Character style) throws IOException
+    protected void _writeScalar(String value, String type, Character style) throws IOException
     {
         _emitter.emit(_scalarEvent(value, type, style));
     }
