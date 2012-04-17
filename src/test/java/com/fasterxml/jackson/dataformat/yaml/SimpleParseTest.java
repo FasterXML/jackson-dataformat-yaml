@@ -1,5 +1,6 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -49,5 +50,15 @@ public class SimpleParseTest extends ModuleTestBase
         byte[] data = user.getUserImage();
         assertNotNull(data);
         Assert.assertArrayEquals(new byte[] { 1, 2, 3, 4, 5 }, data);
+    }
+
+    public void testIssue1() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        final byte[] YAML = "firstName: Billy".getBytes("UTF-8");
+        FiveMinuteUser user = new FiveMinuteUser();
+        user.firstName = "Bubba";
+        mapper.readerForUpdating(user).readValue(new ByteArrayInputStream(YAML));
+        assertEquals("Billy", user.firstName);
     }
 }

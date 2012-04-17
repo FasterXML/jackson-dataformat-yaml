@@ -376,10 +376,13 @@ public class YAMLFactory extends JsonFactory
     
     protected Reader _createReader(InputStream in, JsonEncoding enc, IOContext ctxt) throws IOException
     {
-     // 29-Mar-2012, tatu: let's not yet bother with custom UTF8 reader        
+        if (enc == null) {
+            enc = JsonEncoding.UTF8;
+        }
+        // 29-Mar-2012, tatu: let's not yet bother with custom UTF8 reader        
 /*        
         // default to UTF-8 if encoding missing
-        if (enc == null || enc == JsonEncoding.UTF8) {
+        if (enc == JsonEncoding.UTF8) {
             return new InputStreamReader(in, UTF8);
             boolean autoClose = ctxt.isResourceManaged() || this.isEnabled(JsonParser.Feature.AUTO_CLOSE_SOURCE);
             return new UTF8Reader(ctxt, in, autoClose);
