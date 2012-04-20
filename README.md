@@ -50,4 +50,4 @@ but you can also just use underlying `YAMLFactory` and parser it produces, for e
 
 # Documentation
 
-* [Documentation](jackson-dataformat-csv/wiki/Documentation) IS TO BE WRITTEN
+* [Documentation](jackson-dataformat-yaml/wiki/Documentation) IS TO BE WRITTEN
