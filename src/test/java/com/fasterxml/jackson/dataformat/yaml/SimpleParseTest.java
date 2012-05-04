@@ -2,6 +2,7 @@ package com.fasterxml.jackson.dataformat.yaml;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Assert;
 
@@ -60,5 +61,17 @@ public class SimpleParseTest extends ModuleTestBase
         user.firstName = "Bubba";
         mapper.readerForUpdating(user).readValue(new ByteArrayInputStream(YAML));
         assertEquals("Billy", user.firstName);
+    }
+
+    // [Issue-2]
+    public void testUUIDs() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        UUID uuid = new UUID(0, 0);
+        String yaml = mapper.writeValueAsString(uuid);
+        
+        UUID result = mapper.readValue(yaml, UUID.class);
+        
+        assertEquals(uuid, result);
     }
 }

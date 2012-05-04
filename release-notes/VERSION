@@ -1,0 +1,15 @@
+Version: 2.0.0
+
+Release:
+  03-May-2012
+
+Description:
+  First official release.
+
+Fixes:
+
+* [Issue-2] UUIDs not properly deserialized.
+
+------------------------------------------------------------------------
+=== History: ===
+------------------------------------------------------------------------

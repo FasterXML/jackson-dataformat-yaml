@@ -286,7 +286,6 @@ public class YAMLParser
 
         while (true) {
             Event evt = _yamlParser.getEvent();
-
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
             if (evt == null) {
                 return (_currToken = null);
@@ -395,7 +394,10 @@ public class YAMLParser
                 case '+':
                 case '-':
                 case '.':
-                    return _decodeNumberScalar(value);
+                    JsonToken t = _decodeNumberScalar(value);
+                    if (t != null) {
+                        return t;
+                    }
                 }
                 Boolean B = _matchYAMLBoolean(value);
                 if (B != null) {
