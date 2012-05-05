@@ -61,10 +61,9 @@ public class YAMLParser
     }
 
     // note: does NOT include '0', handled separately
-    protected final static Pattern PATTERN_INT = Pattern.compile(
-            "-?[1-9][0-9]*");
+//    private final static Pattern PATTERN_INT = Pattern.compile("-?[1-9][0-9]*");
 
-    protected final static Pattern PATTERN_FLOAT = Pattern.compile(
+    private final static Pattern PATTERN_FLOAT = Pattern.compile(
             "[-+]?([0-9][0-9_]*)?\\.[0-9.]*([eE][-+][0-9]+)?");
     
     /*
@@ -373,8 +372,9 @@ public class YAMLParser
         _textValue = value;
         // we may get an explicit tag, if so, use for corroborating...
         String typeTag = scalar.getTag();
+        final int len = value.length();
         if (typeTag == null) { // no, implicit
-            if (value.length() > 0) {
+            if (len > 0) {
                 char c = value.charAt(0);
                 switch (c) {
                 case 'n':
@@ -394,12 +394,12 @@ public class YAMLParser
                 case '+':
                 case '-':
                 case '.':
-                    JsonToken t = _decodeNumberScalar(value);
+                    JsonToken t = _decodeNumberScalar(value, len);
                     if (t != null) {
                         return t;
                     }
                 }
-                Boolean B = _matchYAMLBoolean(value);
+                Boolean B = _matchYAMLBoolean(value, len);
                 if (B != null) {
                     return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
                 }
@@ -407,7 +407,7 @@ public class YAMLParser
         } else { // yes, got type tag
             // canonical values by YAML are actually 'y' and 'n'; but plenty more unofficial:
             if ("bool".equals(typeTag)) { // must be "true" or "false"
-                Boolean B = _matchYAMLBoolean(value);
+                Boolean B = _matchYAMLBoolean(value, len);
                 if (B != null) {
                     return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
                 }
@@ -424,9 +424,9 @@ public class YAMLParser
         return (_currToken = JsonToken.VALUE_STRING);
     }
 
-    protected Boolean _matchYAMLBoolean(String value)
+    protected Boolean _matchYAMLBoolean(String value, int len)
     {
-        switch (value.length()) {
+        switch (len) {
         case 1:
             switch (value.charAt(0)) {
             case 'y': case 'Y': return Boolean.TRUE;
@@ -451,7 +451,7 @@ public class YAMLParser
         return null;
     }
 
-    protected JsonToken _decodeNumberScalar(String value)
+    protected JsonToken _decodeNumberScalar(String value, final int len)
     {
         if ("0".equals(value)) { // special case for regexp (can't take minus etc)
             _numberNegative = false;
@@ -459,10 +459,30 @@ public class YAMLParser
             _numTypesValid = NR_INT;
             return JsonToken.VALUE_NUMBER_INT;
         }
-        if (PATTERN_INT.matcher(value).matches()) {
-            _numberNegative = value.charAt(0) == '-';
-            _numTypesValid = 0;
-            return JsonToken.VALUE_NUMBER_INT;
+        /* 05-May-2012, tatu: Turns out this is a hot spot; so let's write it
+         *   out and avoid regexp overhead...
+         */
+        //if (PATTERN_INT.matcher(value).matches()) {
+        int i;
+        if (value.charAt(0) == '-') {
+            _numberNegative = true;
+            i = 1;
+            if (len == 1) {
+                return null;
+            }
+        } else {
+            _numberNegative = true;
+            i = 0;
+        }
+        while (true) {
+            int c = value.charAt(i);
+            if (c > '9' || c < '0') {
+                break;
+            }
+            if (++i == len) {
+                _numTypesValid = 0;
+                return JsonToken.VALUE_NUMBER_INT;
+            }
         }
         if (PATTERN_FLOAT.matcher(value).matches()) {
             _numTypesValid = 0;

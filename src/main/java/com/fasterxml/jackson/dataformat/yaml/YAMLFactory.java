@@ -379,15 +379,12 @@ public class YAMLFactory extends JsonFactory
         if (enc == null) {
             enc = JsonEncoding.UTF8;
         }
-        // 29-Mar-2012, tatu: let's not yet bother with custom UTF8 reader        
-/*        
         // default to UTF-8 if encoding missing
         if (enc == JsonEncoding.UTF8) {
-            return new InputStreamReader(in, UTF8);
             boolean autoClose = ctxt.isResourceManaged() || this.isEnabled(JsonParser.Feature.AUTO_CLOSE_SOURCE);
-            return new UTF8Reader(ctxt, in, autoClose);
+            return new UTF8Reader(in, autoClose);
+//          return new InputStreamReader(in, UTF8);
         }
-*/
         return new InputStreamReader(in, enc.getJavaName());
     }
 
@@ -397,13 +394,10 @@ public class YAMLFactory extends JsonFactory
         if (enc == null) {
             enc = JsonEncoding.UTF8;
         }
-        // 29-Mar-2012, tatu: let's not yet bother with custom UTF8 reader        
-        /*        
         // default to UTF-8 if encoding missing
         if (enc == null || enc == JsonEncoding.UTF8) {
-            return new UTF8Reader(null, data, offset, len);
+            return new UTF8Reader(data, offset, len, true);
         }
-*/       
         ByteArrayInputStream in = new ByteArrayInputStream(data, offset, len);
         return new InputStreamReader(in, enc.getJavaName());
     }
