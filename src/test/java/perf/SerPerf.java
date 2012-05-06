@@ -20,7 +20,7 @@ public final class SerPerf
     private SerPerf() throws Exception
     {
         // Let's try to guesstimate suitable size...
-        REPS = 9000;
+        REPS = 6000;
     }
 
     private MediaItem buildItem()

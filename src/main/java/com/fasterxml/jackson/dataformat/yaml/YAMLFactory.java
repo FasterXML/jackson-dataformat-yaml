@@ -4,6 +4,9 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
+
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
@@ -49,6 +52,10 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************************
      */
 
+    protected DumperOptions _outputOptions;
+
+    protected Integer[] _version;
+    
     /**
      * Default constructor used to create factory instances.
      * Creation of a factory instance is a light-weight operation,
@@ -61,7 +68,24 @@ public class YAMLFactory extends JsonFactory
      */
     public YAMLFactory() { this(null); }
 
-    public YAMLFactory(ObjectCodec oc) { super(oc); }
+    public YAMLFactory(ObjectCodec oc)
+    {
+        super(oc);
+        _outputOptions = _defaultOptions();
+        DumperOptions.Version version = _outputOptions.getVersion();
+        _version = (version == null) ? null : version.getArray();
+    }
+
+    private static DumperOptions _defaultOptions()
+    {
+        DumperOptions opt = new DumperOptions();
+        // would we want canonical?
+        opt.setCanonical(false);
+        // if not, MUST specify flow styles
+        opt.setDefaultFlowStyle(FlowStyle.BLOCK);
+        return opt;
+        
+    }
     
     /*                                                                                       
     /**********************************************************                              
@@ -347,12 +371,9 @@ public class YAMLFactory extends JsonFactory
     @Override
     protected Writer _createWriter(OutputStream out, JsonEncoding enc, IOContext ctxt) throws IOException
     {
-        // 29-Mar-2012, tatu: Let's not yet bother with custom writer; may be faster esp for smaller but...
-        /*
         if (enc == JsonEncoding.UTF8) {
-            return new UTF8Writer(ctxt, out);
+            return new UTF8Writer(out);
         }
-        */
         return new OutputStreamWriter(out, enc.getJavaName());
     }
     
@@ -367,7 +388,7 @@ public class YAMLFactory extends JsonFactory
     {
         int feats = _yamlGeneratorFeatures;
         YAMLGenerator gen = new YAMLGenerator(ctxt, _generatorFeatures, feats,
-                _objectCodec, out);
+                _objectCodec, out, _outputOptions, _version);
         // any other initializations? No?
         return gen;
     }

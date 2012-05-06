@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.events.*;
 
@@ -100,27 +99,18 @@ public class YAMLGenerator extends GeneratorBase
      */
     
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
-            ObjectCodec codec, Writer out)
-        throws IOException
+            ObjectCodec codec, Writer out,
+            DumperOptions outputOptions, Integer[] version
+            ) throws IOException
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
         _yamlFeatures = yamlFeatures;
         _writer = out;
-        _outputOptions = new DumperOptions();
-        // would we want canonical?
-        _outputOptions.setCanonical(false);
-        // if not, MUST specify flow styles
-        _outputOptions.setDefaultFlowStyle(FlowStyle.BLOCK);
-        _emitter = new Emitter(_writer, _outputOptions);
-        
+        _emitter = new Emitter(_writer, outputOptions);
+        _outputOptions = outputOptions;
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
-
-        Integer[] version = null;
-        if (_outputOptions.getVersion() != null) {
-            version = _outputOptions.getVersion().getArray();
-        }
         _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ false,
                 version, /*tags*/ Collections.<String,String>emptyMap()));
     }

@@ -1,15 +1,24 @@
-Version: 2.0.0
+Version: 2.0.1
 
 Release:
-  03-May-2012
+  xx-May-2012
 
 Description:
-  First official release.
+  First patch release for 2.0.0
 
 Fixes:
 
-* [Issue-2] UUIDs not properly deserialized.
+Other:
+
+- 10-20% performance improvements based on profiling (most overhead
+  in SnakeYaml, so limited possibilities)
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.0.0 [03-May-2012]:
+
+Fixes:
+
+* [Issue-2] UUIDs not properly deserialized.
