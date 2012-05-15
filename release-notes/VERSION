@@ -1,23 +1,22 @@
-Version: 2.0.1
+Version: 2.0.2
 
 Release:
-  xx-May-2012
+  14-May-2012
 
 Description:
-  First patch release for 2.0.0
-
-Fixes:
-
-Other:
-
-- 10-20% performance improvements based on profiling (most overhead
-  in SnakeYaml, so limited possibilities)
+  Another patch release for 2.0; no fixes just update to other 2.0.2
+  components.
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
 
-2.0.0 [03-May-2012]:
+2.0.1 (23-Apr-2012)
+
+- 10-20% performance improvements based on profiling (most overhead
+  in SnakeYaml, so limited possibilities)
+
+2.0.0 (03-May-2012)
 
 Fixes:
 
