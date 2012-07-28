@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.core.io.IOContext;
-import com.fasterxml.jackson.core.json.UTF8JsonGenerator;
 
 public class YAMLFactory extends JsonFactory
 {
@@ -576,6 +575,7 @@ public class YAMLFactory extends JsonFactory
         throw new IllegalStateException("Method should never get called");
     }
 
+    @Override
     @Deprecated
     protected YAMLGenerator _createUTF8JsonGenerator(OutputStream out, IOContext ctxt) throws IOException {
         return _createUTF8Generator(out, ctxt);

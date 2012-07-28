@@ -6,8 +6,7 @@ import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.Mark;
-import org.yaml.snakeyaml.events.Event;
-import org.yaml.snakeyaml.events.ScalarEvent;
+import org.yaml.snakeyaml.events.*;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.reader.StreamReader;
 
@@ -117,6 +116,20 @@ public class YAMLParser
      * Let's also have a local copy of the current field name
      */
     protected String _currentFieldName;
+
+    /**
+     * Flag that is set when current token was derived from an Alias
+     * (reference to another value's anchor)
+     * 
+     * @since 2.1
+     */
+    protected boolean _currentIsAlias;
+
+    /**
+     * Anchor for the value that parser currently points to: in case of
+     * structured types, value whose first token current token is.
+     */
+    protected String _currentAnchor;
     
     /*
     /**********************************************************************
@@ -144,6 +157,32 @@ public class YAMLParser
     @Override
     public void setCodec(ObjectCodec c) {
         _objectCodec = c;
+    }
+
+    /*                                                                                       
+    /**********************************************************                              
+    /* Extended YAML-specific API
+    /**********************************************************                              
+     */
+
+    /**
+     * Method that can be used to check whether current token was
+     * created from YAML Alias token (reference to an anchor).
+     * 
+     * @since 2.1
+     */
+    public boolean isCurrentAlias() {
+        return _currentIsAlias;
+    }
+
+    /**
+     * Method that can be used to check if the current token has an
+     * associated anchor (id to reference via Alias)
+     * 
+     * @since 2.1
+     */
+    public String getCurrentAnchor() {
+        return _currentAnchor;
     }
     
     /*                                                                                       
@@ -282,11 +321,13 @@ public class YAMLParser
     @Override
     public JsonToken nextToken() throws IOException, JsonParseException
     {
+        _currentIsAlias = false;
         _binaryValue = null;
+        _currentAnchor = null;
         if (_closed) {
             return null;
         }
-
+        
         while (true) {
             Event evt = _yamlParser.getEvent();
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
@@ -295,7 +336,7 @@ public class YAMLParser
             }
             
             _lastEvent = evt;
-
+            
             /* One complication: field names are only inferred from the
              * fact that we are in Object context...
              */
@@ -311,9 +352,11 @@ public class YAMLParser
                     }
                     _reportError("Expected a field name (Scalar value in YAML), got this instead: "+evt);
                 }
-                String name = ((ScalarEvent) evt).getValue();
+                ScalarEvent scalar = (ScalarEvent) evt;
+                String name = scalar.getValue();
                 _currentFieldName = name;
                 _parsingContext.setCurrentName(name);
+                _currentAnchor = scalar.getAnchor();
                 return (_currToken = JsonToken.FIELD_NAME);
             }
             // Ugh. Why not expose id, to be able to Switch?
@@ -326,6 +369,7 @@ public class YAMLParser
             // followed by maps, then arrays
             if (evt.is(Event.ID.MappingStart)) {
                 Mark m = evt.getStartMark();
+                _currentAnchor = ((NodeEvent)evt).getAnchor();
                 _parsingContext = _parsingContext.createChildObjectContext(m.getLine(), m.getColumn());
                 return (_currToken = JsonToken.START_OBJECT);
             }
@@ -334,6 +378,7 @@ public class YAMLParser
             }
             if (evt.is(Event.ID.SequenceStart)) {
                 Mark m = evt.getStartMark();
+                _currentAnchor = ((NodeEvent)evt).getAnchor();
                 _parsingContext = _parsingContext.createChildArrayContext(m.getLine(), m.getColumn());
                 return (_currToken = JsonToken.START_ARRAY);
             }
@@ -357,8 +402,11 @@ public class YAMLParser
                 continue;
             }
             if (evt.is(Event.ID.Alias)) {
+                AliasEvent alias = (AliasEvent) evt;
+                _currentIsAlias = true;
+                _textValue = alias.getAnchor();
                 // for now, nothing to do: in future, maybe try to expose as ObjectIds?
-                continue;
+                return (_currToken = JsonToken.VALUE_STRING);
             }
             if (evt.is(Event.ID.StreamEnd)) { // end-of-input; force closure
                 close();
@@ -649,6 +697,12 @@ public class YAMLParser
         _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
     }
 
+    /*
+    /**********************************************************************
+    /* Internal methods
+    /**********************************************************************
+     */
+    
     /**
      * Helper method used to clean up YAML floating-point value so it can be parsed
      * using standard JDK classes.
@@ -671,22 +725,5 @@ public class YAMLParser
             }
         }
         return sb.toString();
-    }
-    
-    
-    /*
-    /**********************************************************************
-    /* Internal methods
-    /**********************************************************************
-     */
-    
-    public ByteArrayBuilder _getByteArrayBuilder()
-    {
-        if (_byteArrayBuilder == null) {
-            _byteArrayBuilder = new ByteArrayBuilder();
-        } else {
-            _byteArrayBuilder.reset();
-        }
-        return _byteArrayBuilder;
     }
 }
