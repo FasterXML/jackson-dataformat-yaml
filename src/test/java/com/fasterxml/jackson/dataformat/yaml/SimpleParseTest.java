@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.junit.Assert;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SimpleParseTest extends ModuleTestBase
@@ -73,5 +75,39 @@ public class SimpleParseTest extends ModuleTestBase
         UUID result = mapper.readValue(yaml, UUID.class);
         
         assertEquals(uuid, result);
+    }
+
+    // [Issue-4]: accidental recognition as double, with multiple dots
+    public void testDoubleParsing() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        // First, test out valid use case.
+        String YAML = "";
+        YAML = "num: +1_000.25"; // note underscores; legal in YAML apparently
+        JsonParser jp = f.createJsonParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        // should be considered a String...
+        assertToken(JsonToken.VALUE_NUMBER_FLOAT, jp.nextToken());
+        assertEquals(1000.25, jp.getDoubleValue());
+        // let's retain exact representation text however:
+        assertEquals("+1_000.25", jp.getText());
+        jp.close();
+        
+        // and then non-number that may be mistaken
+        
+        final String IP = "10.12.45.127";
+        YAML = "ip: "+IP+"\n";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("ip", jp.getCurrentName());
+        // should be considered a String...
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals(IP, jp.getText());
+        jp.close();
     }
 }
