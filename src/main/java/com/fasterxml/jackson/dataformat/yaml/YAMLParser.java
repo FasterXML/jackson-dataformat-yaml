@@ -63,8 +63,12 @@ public class YAMLParser
     // note: does NOT include '0', handled separately
 //    private final static Pattern PATTERN_INT = Pattern.compile("-?[1-9][0-9]*");
 
+    /**
+     * We will use pattern that is bit stricter than YAML definition,
+     * but we will still allow things like extra '_' in there.
+     */
     private final static Pattern PATTERN_FLOAT = Pattern.compile(
-            "[-+]?([0-9][0-9_]*)?\\.[0-9.]*([eE][-+][0-9]+)?");
+            "[-+]?([0-9][0-9_]*)?\\.[0-9]*([eE][-+][0-9]+)?");
     
     /*
     /**********************************************************************
@@ -625,24 +629,51 @@ public class YAMLParser
             }
         }
         if (_currToken == JsonToken.VALUE_NUMBER_FLOAT) {
+            // related to [Issue-4]: strip out optional underscores, if any:
+            String str = _cleanYamlDouble(_textValue);
             try {
                 if (expType == NR_BIGDECIMAL) {
-                    _numberBigDecimal = new BigDecimal(_textValue);
+                    _numberBigDecimal = new BigDecimal(str);
                     _numTypesValid = NR_BIGDECIMAL;
                 } else {
                     // Otherwise double has to do
-                    _numberDouble = Double.parseDouble(_textValue);
+                    _numberDouble = Double.parseDouble(str);
                     _numTypesValid = NR_DOUBLE;
                 }
             } catch (NumberFormatException nex) {
                 // Can this ever occur? Due to overflow, maybe?
-                _wrapError("Malformed numeric value '"+_textBuffer.contentsAsString()+"'", nex);
+                _wrapError("Malformed numeric value '"+str+"'", nex);
             }
             return;
         }
         _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
     }
 
+    /**
+     * Helper method used to clean up YAML floating-point value so it can be parsed
+     * using standard JDK classes.
+     * Currently this just means stripping out optional underscores.
+     */
+    private String _cleanYamlDouble(String str)
+    {
+        final int len = str.length();
+        int ix = str.indexOf('_');
+        if (ix < 0 || len == 0) {
+            return str;
+        }
+        StringBuilder sb = new StringBuilder(len);
+        // first: do we have a leading plus sign to skip?
+        int i = (str.charAt(0) == '+') ? 1 : 0;
+        for (; i < len; ++i) {
+            char c = str.charAt(i);
+            if (c != '_') {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+    
+    
     /*
     /**********************************************************************
     /* Internal methods

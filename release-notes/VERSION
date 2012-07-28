@@ -1,19 +1,30 @@
-Version: 2.0.2
+Version: 2.0.5
 
 Release:
-  14-May-2012
+  27-Jul-2012
 
 Description:
   Another patch release for 2.0.
+
+Fixes:
+
+- [Issue-4]: Regexp for detecting floating point numbers too permissive with dots
+ (reported by Dan Sheehan)
+
+------------------------------------------------------------------------
+=== History: ===
+------------------------------------------------------------------------
+
+2.0.4: skipped release (no changes)
+
+2.0.3: skipped release (no changes)
+
+2.0.2 (14-May-2012)
 
 Improvements:
 
 - 10-20% performance improvements based on profiling (most overhead
   in SnakeYaml, so limited possibilities)
-
-------------------------------------------------------------------------
-=== History: ===
-------------------------------------------------------------------------
 
 2.0.0 (03-May-2012)
 
