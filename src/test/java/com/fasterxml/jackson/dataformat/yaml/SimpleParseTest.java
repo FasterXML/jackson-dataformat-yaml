@@ -15,7 +15,8 @@ public class SimpleParseTest extends ModuleTestBase
         YAMLFactory f = new YAMLFactory();
 
         // First, test out valid use case.
-        String YAML = "";
+        String YAML;
+
         YAML = "num: +1_000.25"; // note underscores; legal in YAML apparently
         JsonParser jp = f.createJsonParser(YAML);
 
@@ -43,6 +44,31 @@ public class SimpleParseTest extends ModuleTestBase
         jp.close();
     }
 
+    // looks like colons in content can be problematic, if unquoted
+    public void testColons() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        // First, test out valid use case. NOTE: spaces matter!
+        String YAML = "section:\n"
+                    +"  text: foo:bar\n";
+        JsonParser jp = f.createJsonParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("section", jp.getCurrentName());
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("text", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals("foo:bar", jp.getText());
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
+        assertNull(jp.nextToken());
+
+        jp.close();
+    }
+    
     /**
      * How should YAML Anchors be exposed?
      */

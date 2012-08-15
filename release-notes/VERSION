@@ -15,6 +15,15 @@ Improvements:
 === History: ===
 ------------------------------------------------------------------------
 
+2.0.5 (27-Jul-2012)
+
+- [Issue-4]: Regexp for detecting floating point numbers too permissive with dots
+ (reported by Dan Sheehan)
+ 
+2.0.4: skipped release (no changes)
+
+2.0.3: skipped release (no changes)
+
 2.0.2 (14-May-2012)
 
 Improvements:
