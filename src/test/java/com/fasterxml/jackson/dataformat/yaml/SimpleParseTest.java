@@ -44,6 +44,7 @@ public class SimpleParseTest extends ModuleTestBase
         jp.close();
     }
 
+    // [Issue#7]
     // looks like colons in content can be problematic, if unquoted
     public void testColons() throws Exception
     {

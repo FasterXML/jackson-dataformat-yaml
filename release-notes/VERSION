@@ -10,6 +10,7 @@ Improvements:
 
 - [Issue-5]: Expose Aliases as JsonToken.STRING_VALUE tokens
 - [Issue-6]: Add a method in YAMLParser to detect Anchors: `getCurrentAnchor()`
+- [Issue-7]: Possible parsing problems with unquoted values with colons
 
 ------------------------------------------------------------------------
 === History: ===
