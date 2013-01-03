@@ -127,4 +127,49 @@ public class SimpleParseTest extends ModuleTestBase
         assertNull(yp.nextToken());
         yp.close();
     }
+
+    // [Issue#10]
+    // Scalars should not be parsed when not in the plain flow style.
+    public void testQuotedStyles() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        String YAML = "strings: [\"true\", 'false']";
+        JsonParser jp = f.createJsonParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("strings", jp.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, jp.nextToken());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals("true", jp.getText());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals("false", jp.getText());
+        assertToken(JsonToken.END_ARRAY, jp.nextToken());
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
+        assertNull(jp.nextToken());
+
+        jp.close();
+    }
+
+    // Scalars should be parsed when in the plain flow style.
+    public void testUnquotedStyles() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        String YAML = "booleans: [true, false]";
+        JsonParser jp = f.createJsonParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("booleans", jp.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, jp.nextToken());
+        assertToken(JsonToken.VALUE_TRUE, jp.nextToken());
+        assertToken(JsonToken.VALUE_FALSE, jp.nextToken());
+        assertToken(JsonToken.END_ARRAY, jp.nextToken());
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
+        assertNull(jp.nextToken());
+
+        jp.close();
+    }
 }
