@@ -95,7 +95,6 @@ public class YAMLParser
     protected Reader _reader;
     
     protected ParserImpl _yamlParser;
-    
     /*
     /**********************************************************************
     /* State
@@ -425,8 +424,15 @@ public class YAMLParser
         // we may get an explicit tag, if so, use for corroborating...
         String typeTag = scalar.getTag();
         final int len = value.length();
+
         if (typeTag == null) { // no, implicit
-            if (len > 0) {
+            // We only try to parse the string value if it is in the plain flow style.
+            // The API for ScalarEvent.getStyle() might be read as a null being returned
+            // in the plain flow style, but debugging shows the null-byte character, so
+            // we support both.
+            Character style = scalar.getStyle();
+
+            if ((style == null || style == '\u0000') && len > 0) {
                 char c = value.charAt(0);
                 switch (c) {
                 case 'n':
