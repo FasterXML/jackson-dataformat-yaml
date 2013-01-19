@@ -41,7 +41,8 @@ abstractions.
   </scm>
 
   <properties>
-    <jackson.core.version>2.1.2</jackson.core.version>
+    <jackson.core.version>2.1.3</jackson.core.version>
+    <jackson.annotations.version>2.1.2</jackson.annotations.version>
     <javac.src.version>1.6</javac.src.version>
     <javac.target.version>1.6</javac.target.version>
 
@@ -87,7 +88,7 @@ com.fasterxml.jackson.core.util,
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.core.version}</version>
+      <version>${jackson.annotations.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
