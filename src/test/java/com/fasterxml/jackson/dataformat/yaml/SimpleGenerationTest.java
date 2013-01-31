@@ -61,4 +61,16 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("userImage: \"AQMNTw==\"", it.next());
         assertEquals("verified: false", it.next());
     }
+
+    // Issue#12:
+    public void testWithFile() throws Exception
+    {
+    	File f = File.createTempFile("test", ".yml");
+    	f.deleteOnExit();
+        ObjectMapper mapper = mapperForYAML();
+        mapper.writeValue(f, "Foobar");
+        assertTrue(f.canRead());
+        assertEquals(13L, f.length());
+        f.delete();
+    }
 }

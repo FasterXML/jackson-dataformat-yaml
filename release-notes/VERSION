@@ -5,6 +5,7 @@ Fixes:
 
 - [Issue-10]: Avoid parsing scalars in non-plain flow styles
  (contributed by nkvoll@github)
+- [Issue-12]: Problems with 'YAMLFactory.createJsonGenerator(File)'
 
 ------------------------------------------------------------------------
 === History: ===

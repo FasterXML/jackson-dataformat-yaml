@@ -14,7 +14,9 @@ import com.fasterxml.jackson.core.io.IOContext;
 
 public class YAMLFactory extends JsonFactory
 {
-    /**
+	private static final long serialVersionUID = 1171663157274350349L;
+
+	/**
      * Name used to identify YAML format.
      * (and returned by {@link #getFormatName()}
      */
@@ -52,6 +54,7 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************************
      */
 
+    // !!! NOTE: probably not Serializable, should fix
     protected DumperOptions _outputOptions;
 
     protected Integer[] _version;
@@ -572,7 +575,7 @@ public class YAMLFactory extends JsonFactory
 
     @Override
     protected YAMLGenerator _createUTF8Generator(OutputStream out, IOContext ctxt) throws IOException {
-        throw new IllegalStateException("Method should never get called");
+    	return _createGenerator(new UTF8Writer(out), ctxt);
     }
 
     @Override
@@ -595,7 +598,7 @@ public class YAMLFactory extends JsonFactory
     /* Internal methods
     /**********************************************************
      */
-    
+
     protected final Charset UTF8 = Charset.forName("UTF-8");
 
     protected Reader _createReader(InputStream in, JsonEncoding enc, IOContext ctxt) throws IOException
