@@ -572,7 +572,7 @@ public class YAMLFactory extends JsonFactory
 
     @Override
     protected YAMLGenerator _createUTF8Generator(OutputStream out, IOContext ctxt) throws IOException {
-        throw new IllegalStateException("Method should never get called");
+    	return _createGenerator(new UTF8Writer(out), ctxt);
     }
 
     @Override
@@ -595,7 +595,7 @@ public class YAMLFactory extends JsonFactory
     /* Internal methods
     /**********************************************************
      */
-    
+
     protected final Charset UTF8 = Charset.forName("UTF-8");
 
     protected Reader _createReader(InputStream in, JsonEncoding enc, IOContext ctxt) throws IOException
