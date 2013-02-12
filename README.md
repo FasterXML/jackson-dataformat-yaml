@@ -23,11 +23,13 @@ Missing are:
 
 To use this extension on Maven-based projects, use following dependency:
 
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>2.1.3</version>
-    </dependency>
+```xml
+<dependency>
+  <groupId>com.fasterxml.jackson.dataformat</groupId>
+  <artifactId>jackson-dataformat-yaml</artifactId>
+  <version>2.1.3</version>
+</dependency>
+```
 
 # Usage
 
@@ -35,16 +37,20 @@ To use this extension on Maven-based projects, use following dependency:
 
 Usage is as with basic `JsonFactory`; most commonly you will just construct a standard `ObjectMapper` with `com.fasterxml.jackson.dataformat.yaml.YAMLFactory`, like so:
 
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    User user = mapper.readValue(yamlSource, User.class);
+```java
+ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+User user = mapper.readValue(yamlSource, User.class);
+```
 
 but you can also just use underlying `YAMLFactory` and parser it produces, for event-based processing:
 
-    YAMLFactory factory = new YAMLFactory();
-    JsonParser parser = factory.createJsonParser(yamlString); // don't be fooled by method name...
-    while (parser.nextToken() != null) {
-      // do something!
-    }
+```java
+YAMLFactory factory = new YAMLFactory();
+JsonParser parser = factory.createJsonParser(yamlString); // don't be fooled by method name...
+while (parser.nextToken() != null) {
+  // do something!
+}
+```
 
 # Documentation
 
