@@ -3,12 +3,118 @@ package com.fasterxml.jackson.dataformat.yaml;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
+import java.math.BigInteger;
+
 /**
  * Unit tests for checking functioning of the underlying
  * parser implementation.
  */
 public class SimpleParseTest extends ModuleTestBase
 {
+    // Parsing large numbers around the transition from int->long and long->BigInteger
+    public void testIntParsing() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        String YAML;
+        JsonParser jp;
+
+        // Test positive max-int
+        YAML = "num: 2147483647";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Integer.MAX_VALUE, jp.getIntValue());
+        assertEquals(JsonParser.NumberType.INT, jp.getNumberType());
+        assertEquals("2147483647", jp.getText());
+        jp.close();
+
+        // Test negative max-int
+        YAML = "num: -2147483648";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Integer.MIN_VALUE, jp.getIntValue());
+        assertEquals(JsonParser.NumberType.INT, jp.getNumberType());
+        assertEquals("-2147483648", jp.getText());
+        jp.close();
+
+        // Test positive max-int + 1
+        YAML = "num: 2147483648";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Integer.MAX_VALUE + 1L, jp.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
+        assertEquals("2147483648", jp.getText());
+        jp.close();
+
+        // Test negative max-int - 1
+        YAML = "num: -2147483649";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Integer.MIN_VALUE - 1L, jp.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
+        assertEquals("-2147483649", jp.getText());
+        jp.close();
+
+        // Test positive max-long
+        YAML = "num: 9223372036854775807";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Long.MAX_VALUE, jp.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
+        assertEquals("9223372036854775807", jp.getText());
+        jp.close();
+
+        // Test negative max-long
+        YAML = "num: -9223372036854775808";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(Long.MIN_VALUE, jp.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
+        assertEquals("-9223372036854775808", jp.getText());
+        jp.close();
+
+        // Test positive max-long + 1
+        YAML = "num: 9223372036854775808";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE), jp.getBigIntegerValue());
+        assertEquals(JsonParser.NumberType.BIG_INTEGER, jp.getNumberType());
+        assertEquals("9223372036854775808", jp.getText());
+        jp.close();
+
+        // Test negative max-long - 1
+        YAML = "num: -9223372036854775809";
+        jp = f.createJsonParser(YAML);
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(BigInteger.valueOf(Long.MIN_VALUE).subtract(BigInteger.ONE), jp.getBigIntegerValue());
+        assertEquals(JsonParser.NumberType.BIG_INTEGER, jp.getNumberType());
+        assertEquals("-9223372036854775809", jp.getText());
+        jp.close();
+    }
+
     // [Issue-4]: accidental recognition as double, with multiple dots
     public void testDoubleParsing() throws Exception
     {
