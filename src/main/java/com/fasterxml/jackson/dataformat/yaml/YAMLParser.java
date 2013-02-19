@@ -529,7 +529,7 @@ public class YAMLParser
                 return null;
             }
         } else {
-            _numberNegative = true;
+            _numberNegative = false;
             i = 0;
         }
         while (true) {
@@ -675,8 +675,16 @@ public class YAMLParser
             }
             // !!! TODO: implement proper bounds checks; now we'll just use BigInteger for convenience
             try {
-                _numberBigInt = new BigInteger(_textValue);
+                BigInteger n = new BigInteger(_textValue);
+                // Could still fit in a long, need to check
+                if (len == 19 && n.bitLength() <= 63) {
+                    _numberLong = n.longValue();
+                    _numTypesValid = NR_LONG;
+                    return;
+                }
+                _numberBigInt = n;
                 _numTypesValid = NR_BIGINT;
+                return;
             } catch (NumberFormatException nex) {
                 // Can this ever occur? Due to overflow, maybe?
                 _wrapError("Malformed numeric value '"+_textValue+"'", nex);
