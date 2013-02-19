@@ -37,7 +37,7 @@ abstractions.
     <connection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-dataformat-yaml</url>    
-    <tag>HEAD</tag>
+    <tag>2.1.4</tag>
   </scm>
 
   <properties>
