@@ -64,7 +64,7 @@ public class YAMLGenerator extends GeneratorBase
 
     /**
      * Bit flag composed of bits that indicate which
-     * {@link org.codehaus.jackson.smile.SmileGenerator.Feature}s
+     * {@link YAMLGenerator.Feature}s
      * are enabled.
      */
     protected int _yamlFeatures;
