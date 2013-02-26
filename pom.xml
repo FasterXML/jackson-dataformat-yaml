@@ -41,8 +41,8 @@ abstractions.
   </scm>
 
   <properties>
-    <jackson.core.version>2.1.4-SNAPSHOT</jackson.core.version>
-    <jackson.annotations.version>2.1.2</jackson.annotations.version>
+    <jackson.core.version>2.1.4</jackson.core.version>
+    <jackson.annotations.version>2.1.4</jackson.annotations.version>
     <javac.src.version>1.6</javac.src.version>
     <javac.target.version>1.6</javac.target.version>
 

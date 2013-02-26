@@ -1,10 +1,10 @@
 Project: jackson-dataformat-yaml
-Version: 2.1.4 (...)
+Version: 2.1.4 (26-Feb-2013)
 
 Fixes:
 
-- [Issue-12]: YAMLFactory.writeValue(File, Object) fails (missing overrides)
-- [Issue-14]: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
+#12: YAMLFactory.writeValue(File, Object) fails (missing overrides)
+#14: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
  (contributed by Shawn S)
 
 ------------------------------------------------------------------------
