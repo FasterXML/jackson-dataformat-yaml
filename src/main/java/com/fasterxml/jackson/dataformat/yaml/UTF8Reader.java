@@ -118,6 +118,7 @@ public final class UTF8Reader
     /**********************************************************************
      */
 
+    @Override
     public void close()
         throws IOException
     {

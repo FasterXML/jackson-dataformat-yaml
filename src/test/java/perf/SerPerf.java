@@ -82,7 +82,7 @@ public final class SerPerf
 
             case 1:
                 msg = "Serialize, JSON/manual";
-                sum += testObjectSer(jsonMapper.getJsonFactory(), item, REPS+REPS, result);
+                sum += testObjectSer(jsonMapper.getFactory(), item, REPS+REPS, result);
                 break;
 
             case 2:
@@ -132,7 +132,7 @@ public final class SerPerf
     {
         for (int i = 0; i < reps; ++i) {
             result.reset();
-            JsonGenerator jgen = jf.createJsonGenerator(result, JsonEncoding.UTF8);
+            JsonGenerator jgen = jf.createGenerator(result, JsonEncoding.UTF8);
             value.serialize(jgen);
             jgen.close();
         }

@@ -98,7 +98,7 @@ public class YAMLFactory extends JsonFactory
 
     @Override
     public Version version() {
-        return ModuleVersion.instance.version();
+        return PackageVersion.VERSION;
     }
     
     /*
@@ -261,6 +261,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(r, ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(File f)
         throws IOException, JsonParseException
@@ -359,6 +360,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(r, ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createJsonParser(File f)
         throws IOException, JsonParseException

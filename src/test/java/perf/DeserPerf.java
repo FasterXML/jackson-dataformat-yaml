@@ -128,7 +128,7 @@ public final class DeserPerf
     {
         MediaItem item = null;
         for (int i = 0; i < reps; ++i) {
-            JsonParser jp = jf.createJsonParser(input);
+            JsonParser jp = jf.createParser(input);
             item = MediaItem.deserialize(jp);
             jp.close();
         }
