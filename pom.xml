@@ -43,8 +43,8 @@ abstractions.
   <properties>
     <jackson.core.version>2.2.0-SNAPSHOT</jackson.core.version>
     <jackson.annotations.version>2.2.0-SNAPSHOT</jackson.annotations.version>
-    <javac.src.version>1.6</javac.src.version>
-    <javac.target.version>1.6</javac.target.version>
+    <javac.src.version>1.5</javac.src.version>
+    <javac.target.version>1.5</javac.target.version>
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>com.fasterxml.jackson.dataformat.yaml</packageVersion.package>
 

@@ -1,19 +1,34 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.emitter.Emitter;
-import org.yaml.snakeyaml.events.*;
+import org.yaml.snakeyaml.events.DocumentEndEvent;
+import org.yaml.snakeyaml.events.DocumentStartEvent;
+import org.yaml.snakeyaml.events.ImplicitTuple;
+import org.yaml.snakeyaml.events.MappingEndEvent;
+import org.yaml.snakeyaml.events.MappingStartEvent;
+import org.yaml.snakeyaml.events.ScalarEvent;
+import org.yaml.snakeyaml.events.SequenceEndEvent;
+import org.yaml.snakeyaml.events.SequenceStartEvent;
+import org.yaml.snakeyaml.events.StreamEndEvent;
+import org.yaml.snakeyaml.events.StreamStartEvent;
 
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.Base64Variant;
+import com.fasterxml.jackson.core.FormatSchema;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.ObjectCodec;
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.SerializableString;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.base.GeneratorBase;
-import com.fasterxml.jackson.core.json.JsonWriteContext;
 import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.json.JsonWriteContext;
 
 public class YAMLGenerator extends GeneratorBase
 {
@@ -408,7 +423,7 @@ public class YAMLGenerator extends GeneratorBase
         _verifyValueWrite("write Binary value");
         // ok, better just Base64 encode as a String...
         if (offset > 0 || (offset+len) != data.length) {
-            data = Arrays.copyOfRange(data, offset, offset+len);
+            data = _copyOfRange(data, offset, offset+len);
         }
         String encoded = b64variant.encode(data);
         _writeScalar(encoded, "byte[]", STYLE_BASE64);
@@ -541,5 +556,15 @@ public class YAMLGenerator extends GeneratorBase
         // 'type' can be used as 'tag'... but should we?
         return new ScalarEvent(null, null, DEFAULT_IMPLICIT, value,
                 null, null, style);
+    }
+    
+    private static byte[] _copyOfRange(byte[] original, int from, int to) {
+        int newLength = to - from;
+        if (newLength < 0)
+            throw new IllegalArgumentException(from + " > " + to);
+        byte[] copy = new byte[newLength];
+        System.arraycopy(original, from, copy, 0,
+                         Math.min(original.length - from, newLength));
+        return copy;
     }
 }
