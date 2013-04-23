@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.fasterxml</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>8</version>
+    <version>10</version>
   </parent>
 
   <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -41,14 +41,12 @@ abstractions.
   </scm>
 
   <properties>
-    <jackson.core.version>2.2.0-SNAPSHOT</jackson.core.version>
-    <jackson.annotations.version>2.2.0-SNAPSHOT</jackson.annotations.version>
-    <javac.src.version>1.6</javac.src.version>
-    <javac.target.version>1.6</javac.target.version>
+    <jackson.core.version>2.2.0</jackson.core.version>
+    <jackson.annotations.version>2.2.0</jackson.annotations.version>
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
-    <packageVersion.package>com.fasterxml.jackson.dataformat.yaml</packageVersion.package>
+    <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
 
-    <osgi.export>com.fasterxml.jackson.dataformat.yaml;version=${project.version}</osgi.export>
+    <osgi.export>${project.groupId}.yaml;version=${project.version}</osgi.export>
     <osgi.import>
 org.yaml.snakeyaml,
 org.yaml.snakeyaml.emitter,
