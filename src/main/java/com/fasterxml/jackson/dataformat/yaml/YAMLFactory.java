@@ -21,23 +21,23 @@ public class YAMLFactory extends JsonFactory
      * (and returned by {@link #getFormatName()}
      */
     public final static String FORMAT_NAME_YAML = "YAML";
-    
+
     /**
      * Bitfield (set of flags) of all parser features that are enabled
      * by default.
      */
-    final static int DEFAULT_YAML_PARSER_FEATURE_FLAGS = YAMLParser.Feature.collectDefaults();
+    protected final static int DEFAULT_YAML_PARSER_FEATURE_FLAGS = YAMLParser.Feature.collectDefaults();
 
     /**
      * Bitfield (set of flags) of all generator features that are enabled
      * by default.
      */    
-    final static int DEFAULT_YAML_GENERATOR_FEATURE_FLAGS = YAMLGenerator.Feature.collectDefaults();
+    protected final static int DEFAULT_YAML_GENERATOR_FEATURE_FLAGS = YAMLGenerator.Feature.collectDefaults();
 
-    final static byte UTF8_BOM_1 = (byte) 0xEF;
-    final static byte UTF8_BOM_2 = (byte) 0xBB;
-    final static byte UTF8_BOM_3 = (byte) 0xBF;
-    
+    private final static byte UTF8_BOM_1 = (byte) 0xEF;
+    private final static byte UTF8_BOM_2 = (byte) 0xBB;
+    private final static byte UTF8_BOM_3 = (byte) 0xBF;
+
     /*
     /**********************************************************************
     /* Configuration
@@ -54,8 +54,7 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************************
      */
 
-    // !!! NOTE: probably not Serializable, should fix
-    protected DumperOptions _outputOptions;
+    protected transient DumperOptions _outputOptions;
 
     protected Integer[] _version;
     
@@ -74,11 +73,25 @@ public class YAMLFactory extends JsonFactory
     public YAMLFactory(ObjectCodec oc)
     {
         super(oc);
+        _yamlParserFeatures = DEFAULT_YAML_PARSER_FEATURE_FLAGS;
+        _yamlGeneratorFeatures = DEFAULT_YAML_GENERATOR_FEATURE_FLAGS;
         _outputOptions = _defaultOptions();
         DumperOptions.Version version = _outputOptions.getVersion();
         _version = (version == null) ? null : version.getArray();
     }
 
+    /**
+     * @since 2.2.1
+     */
+    public YAMLFactory(YAMLFactory src, ObjectCodec oc)
+    {
+        super(src, oc);
+        _outputOptions = src._outputOptions;
+        _version = src._version;
+        _yamlParserFeatures = src._yamlParserFeatures;
+        _yamlGeneratorFeatures = src._yamlGeneratorFeatures;
+    }
+    
     private static DumperOptions _defaultOptions()
     {
         DumperOptions opt = new DumperOptions();
@@ -89,7 +102,32 @@ public class YAMLFactory extends JsonFactory
         return opt;
         
     }
-    
+
+    @Override
+    public YAMLFactory copy()
+    {
+        _checkInvalidCopy(YAMLFactory.class);
+        return new YAMLFactory(this, null);
+    }
+
+    /*
+    /**********************************************************
+    /* Serializable overrides
+    /**********************************************************
+     */
+
+    /**
+     * Method that we need to override to actually make restoration go
+     * through constructors etc.
+     * Also: must be overridden by sub-classes as well.
+     */
+    @Override
+    protected Object readResolve() {
+        // this is transient, need to explicitly recreate:
+        _outputOptions = _defaultOptions();
+        return new YAMLFactory(this, _objectCodec);
+    }
+
     /*                                                                                       
     /**********************************************************                              
     /* Versioned                                                                             
@@ -347,6 +385,7 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(String content)
         throws IOException, JsonParseException
@@ -361,6 +400,7 @@ public class YAMLFactory extends JsonFactory
     }
 
     @SuppressWarnings("resource")
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(File f)
         throws IOException, JsonParseException
@@ -374,6 +414,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
     
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(URL url)
         throws IOException, JsonParseException
@@ -387,6 +428,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
 
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(InputStream in)
         throws IOException, JsonParseException
@@ -399,6 +441,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
 
+    @Deprecated
     @Override
     public JsonParser createJsonParser(Reader r)
         throws IOException, JsonParseException
@@ -410,6 +453,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(r, ctxt);
     }
 
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(byte[] data)
         throws IOException, JsonParseException
@@ -425,6 +469,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(data, 0, data.length, ctxt);
     }
     
+    @Deprecated
     @Override
     public YAMLParser createJsonParser(byte[] data, int offset, int len)
         throws IOException, JsonParseException
@@ -487,16 +532,19 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(OutputStream out, JsonEncoding enc) throws IOException {
         return createGenerator(out, enc);
     }
 
+    @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(OutputStream out) throws IOException {
         return createGenerator(out);
     }
-    
+
+    @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(Writer out) throws IOException {
         return createGenerator(out);
