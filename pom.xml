@@ -37,12 +37,12 @@ abstractions.
     <connection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</developerConnection>
     <url>http://github.com/FasterXML/jackson-dataformat-yaml</url>    
-    <tag>jackson-dataformat-yaml-2.1.4</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
-    <jackson.core.version>2.1.4</jackson.core.version>
-    <jackson.annotations.version>2.1.4</jackson.annotations.version>
+    <jackson.core.version>2.1.5</jackson.core.version>
+    <jackson.annotations.version>2.1.5</jackson.annotations.version>
     <javac.src.version>1.6</javac.src.version>
     <javac.target.version>1.6</javac.target.version>
 
