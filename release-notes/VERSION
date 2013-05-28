@@ -1,11 +1,15 @@
 Project: jackson-dataformat-yaml
-Version: 2.2.1 (03-May-2013)
+Version: 2.2.2 (27-May-2013)
 
-- Fixed problem with YamlFactory.copy()
+No functional changes.
 
 ------------------------------------------------------------------------
 === History: ===
 ------------------------------------------------------------------------
+
+2.2.1 (03-May-2013)
+
+- Fixed problem with YamlFactory.copy()
 
 2.2.0 (22-Apr-2013)
 
