@@ -97,33 +97,6 @@ com.fasterxml.jackson.core.util,
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <!--  We will shade SnakeYAML, to simplify deployment, avoid version conflicts -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <include>org.yaml:snakeyaml</include>
-                </includes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>org.yaml.snakeyaml</pattern>
-                  <shadedPattern>com.fasterxml.jackson.dataformat.yaml.snakeyaml</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
