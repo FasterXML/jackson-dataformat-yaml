@@ -19,25 +19,26 @@ public class SimpleGenerationTest extends ModuleTestBase
         gen.writeString("foobar");
         gen.writeEndArray();
         gen.close();
-        
+
         String yaml = w.toString();
-        // should probably parse...
-        assertEquals("---\n- 3\n- \"foobar\"\n", yaml);
+        // should probably parse?
+        // note: 1.12 uses more compact notation; 1.10 has prefix
+        yaml = trimDocMarker(yaml).trim();
+        assertEquals("- 3\n- \"foobar\"", yaml);
     }
 
     public void testStreamingObject() throws Exception
     {
         YAMLFactory f = new YAMLFactory();
         StringWriter w = new StringWriter();
+        @SuppressWarnings("resource")
         JsonGenerator gen = f.createGenerator(w);
-        gen.writeStartObject();
-        gen.writeStringField("name", "Brad");
-        gen.writeNumberField("age", 39);
-        gen.writeEndObject();
-        gen.close();
-        
+        _writeBradDoc(gen);
         String yaml = w.toString();
-        assertEquals("---\nname: \"Brad\"\nage: 39\n", yaml);
+
+        // note: 1.12 uses more compact notation; 1.10 has prefix
+        yaml = trimDocMarker(yaml).trim();
+        assertEquals("name: \"Brad\"\nage: 39", yaml);
     }
     
     public void testBasicPOJO() throws Exception
@@ -47,14 +48,20 @@ public class SimpleGenerationTest extends ModuleTestBase
                 FiveMinuteUser.Gender.MALE, new byte[] { 1, 3, 13, 79 });
         String yaml = mapper.writeValueAsString(user).trim();
         String[] parts = yaml.split("\n");
-        assertEquals(6, parts.length);
+        boolean gotHeader = (parts.length == 6);
+        if (!gotHeader) {
+            // 1.10 has 6 as it has header
+            assertEquals(5, parts.length);
+        }
         // unify ordering, need to use TreeSets
         TreeSet<String> exp = new TreeSet<String>();
         for (String part : parts) {
             exp.add(part.trim());
         }
         Iterator<String> it = exp.iterator();
-        assertEquals("---", it.next());
+        if (gotHeader) {
+            assertEquals("---", it.next());
+        }
         assertEquals("firstName: \"Bob\"", it.next());
         assertEquals("gender: \"MALE\"", it.next());
         assertEquals("lastName: \"Dabolito\"", it.next());
@@ -70,7 +77,57 @@ public class SimpleGenerationTest extends ModuleTestBase
         ObjectMapper mapper = mapperForYAML();
         mapper.writeValue(f, "Foobar");
         assertTrue(f.canRead());
-        assertEquals(13L, f.length());
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
+                f), "UTF-8"));
+        String doc = br.readLine();
+        String str = br.readLine();
+        if (str != null) {
+            doc += "\n" + str;
+        }
+        doc = trimDocMarker(doc);
+        assertEquals("\"Foobar\"", doc);
+        br.close();
         f.delete();
+    }
+
+    @SuppressWarnings("resource")
+    public void testStartMarker() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        // Ok, first, assume we do get the marker:
+        StringWriter w = new StringWriter();
+        assertTrue(f.isEnabled(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        YAMLGenerator gen = f.createGenerator(w);
+        assertTrue(gen.isEnabled(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        _writeBradDoc(gen);
+        String yaml = w.toString().trim();
+        assertEquals("---\nname: \"Brad\"\nage: 39", yaml);
+
+        // and then, disabling, and not any more
+        f.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        w = new StringWriter();
+        gen = f.createGenerator(w);
+        assertFalse(gen.isEnabled(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+        _writeBradDoc(gen);
+        yaml = w.toString().trim();
+        assertEquals("name: \"Brad\"\nage: 39", yaml);
+    }
+
+    /*
+    /**********************************************************************
+    /* Helper methods
+    /**********************************************************************
+     */
+    
+    
+    protected void _writeBradDoc(JsonGenerator gen) throws IOException
+    {
+        gen.writeStartObject();
+        gen.writeStringField("name", "Brad");
+        gen.writeNumberField("age", 39);
+        gen.writeEndObject();
+        gen.close();
     }
 }

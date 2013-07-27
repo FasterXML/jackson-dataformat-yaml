@@ -156,4 +156,12 @@ public abstract class ModuleTestBase extends junit.framework.TestCase
         }
         fail("Expected an exception with one of substrings ("+Arrays.asList(matches)+"): got one with message \""+msg+"\"");
     }
+
+    protected String trimDocMarker(String doc)
+    {
+        if (doc.startsWith("---")) {
+            doc = doc.substring(3).trim();
+        }
+        return doc;
+    }
 }

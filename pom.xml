@@ -59,7 +59,7 @@ com.fasterxml.jackson.core.util,
     <dependency>
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
-      <version>1.10</version>
+      <version>1.12</version>
     </dependency>
 
      <!-- and for testing, JUnit (or TestNG?) is needed; as well as databinder, annotatons -->

@@ -22,7 +22,14 @@ public class YAMLGenerator extends GeneratorBase
      * Enumeration that defines all togglable features for YAML generators
      */
     public enum Feature {
-        BOGUS(false) // placeholder
+        /**
+         * Whether we are to write an explicit document start marker ("---")
+         * or not.
+         * 
+         * @since 2.3
+         */
+        WRITE_DOC_START_MARKER(true),
+
         ;
 
         protected final boolean _defaultState;
@@ -84,7 +91,7 @@ public class YAMLGenerator extends GeneratorBase
         
     // Which flow style to use for Base64? Maybe basic quoted?
     private final static Character STYLE_BASE64 = Character.valueOf('"');
-    
+
     /*
     /**********************************************************
     /* Output state
@@ -92,13 +99,13 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     protected Emitter _emitter;
-    
+
     /*
     /**********************************************************
     /* Life-cycle
     /**********************************************************
      */
-    
+
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out,
             DumperOptions outputOptions, org.yaml.snakeyaml.DumperOptions.Version version
@@ -113,8 +120,12 @@ public class YAMLGenerator extends GeneratorBase
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
         Map<String,String> noTags = Collections.emptyMap();
-        _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ false,
-                ((version == null) ? null : version.getArray()), noTags));
+        
+        boolean startMarker = (Feature.WRITE_DOC_START_MARKER.getMask() & yamlFeatures) != 0;
+        
+        _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ startMarker,
+                version, // for 1.10 was: ((version == null) ? null : version.getArray()),
+                noTags));
     }
 
     /*                                                                                       
