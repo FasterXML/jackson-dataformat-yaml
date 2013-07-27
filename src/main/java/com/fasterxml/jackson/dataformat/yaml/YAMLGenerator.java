@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.emitter.Emitter;
@@ -100,7 +101,7 @@ public class YAMLGenerator extends GeneratorBase
     
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out,
-            DumperOptions outputOptions, Integer[] version
+            DumperOptions outputOptions, org.yaml.snakeyaml.DumperOptions.Version version
             ) throws IOException
     {
         super(jsonFeatures, codec);
@@ -111,8 +112,9 @@ public class YAMLGenerator extends GeneratorBase
         _outputOptions = outputOptions;
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
+        Map<String,String> noTags = Collections.emptyMap();
         _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ false,
-                version, /*tags*/ Collections.<String,String>emptyMap()));
+                ((version == null) ? null : version.getArray()), noTags));
     }
 
     /*                                                                                       

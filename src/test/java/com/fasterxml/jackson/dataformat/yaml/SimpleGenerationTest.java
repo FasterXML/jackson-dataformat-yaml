@@ -13,7 +13,7 @@ public class SimpleGenerationTest extends ModuleTestBase
     {
         YAMLFactory f = new YAMLFactory();
         StringWriter w = new StringWriter();
-        JsonGenerator gen = f.createJsonGenerator(w);
+        JsonGenerator gen = f.createGenerator(w);
         gen.writeStartArray();
         gen.writeNumber(3);
         gen.writeString("foobar");
@@ -29,7 +29,7 @@ public class SimpleGenerationTest extends ModuleTestBase
     {
         YAMLFactory f = new YAMLFactory();
         StringWriter w = new StringWriter();
-        JsonGenerator gen = f.createJsonGenerator(w);
+        JsonGenerator gen = f.createGenerator(w);
         gen.writeStartObject();
         gen.writeStringField("name", "Brad");
         gen.writeNumberField("age", 39);
@@ -65,8 +65,8 @@ public class SimpleGenerationTest extends ModuleTestBase
     // Issue#12:
     public void testWithFile() throws Exception
     {
-    	File f = File.createTempFile("test", ".yml");
-    	f.deleteOnExit();
+        File f = File.createTempFile("test", ".yml");
+        f.deleteOnExit();
         ObjectMapper mapper = mapperForYAML();
         mapper.writeValue(f, "Foobar");
         assertTrue(f.canRead());

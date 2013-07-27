@@ -6,13 +6,15 @@ import com.fasterxml.jackson.core.*;
 
 public class TestVersions extends ModuleTestBase
 {
+    @SuppressWarnings("resource")
     public void testMapperVersions() throws IOException
     {
         YAMLFactory f = new YAMLFactory();
         assertVersion(f);
-        YAMLParser jp = (YAMLParser) f.createJsonParser("123");
+        YAMLParser jp = (YAMLParser) f.createParser("123");
         assertVersion(jp);
-        YAMLGenerator jgen = (YAMLGenerator) f.createJsonGenerator(new ByteArrayOutputStream());
+        jp.close();
+        YAMLGenerator jgen = (YAMLGenerator) f.createGenerator(new ByteArrayOutputStream());
         assertVersion(jgen);
     }
 

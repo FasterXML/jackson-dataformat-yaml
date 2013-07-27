@@ -56,7 +56,7 @@ public class YAMLFactory extends JsonFactory
 
     protected transient DumperOptions _outputOptions;
 
-    protected Integer[] _version;
+    protected DumperOptions.Version _version;
     
     /**
      * Default constructor used to create factory instances.
@@ -76,8 +76,7 @@ public class YAMLFactory extends JsonFactory
         _yamlParserFeatures = DEFAULT_YAML_PARSER_FEATURE_FLAGS;
         _yamlGeneratorFeatures = DEFAULT_YAML_GENERATOR_FEATURE_FLAGS;
         _outputOptions = _defaultOptions();
-        DumperOptions.Version version = _outputOptions.getVersion();
-        _version = (version == null) ? null : version.getArray();
+        _version = _outputOptions.getVersion();
     }
 
     /**
@@ -286,6 +285,7 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(String content)
         throws IOException, JsonParseException
@@ -298,7 +298,7 @@ public class YAMLFactory extends JsonFactory
         }
         return _createParser(r, ctxt);
     }
-
+    
     @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(File f)
@@ -313,6 +313,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
     
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(URL url)
         throws IOException, JsonParseException
@@ -326,6 +327,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(InputStream in)
         throws IOException, JsonParseException
@@ -338,6 +340,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(in, ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public JsonParser createParser(Reader r)
         throws IOException, JsonParseException
@@ -349,6 +352,7 @@ public class YAMLFactory extends JsonFactory
         return _createParser(r, ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(byte[] data)
         throws IOException, JsonParseException
@@ -363,7 +367,8 @@ public class YAMLFactory extends JsonFactory
         }
         return _createParser(data, 0, data.length, ctxt);
     }
-    
+
+    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(byte[] data, int offset, int len)
         throws IOException, JsonParseException
@@ -385,104 +390,53 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(String content)
-        throws IOException, JsonParseException
-    {
-        Reader r = new StringReader(content);
-        IOContext ctxt = _createContext(r, true); // true->own, can close
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            r = _inputDecorator.decorate(ctxt, r);
-        }
-        return _createParser(r, ctxt);
+    public YAMLParser createJsonParser(String content) throws IOException, JsonParseException {
+        return createParser(content);
     }
 
-    @SuppressWarnings("resource")
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(File f)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(f, true);
-        InputStream in = new FileInputStream(f);
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            in = _inputDecorator.decorate(ctxt, in);
-        }
-        return _createParser(in, ctxt);
+    public YAMLParser createJsonParser(File f) throws IOException, JsonParseException {
+        return createParser(f);
     }
     
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(URL url)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(url, true);
-        InputStream in = _optimizedStreamFromURL(url);
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            in = _inputDecorator.decorate(ctxt, in);
-        }
-        return _createParser(in, ctxt);
+    public YAMLParser createJsonParser(URL url) throws IOException, JsonParseException {
+        return createParser(url);
     }
 
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(InputStream in)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(in, false);
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            in = _inputDecorator.decorate(ctxt, in);
-        }
-        return _createParser(in, ctxt);
+    public YAMLParser createJsonParser(InputStream in) throws IOException, JsonParseException {
+        return createParser(in);
     }
 
+    // remove in 2.4
     @Deprecated
     @Override
-    public JsonParser createJsonParser(Reader r)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(r, false);
-        if (_inputDecorator != null) {
-            r = _inputDecorator.decorate(ctxt, r);
-        }
-        return _createParser(r, ctxt);
+    public JsonParser createJsonParser(Reader r) throws IOException, JsonParseException {
+        return createParser(r);
     }
 
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(byte[] data)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(data, true);
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            InputStream in = _inputDecorator.decorate(ctxt, data, 0, data.length);
-            if (in != null) {
-                return _createParser(in, ctxt);
-            }
-        }
-        return _createParser(data, 0, data.length, ctxt);
+    public YAMLParser createJsonParser(byte[] data) throws IOException, JsonParseException {
+        return createParser(data);
     }
     
+    // remove in 2.4
     @Deprecated
     @Override
-    public YAMLParser createJsonParser(byte[] data, int offset, int len)
-        throws IOException, JsonParseException
-    {
-        IOContext ctxt = _createContext(data, true);
-        // [JACKSON-512]: allow wrapping with InputDecorator
-        if (_inputDecorator != null) {
-            InputStream in = _inputDecorator.decorate(ctxt, data, offset, len);
-            if (in != null) {
-                return _createParser(in, ctxt);
-            }
-        }
-        return _createParser(data, offset, len, ctxt);
+    public YAMLParser createJsonParser(byte[] data, int offset, int len) throws IOException, JsonParseException {
+        return createParser(data, offset, len);
     }
 
     /*
@@ -491,6 +445,7 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLGenerator createGenerator(OutputStream out, JsonEncoding enc) throws IOException
     {
@@ -503,6 +458,7 @@ public class YAMLFactory extends JsonFactory
         return _createGenerator(_createWriter(out, JsonEncoding.UTF8, ctxt), ctxt);
     }
 
+    @SuppressWarnings("resource")
     @Override
     public YAMLGenerator createGenerator(OutputStream out) throws IOException
     {
@@ -515,6 +471,7 @@ public class YAMLFactory extends JsonFactory
         return _createGenerator(_createWriter(out, JsonEncoding.UTF8, ctxt), ctxt);
     }
     
+    @SuppressWarnings("resource")
     @Override
     public YAMLGenerator createGenerator(Writer out) throws IOException
     {
@@ -532,18 +489,21 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************
      */
 
+    // remove in 2.4
     @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(OutputStream out, JsonEncoding enc) throws IOException {
         return createGenerator(out, enc);
     }
 
+    // remove in 2.4
     @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(OutputStream out) throws IOException {
         return createGenerator(out);
     }
 
+    // remove in 2.4
     @Deprecated
     @Override
     public YAMLGenerator createJsonGenerator(Writer out) throws IOException {
@@ -558,6 +518,7 @@ public class YAMLFactory extends JsonFactory
 
     //protected IOContext _createContext(Object srcRef, boolean resourceManaged)
 
+    @SuppressWarnings("resource")
     @Override
     protected YAMLParser _createParser(InputStream in, IOContext ctxt)
         throws IOException, JsonParseException
@@ -575,6 +536,7 @@ public class YAMLFactory extends JsonFactory
                 _objectCodec, r);
     }
 
+    @SuppressWarnings("resource")
     @Override
     protected YAMLParser _createParser(byte[] data, int offset, int len, IOContext ctxt)
         throws IOException, JsonParseException
@@ -585,6 +547,7 @@ public class YAMLFactory extends JsonFactory
     }
 
     @Override
+    @Deprecated
     protected YAMLParser _createJsonParser(InputStream in, IOContext ctxt)
         throws IOException, JsonParseException
     {
@@ -592,6 +555,7 @@ public class YAMLFactory extends JsonFactory
     }
 
     @Override
+    @Deprecated
     protected JsonParser _createJsonParser(Reader r, IOContext ctxt)
         throws IOException, JsonParseException
     {
@@ -599,6 +563,7 @@ public class YAMLFactory extends JsonFactory
     }
 
     @Override
+    @Deprecated
     protected YAMLParser _createJsonParser(byte[] data, int offset, int len, IOContext ctxt)
         throws IOException, JsonParseException
     {
@@ -617,15 +582,18 @@ public class YAMLFactory extends JsonFactory
     }
 
     @Override
+    @Deprecated
     protected YAMLGenerator _createJsonGenerator(Writer out, IOContext ctxt)
         throws IOException
     {
         return _createGenerator(out, ctxt);
     }
 
+    @SuppressWarnings("resource")
+    @Deprecated
     @Override
     protected YAMLGenerator _createUTF8Generator(OutputStream out, IOContext ctxt) throws IOException {
-    	return _createGenerator(new UTF8Writer(out), ctxt);
+        return _createGenerator(new UTF8Writer(out), ctxt);
     }
 
     @Override
