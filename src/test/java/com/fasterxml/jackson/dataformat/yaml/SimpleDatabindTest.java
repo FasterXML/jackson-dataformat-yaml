@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * Unit tests for checking functioning of the databinding
@@ -14,6 +15,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class SimpleDatabindTest extends ModuleTestBase
 {
+    static class EmptyBean {
+    }
+    
+    /*
+    /**********************************************************
+    /* Test methods
+    /**********************************************************
+     */
+
     public void testBasicUntyped() throws Exception
     {
         final String YAML =
@@ -77,5 +87,15 @@ public class SimpleDatabindTest extends ModuleTestBase
         UUID result = mapper.readValue(yaml, UUID.class);
         
         assertEquals(uuid, result);
+    }
+    
+    // [Issue#15]
+    public void testEmptyBean() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        String yaml = mapper.writeValueAsString(new EmptyBean());
+        yaml = yaml.trim();
+        assertEquals("--- {}", yaml);
     }
 }
