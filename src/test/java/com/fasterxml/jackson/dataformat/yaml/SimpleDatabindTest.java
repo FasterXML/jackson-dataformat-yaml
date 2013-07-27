@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class SimpleDatabindTest extends ModuleTestBase
 {
+    // to try to reproduce [Issue#15]
     static class EmptyBean {
     }
     
