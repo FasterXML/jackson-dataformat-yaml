@@ -5,7 +5,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.format.InputAccessor;
@@ -54,8 +53,6 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************************
      */
 
-    protected transient DumperOptions _outputOptions;
-
     protected DumperOptions.Version _version;
     
     /**
@@ -75,8 +72,11 @@ public class YAMLFactory extends JsonFactory
         super(oc);
         _yamlParserFeatures = DEFAULT_YAML_PARSER_FEATURE_FLAGS;
         _yamlGeneratorFeatures = DEFAULT_YAML_GENERATOR_FEATURE_FLAGS;
-        _outputOptions = _defaultOptions();
-        _version = _outputOptions.getVersion();
+        /* 26-Jul-2013, tatu: Seems like we should force output as 1.1 but
+         *   that adds version declaration which looks ugly...
+         */
+        //_version = DumperOptions.Version.V1_1;
+        _version = null;
     }
 
     /**
@@ -85,21 +85,9 @@ public class YAMLFactory extends JsonFactory
     public YAMLFactory(YAMLFactory src, ObjectCodec oc)
     {
         super(src, oc);
-        _outputOptions = src._outputOptions;
         _version = src._version;
         _yamlParserFeatures = src._yamlParserFeatures;
         _yamlGeneratorFeatures = src._yamlGeneratorFeatures;
-    }
-    
-    private static DumperOptions _defaultOptions()
-    {
-        DumperOptions opt = new DumperOptions();
-        // would we want canonical?
-        opt.setCanonical(false);
-        // if not, MUST specify flow styles
-        opt.setDefaultFlowStyle(FlowStyle.BLOCK);
-        return opt;
-        
     }
 
     @Override
@@ -122,8 +110,6 @@ public class YAMLFactory extends JsonFactory
      */
     @Override
     protected Object readResolve() {
-        // this is transient, need to explicitly recreate:
-        _outputOptions = _defaultOptions();
         return new YAMLFactory(this, _objectCodec);
     }
 
@@ -576,7 +562,7 @@ public class YAMLFactory extends JsonFactory
     {
         int feats = _yamlGeneratorFeatures;
         YAMLGenerator gen = new YAMLGenerator(ctxt, _generatorFeatures, feats,
-                _objectCodec, out, _outputOptions, _version);
+                _objectCodec, out, _version);
         // any other initializations? No?
         return gen;
     }
@@ -626,7 +612,7 @@ public class YAMLFactory extends JsonFactory
         }
         // default to UTF-8 if encoding missing
         if (enc == JsonEncoding.UTF8) {
-            boolean autoClose = ctxt.isResourceManaged() || this.isEnabled(JsonParser.Feature.AUTO_CLOSE_SOURCE);
+            boolean autoClose = ctxt.isResourceManaged() || isEnabled(JsonParser.Feature.AUTO_CLOSE_SOURCE);
             return new UTF8Reader(in, autoClose);
 //          return new InputStreamReader(in, UTF8);
         }

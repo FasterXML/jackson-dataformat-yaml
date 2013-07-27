@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.events.*;
 
@@ -30,6 +31,11 @@ public class YAMLGenerator extends GeneratorBase
          */
         WRITE_DOC_START_MARKER(true),
 
+        /**
+         * Do we try to force so-called canonical output or not.
+         */
+        CANONICAL_OUTPUT(false)
+        
         ;
 
         protected final boolean _defaultState;
@@ -108,22 +114,22 @@ public class YAMLGenerator extends GeneratorBase
 
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out,
-            DumperOptions outputOptions, org.yaml.snakeyaml.DumperOptions.Version version
+            org.yaml.snakeyaml.DumperOptions.Version version
             ) throws IOException
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
         _yamlFeatures = yamlFeatures;
         _writer = out;
-        _emitter = new Emitter(_writer, outputOptions);
-        _outputOptions = outputOptions;
+
+        _emitter = new Emitter(_writer, _outputOptions());
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
         Map<String,String> noTags = Collections.emptyMap();
         
         boolean startMarker = (Feature.WRITE_DOC_START_MARKER.getMask() & yamlFeatures) != 0;
         
-        _emitter.emit(new DocumentStartEvent(null, null, /*explicit start*/ startMarker,
+        _emitter.emit(new DocumentStartEvent(null, null, startMarker,
                 version, // for 1.10 was: ((version == null) ? null : version.getArray()),
                 noTags));
     }
@@ -283,7 +289,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
-        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
+        Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
         // note: can NOT be implicit, to avoid having to specify tag
         _emitter.emit(new SequenceStartEvent(/*anchor*/null, /*tag*/null,
                 /*implicit*/ true,  null, null, style));
@@ -304,7 +310,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
-        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
+        Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
         // note: can NOT be implicit, to avoid having to specify tag
         _emitter.emit(new MappingStartEvent(/* anchor */null, null, //TAG_OBJECT,
                 /*implicit*/true, null, null, style));
@@ -555,5 +561,22 @@ public class YAMLGenerator extends GeneratorBase
         // 'type' can be used as 'tag'... but should we?
         return new ScalarEvent(null, null, DEFAULT_IMPLICIT, value,
                 null, null, style);
+    }
+
+    protected DumperOptions _outputOptions()
+    {
+        if (_outputOptions == null) {
+            DumperOptions opt = new DumperOptions();
+            // would we want canonical?
+            if (isEnabled(Feature.CANONICAL_OUTPUT)) {
+                opt.setCanonical(true);
+            } else {
+                opt.setCanonical(false);
+                // if not, MUST specify flow styles
+                opt.setDefaultFlowStyle(FlowStyle.BLOCK);
+            }
+            _outputOptions = opt;
+        }
+        return _outputOptions;
     }
 }
