@@ -97,6 +97,12 @@ public class SimpleDatabindTest extends ModuleTestBase
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         String yaml = mapper.writeValueAsString(new EmptyBean());
         yaml = yaml.trim();
-        assertEquals("--- {}", yaml);
+        
+        // let's be bit more robust; may or may not get doc marker
+        if (yaml.startsWith("---")) {
+            yaml = yaml.substring(3);
+        }
+        yaml = yaml.trim();
+        assertEquals("{}", yaml);
     }
 }
