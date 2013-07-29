@@ -106,6 +106,12 @@ public class YAMLGenerator extends GeneratorBase
 
     protected Emitter _emitter;
 
+    /**
+     * YAML supports native type identifiers, so databinder may indicate
+     * need to output one.
+     */
+    protected String _typeId;
+    
     /*
     /**********************************************************
     /* Life-cycle
@@ -290,9 +296,10 @@ public class YAMLGenerator extends GeneratorBase
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
         Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
-        // note: can NOT be implicit, to avoid having to specify tag
-        _emitter.emit(new SequenceStartEvent(/*anchor*/null, /*tag*/null,
-                /*implicit*/ true,  null, null, style));
+        String yamlTag = _typeId;
+        boolean implicit = (yamlTag == null);
+        _emitter.emit(new SequenceStartEvent(/*anchor*/null, yamlTag,
+                implicit,  null, null, style));
     }
     
     @Override
@@ -301,6 +308,8 @@ public class YAMLGenerator extends GeneratorBase
         if (!_writeContext.inArray()) {
             _reportError("Current context not an ARRAY but "+_writeContext.getTypeDesc());
         }
+        // just to make sure we don't "leak" type ids
+        _typeId = null;        
         _writeContext = _writeContext.getParent();
         _emitter.emit(new SequenceEndEvent(null, null));
     }
@@ -311,9 +320,10 @@ public class YAMLGenerator extends GeneratorBase
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
         Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
-        // note: can NOT be implicit, to avoid having to specify tag
-        _emitter.emit(new MappingStartEvent(/* anchor */null, null, //TAG_OBJECT,
-                /*implicit*/true, null, null, style));
+        String yamlTag = _typeId;
+        boolean implicit = (yamlTag == null);
+        _emitter.emit(new MappingStartEvent(/* anchor */null, yamlTag,
+                implicit, null, null, style));
     }
 
     @Override
@@ -322,6 +332,8 @@ public class YAMLGenerator extends GeneratorBase
         if (!_writeContext.inObject()) {
             _reportError("Current context not an object but "+_writeContext.getTypeDesc());
         }
+        // just to make sure we don't "leak" type ids
+        _typeId = null;        
         _writeContext = _writeContext.getParent();
         _emitter.emit(new MappingEndEvent(null, null));
     }
@@ -447,14 +459,6 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public void writeNull() throws IOException, JsonGenerationException
-    {
-        _verifyValueWrite("write null value");
-        // no real type for this, is there?
-        _writeScalar("null", "object", STYLE_SCALAR);
-    }
-
-    @Override
     public void writeNumber(int i) throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write number");
@@ -521,6 +525,34 @@ public class YAMLGenerator extends GeneratorBase
         _writeScalar(encodedValue, "number", STYLE_SCALAR);
     }
 
+    @Override
+    public void writeNull() throws IOException, JsonGenerationException
+    {
+        _verifyValueWrite("write null value");
+        // no real type for this, is there?
+        _writeScalar("null", "object", STYLE_SCALAR);
+    }
+
+    /*
+    /**********************************************************
+    /* Public API, write methods, Native Ids
+    /**********************************************************
+     */
+
+    @Override
+    public boolean canWriteTypeId() {
+        // yes, YAML does support Native Type Ids!
+        return true;
+    }    
+
+    @Override
+    public void writeTypeId(String typeId)
+        throws IOException, JsonGenerationException
+    {
+        // should we verify there's no preceding type id?
+        _typeId = typeId;
+    }
+    
     /*
     /**********************************************************
     /* Implementations for methods from base class
@@ -553,13 +585,16 @@ public class YAMLGenerator extends GeneratorBase
 
     protected void _writeScalar(String value, String type, Character style) throws IOException
     {
-        _emitter.emit(_scalarEvent(value, type, style));
+        _emitter.emit(_scalarEvent(value, style));
     }
     
-    protected ScalarEvent _scalarEvent(String value, String tag, Character style)
+    protected ScalarEvent _scalarEvent(String value, Character style)
     {
-        // 'type' can be used as 'tag'... but should we?
-        return new ScalarEvent(null, null, DEFAULT_IMPLICIT, value,
+        String yamlTag = _typeId;
+        if (yamlTag != null) {
+            _typeId = null;
+        }
+        return new ScalarEvent(null, yamlTag, DEFAULT_IMPLICIT, value,
                 null, null, style);
     }
 

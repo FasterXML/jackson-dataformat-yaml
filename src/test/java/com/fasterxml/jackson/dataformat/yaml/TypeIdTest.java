@@ -12,7 +12,7 @@ public class TypeIdTest extends ModuleTestBase
     @JsonSubTypes({ @JsonSubTypes.Type(Impl.class) })
     static abstract class Base {
         public int a;
-
+        
         public Base() { }
         public Base(int a) {
             this.a = a;
@@ -35,6 +35,7 @@ public class TypeIdTest extends ModuleTestBase
     {
         ObjectMapper mapper = mapperForYAML();
         String yaml = mapper.writeValueAsString(new Impl(13));
-//        assertEquals("---!!", yaml);
+        yaml = yaml.trim();
+        assertEquals("--- !<impl>\na: 13", yaml);
     }
 }
