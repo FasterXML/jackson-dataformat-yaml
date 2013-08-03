@@ -38,4 +38,24 @@ public class TypeIdTest extends ModuleTestBase
         yaml = yaml.trim();
         assertEquals("--- !<impl>\na: 13", yaml);
     }
+
+    public void testDeserialization() throws Exception
+    {
+        /* Looks like there are couple of alternative ways to indicate
+         * type ids... so let's verify variations we know of.
+         */
+        ObjectMapper mapper = mapperForYAML();
+        
+        for (String typeId : new String[] {
+                "--- !<impl>",
+                "--- !impl",
+            }) {
+            final String input = typeId + "\na: 13";
+            Base result = mapper.readValue(input, Base.class);
+            assertNotNull(result);
+            assertEquals(Impl.class, result.getClass());
+            Impl i = (Impl) result;
+            assertEquals(13, i.a);
+        }
+    }
 }

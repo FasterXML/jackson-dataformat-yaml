@@ -333,7 +333,6 @@ public class YAMLParser
             if (evt == null) {
                 return (_currToken = null);
             }
-            
             _lastEvent = evt;
             
             /* One complication: field names are only inferred from the
@@ -368,7 +367,8 @@ public class YAMLParser
             // followed by maps, then arrays
             if (evt.is(Event.ID.MappingStart)) {
                 Mark m = evt.getStartMark();
-                _currentAnchor = ((NodeEvent)evt).getAnchor();
+                MappingStartEvent map = (MappingStartEvent) evt;
+                _currentAnchor = map.getAnchor();
                 _parsingContext = _parsingContext.createChildObjectContext(m.getLine(), m.getColumn());
                 return (_currToken = JsonToken.START_OBJECT);
             }
@@ -710,6 +710,34 @@ public class YAMLParser
             return;
         }
         _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
+    }
+
+    /*
+    /**********************************************************************
+    /* Native id (type id) access
+    /**********************************************************************
+     */
+
+    @Override
+    public boolean canReadTypeId() {
+        return true; // yes, YAML got 'em
+    }
+
+    @Override
+    public String getTypeId() throws IOException, JsonGenerationException
+    {
+        if (_lastEvent instanceof CollectionStartEvent) {
+            String tag = ((CollectionStartEvent) _lastEvent).getTag();
+            /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
+             *   somewhat exotic ways sometimes. So let's prepare to peel off
+             *   some wrappings:
+             */
+            while (tag.startsWith("!")) {
+                tag = tag.substring(1);
+            }
+            return tag;
+        }
+        return null;
     }
 
     /*
