@@ -107,7 +107,13 @@ public class YAMLGenerator extends GeneratorBase
     protected Emitter _emitter;
 
     /**
-     * YAML supports native type identifiers, so databinder may indicate
+     * YAML supports native Object identifiers, so databinder may indicate
+     * need to output one.
+     */
+    protected String _objectId;
+
+    /**
+     * YAML supports native Type identifiers, so databinder may indicate
      * need to output one.
      */
     protected String _typeId;
@@ -298,7 +304,11 @@ public class YAMLGenerator extends GeneratorBase
         Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
         String yamlTag = _typeId;
         boolean implicit = (yamlTag == null);
-        _emitter.emit(new SequenceStartEvent(/*anchor*/null, yamlTag,
+        String anchor = _objectId;
+        if (anchor != null) {
+            _objectId = null;
+        }
+        _emitter.emit(new SequenceStartEvent(anchor, yamlTag,
                 implicit,  null, null, style));
     }
     
@@ -322,7 +332,11 @@ public class YAMLGenerator extends GeneratorBase
         Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
         String yamlTag = _typeId;
         boolean implicit = (yamlTag == null);
-        _emitter.emit(new MappingStartEvent(/* anchor */null, yamlTag,
+        String anchor = _objectId;
+        if (anchor != null) {
+            _objectId = null;
+        }
+        _emitter.emit(new MappingStartEvent(anchor, yamlTag,
                 implicit, null, null, style));
     }
 
@@ -540,17 +554,31 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     @Override
+    public boolean canWriteObjectId() {
+        // yes, YAML does support Native Type Ids!
+        return true;
+    }    
+    
+    @Override
     public boolean canWriteTypeId() {
         // yes, YAML does support Native Type Ids!
         return true;
     }    
 
     @Override
-    public void writeTypeId(String typeId)
+    public void writeTypeId(String id)
         throws IOException, JsonGenerationException
     {
         // should we verify there's no preceding type id?
-        _typeId = typeId;
+        _typeId = id;
+    }
+
+    @Override
+    public void writeObjectId(String id)
+        throws IOException, JsonGenerationException
+    {
+        // should we verify there's no preceding id?
+        _objectId = id;
     }
     
     /*
@@ -594,7 +622,11 @@ public class YAMLGenerator extends GeneratorBase
         if (yamlTag != null) {
             _typeId = null;
         }
-        return new ScalarEvent(null, yamlTag, DEFAULT_IMPLICIT, value,
+        String anchor = _objectId;
+        if (anchor != null) {
+            _objectId = null;
+        }
+        return new ScalarEvent(anchor, yamlTag, DEFAULT_IMPLICIT, value,
                 null, null, style);
     }
 
