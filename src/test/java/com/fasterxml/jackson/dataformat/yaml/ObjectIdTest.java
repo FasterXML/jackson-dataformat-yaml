@@ -1,7 +1,8 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
-import com.fasterxml.jackson.annotation.*;
+import java.io.StringWriter;
 
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ObjectIdTest extends ModuleTestBase
@@ -32,9 +33,13 @@ public class ObjectIdTest extends ModuleTestBase
         Node second = new Node("second");
         first.next = second;
         second.next = first;
-        
         String yaml = mapper.writeValueAsString(first);
         yaml = yaml.trim();
-        assertEquals("--- &1\nname: First\n\"next\"", yaml);
+        assertEquals("---\n"
+                +"&1 name: \"first\"\n"
+                +"next:\n"
+                +"  &2 name: \"second\"\n"
+                +"  next: *1",
+                yaml);
     }
 }
