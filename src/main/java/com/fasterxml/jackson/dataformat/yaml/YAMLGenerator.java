@@ -10,6 +10,7 @@ import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.events.*;
 
 import com.fasterxml.jackson.core.*;
@@ -558,7 +559,7 @@ public class YAMLGenerator extends GeneratorBase
         // yes, YAML does support Native Type Ids!
         return true;
     }    
-    
+
     @Override
     public boolean canWriteTypeId() {
         // yes, YAML does support Native Type Ids!
@@ -573,6 +574,15 @@ public class YAMLGenerator extends GeneratorBase
         _typeId = id;
     }
 
+    @Override
+    public void writeObjectRef(String id)
+        throws IOException, JsonGenerationException
+    {
+        _verifyValueWrite("write Object reference");
+        AliasEvent evt = new AliasEvent(id, null, null);
+        _emitter.emit(evt);
+    }
+    
     @Override
     public void writeObjectId(String id)
         throws IOException, JsonGenerationException
