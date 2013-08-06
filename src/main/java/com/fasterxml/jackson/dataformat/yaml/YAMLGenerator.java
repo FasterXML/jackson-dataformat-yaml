@@ -566,28 +566,28 @@ public class YAMLGenerator extends GeneratorBase
     }    
 
     @Override
-    public void writeTypeId(String id)
+    public void writeTypeId(Object id)
         throws IOException, JsonGenerationException
     {
         // should we verify there's no preceding type id?
-        _typeId = id;
+        _typeId = String.valueOf(id);
     }
 
     @Override
-    public void writeObjectRef(String id)
+    public void writeObjectRef(Object id)
         throws IOException, JsonGenerationException
     {
         _verifyValueWrite("write Object reference");
-        AliasEvent evt = new AliasEvent(id, null, null);
+        AliasEvent evt = new AliasEvent(String.valueOf(id), null, null);
         _emitter.emit(evt);
     }
     
     @Override
-    public void writeObjectId(String id)
+    public void writeObjectId(Object id)
         throws IOException, JsonGenerationException
     {
         // should we verify there's no preceding id?
-        _objectId = id;
+        _objectId = String.valueOf(id);
     }
     
     /*
