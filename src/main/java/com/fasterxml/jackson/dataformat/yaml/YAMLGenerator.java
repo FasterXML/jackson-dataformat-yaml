@@ -10,7 +10,6 @@ import java.util.Map;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 import org.yaml.snakeyaml.emitter.Emitter;
-import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.events.*;
 
 import com.fasterxml.jackson.core.*;

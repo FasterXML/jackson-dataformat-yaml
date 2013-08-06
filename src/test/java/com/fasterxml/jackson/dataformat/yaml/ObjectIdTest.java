@@ -1,7 +1,5 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
-import java.io.StringWriter;
-
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,6 +24,14 @@ public class ObjectIdTest extends ModuleTestBase
     /**********************************************************
      */
 
+    private final static String SIMPLE_YAML =
+            "---\n"
+            +"&1 name: \"first\"\n"
+            +"next:\n"
+            +"  &2 name: \"second\"\n"
+            +"  next: *1"
+            ;
+    
     public void testSerialization() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
@@ -34,12 +40,18 @@ public class ObjectIdTest extends ModuleTestBase
         first.next = second;
         second.next = first;
         String yaml = mapper.writeValueAsString(first);
-        yaml = yaml.trim();
-        assertEquals("---\n"
-                +"&1 name: \"first\"\n"
-                +"next:\n"
-                +"  &2 name: \"second\"\n"
-                +"  next: *1",
-                yaml);
+        assertYAML(SIMPLE_YAML, yaml);
+    }
+
+    public void testDeserialization() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        Node first = mapper.readValue(SIMPLE_YAML, Node.class);
+        assertNotNull(first);
+        assertEquals("first", first.name);
+        assertNotNull(first.next);
+        assertEquals("second", first.next.name);
+        assertNotNull(first.next.next);
+        assertSame(first, first.next.next);
     }
 }

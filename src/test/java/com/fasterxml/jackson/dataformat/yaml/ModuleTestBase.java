@@ -108,6 +108,16 @@ public abstract class ModuleTestBase extends junit.framework.TestCase
         }
     }
 
+    protected void assertYAML(String expOrig, String actOrig)
+    {
+        String exp = trimDocMarker(expOrig).trim();
+        String act = trimDocMarker(actOrig).trim();
+        if (!exp.equals(act)) {
+            // use std assert to show more accurately where differences are:
+            assertEquals(expOrig, actOrig);
+        }
+    }
+    
     /**
      * Method that gets textual contents of the current token using
      * available methods, and ensures results are consistent, before
@@ -157,7 +167,7 @@ public abstract class ModuleTestBase extends junit.framework.TestCase
         fail("Expected an exception with one of substrings ("+Arrays.asList(matches)+"): got one with message \""+msg+"\"");
     }
 
-    protected String trimDocMarker(String doc)
+    protected static String trimDocMarker(String doc)
     {
         if (doc.startsWith("---")) {
             doc = doc.substring(3).trim();
