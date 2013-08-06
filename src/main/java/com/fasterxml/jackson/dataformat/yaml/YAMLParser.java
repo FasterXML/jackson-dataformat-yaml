@@ -18,11 +18,10 @@ import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 
 /**
  * {@link JsonParser} implementation used to expose YAML documents
- * in form that allows other Jackson functionality to deal
- * with it.
+ * in form that allows other Jackson functionality to process YAML content,
+ * such as binding POJOs to and from it, and building tree representations.
  */
-public class YAMLParser
-    extends ParserBase
+public class YAMLParser extends ParserBase
 {
     /**
      * Enumeration that defines all togglable features for YAML parsers.
@@ -92,9 +91,10 @@ public class YAMLParser
      * Need to keep track of underlying {@link Reader} to be able to
      * auto-close it (if required to)
      */
-    protected Reader _reader;
-    
-    protected ParserImpl _yamlParser;
+    protected final Reader _reader;
+
+    protected final ParserImpl _yamlParser;
+
     /*
     /**********************************************************************
     /* State
@@ -178,8 +178,9 @@ public class YAMLParser
      * Method that can be used to check if the current token has an
      * associated anchor (id to reference via Alias)
      * 
-     * @since 2.1
+     * @deprecated Since 2.3 (was added in 2.1) -- use {@link #getObjectId} instead
      */
+    @Deprecated
     public String getCurrentAnchor() {
         return _currentAnchor;
     }
@@ -201,7 +202,6 @@ public class YAMLParser
     /**********************************************************                              
      */
 
-    
     @Override
     protected boolean loadMore() throws IOException {
         throw new UnsupportedOperationException();
@@ -719,8 +719,19 @@ public class YAMLParser
      */
 
     @Override
+    public boolean canReadObjectId() { // yup
+        return true;
+    }
+    
+    @Override
     public boolean canReadTypeId() {
         return true; // yes, YAML got 'em
+    }
+    
+    @Override
+    public String getObjectId() throws IOException, JsonGenerationException
+    {
+        return _currentAnchor;
     }
 
     @Override
@@ -739,7 +750,7 @@ public class YAMLParser
         }
         return null;
     }
-
+    
     /*
     /**********************************************************************
     /* Internal methods

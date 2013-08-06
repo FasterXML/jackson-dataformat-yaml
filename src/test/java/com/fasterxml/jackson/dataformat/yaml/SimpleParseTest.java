@@ -194,16 +194,16 @@ public class SimpleParseTest extends ModuleTestBase
 
         assertToken(JsonToken.START_OBJECT, yp.nextToken());
         assertFalse(yp.isCurrentAlias());
-        assertNull(yp.getCurrentAnchor());
+        assertNull(yp.getObjectId());
 
         assertToken(JsonToken.FIELD_NAME, yp.nextToken());
         assertEquals("parent", yp.getCurrentName());
         assertFalse(yp.isCurrentAlias());
-        assertNull(yp.getCurrentAnchor());
+        assertNull(yp.getObjectId());
 
         assertToken(JsonToken.START_OBJECT, yp.nextToken());
         assertFalse(yp.isCurrentAlias());
-        assertEquals("id1", yp.getCurrentAnchor());
+        assertEquals("id1", yp.getObjectId());
         assertToken(JsonToken.FIELD_NAME, yp.nextToken());
         assertEquals("name", yp.getCurrentName());
         assertToken(JsonToken.VALUE_STRING, yp.nextToken());
@@ -216,7 +216,7 @@ public class SimpleParseTest extends ModuleTestBase
         assertFalse(yp.isCurrentAlias());
         assertToken(JsonToken.START_OBJECT, yp.nextToken());
         assertFalse(yp.isCurrentAlias());
-        assertEquals("id2", yp.getCurrentAnchor());
+        assertEquals("id2", yp.getObjectId());
         assertToken(JsonToken.FIELD_NAME, yp.nextToken());
         assertEquals("name", yp.getCurrentName());
         assertToken(JsonToken.VALUE_STRING, yp.nextToken());
