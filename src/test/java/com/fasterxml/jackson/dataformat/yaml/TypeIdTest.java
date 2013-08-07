@@ -1,9 +1,9 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 public class TypeIdTest extends ModuleTestBase
 {
@@ -52,10 +52,30 @@ public class TypeIdTest extends ModuleTestBase
             }) {
             final String input = typeId + "\na: 13";
             Base result = mapper.readValue(input, Base.class);
-            assertNotNull(result);
-            assertEquals(Impl.class, result.getClass());
-            Impl i = (Impl) result;
-            assertEquals(13, i.a);
+            _verify(result);
         }
+    }
+
+    public void testRoundtripWithBuffer() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        TokenBuffer tbuf = mapper.readValue("--- !impl\na:13\n", TokenBuffer.class);
+        assertNotNull(tbuf);
+        Base result = mapper.readValue(tbuf.asParser(), Base.class);
+        _verify(result);
+    }
+
+    /*
+    /**********************************************************
+    /* Internal helper methods
+    /**********************************************************
+     */
+
+    private void _verify(Base result)
+    {
+        assertNotNull(result);
+        assertEquals(Impl.class, result.getClass());
+        Impl i = (Impl) result;
+        assertEquals(13, i.a);
     }
 }
