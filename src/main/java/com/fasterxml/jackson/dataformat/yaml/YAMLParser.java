@@ -739,14 +739,16 @@ public class YAMLParser extends ParserBase
     {
         if (_lastEvent instanceof CollectionStartEvent) {
             String tag = ((CollectionStartEvent) _lastEvent).getTag();
-            /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
-             *   somewhat exotic ways sometimes. So let's prepare to peel off
-             *   some wrappings:
-             */
-            while (tag.startsWith("!")) {
-                tag = tag.substring(1);
+            if (tag != null) {
+                /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
+                 *   somewhat exotic ways sometimes. So let's prepare to peel off
+                 *   some wrappings:
+                 */
+                while (tag.startsWith("!")) {
+                    tag = tag.substring(1);
+                }
+                return tag;
             }
-            return tag;
         }
         return null;
     }

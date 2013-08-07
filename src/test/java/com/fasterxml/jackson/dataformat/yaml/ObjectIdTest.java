@@ -2,6 +2,7 @@ package com.fasterxml.jackson.dataformat.yaml;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.TokenBuffer;
 
 public class ObjectIdTest extends ModuleTestBase
 {
@@ -17,7 +18,7 @@ public class ObjectIdTest extends ModuleTestBase
             this.name = name;
         }
     }
-    
+
     /*
     /**********************************************************
     /* Test methods
@@ -47,6 +48,27 @@ public class ObjectIdTest extends ModuleTestBase
     {
         ObjectMapper mapper = mapperForYAML();
         Node first = mapper.readValue(SIMPLE_YAML, Node.class);
+        _verify(first);
+    }
+
+    public void testRoundtripWithBuffer() throws Exception
+    {
+        ObjectMapper mapper = mapperForYAML();
+        TokenBuffer tbuf = mapper.readValue(SIMPLE_YAML, TokenBuffer.class);
+        assertNotNull(tbuf);
+        Node first = mapper.readValue(tbuf.asParser(), Node.class);
+        assertNotNull(first);
+        _verify(first);
+    }
+
+    /*
+    /**********************************************************
+    /* Internal helper methods
+    /**********************************************************
+     */
+
+    private void _verify(Node first)
+    {
         assertNotNull(first);
         assertEquals("first", first.name);
         assertNotNull(first.next);
