@@ -1,6 +1,7 @@
 Project: jackson-dataformat-yaml
 Version: 2.3.0 (xx-xxx-2013)
 
+#3: Support YAML-specific object ids ("anchors", "aliases").
 #17: Support YAML-specific type ids ("tags")
  (requested by cemo@github)
 - Add support for `JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN`

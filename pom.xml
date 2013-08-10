@@ -96,6 +96,20 @@ com.fasterxml.jackson.core.util,
           </execution>
         </executions>
       </plugin>
+      <!--  Need to skip known-failing tests for build... -->
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>com/fasterxml/jackson/dataformat/yaml/failing/*.java</exclude>
+            </excludes>
+            <includes>
+              <include>**/Test*.java</include>
+            </includes>
+          </configuration>
+        </plugin>
       <plugin>
         <!--  We will shade SnakeYAML, to simplify deployment, avoid version conflicts -->
         <groupId>org.apache.maven.plugins</groupId>

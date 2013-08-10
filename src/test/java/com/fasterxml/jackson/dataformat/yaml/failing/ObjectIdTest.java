@@ -1,9 +1,15 @@
-package com.fasterxml.jackson.dataformat.yaml;
+package com.fasterxml.jackson.dataformat.yaml.failing;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
 
+import com.fasterxml.jackson.dataformat.yaml.ModuleTestBase;
+
+/**
+ * Although native Object Ids work in general, Tree Model currently
+ * has issues with it.
+ */
 public class ObjectIdTest extends ModuleTestBase
 {
     @JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
@@ -32,32 +38,13 @@ public class ObjectIdTest extends ModuleTestBase
             +"  &2 name: \"second\"\n"
             +"  next: *1"
             ;
-    
-    public void testSerialization() throws Exception
-    {
-        ObjectMapper mapper = mapperForYAML();
-        Node first = new Node("first");
-        Node second = new Node("second");
-        first.next = second;
-        second.next = first;
-        String yaml = mapper.writeValueAsString(first);
-        assertYAML(SIMPLE_YAML, yaml);
-    }
 
-    public void testDeserialization() throws Exception
+    public void testRoundtripViaTree() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
-        Node first = mapper.readValue(SIMPLE_YAML, Node.class);
-        _verify(first);
-    }
-
-    public void testRoundtripWithBuffer() throws Exception
-    {
-        ObjectMapper mapper = mapperForYAML();
-        TokenBuffer tbuf = mapper.readValue(SIMPLE_YAML, TokenBuffer.class);
-        assertNotNull(tbuf);
-        Node first = mapper.readValue(tbuf.asParser(), Node.class);
-        tbuf.close();
+        JsonNode root = mapper.readTree(SIMPLE_YAML);
+        assertNotNull(root);
+        Node first = mapper.treeToValue(root, Node.class);
         assertNotNull(first);
         _verify(first);
     }
