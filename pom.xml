@@ -106,6 +106,7 @@ com.fasterxml.jackson.core.util,
               <exclude>com/fasterxml/jackson/dataformat/yaml/failing/*.java</exclude>
             </excludes>
             <includes>
+              <include>**/*Test.java</include>
               <include>**/Test*.java</include>
             </includes>
           </configuration>

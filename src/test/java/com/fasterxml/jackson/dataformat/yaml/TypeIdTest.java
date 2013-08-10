@@ -59,9 +59,10 @@ public class TypeIdTest extends ModuleTestBase
     public void testRoundtripWithBuffer() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
-        TokenBuffer tbuf = mapper.readValue("--- !impl\na:13\n", TokenBuffer.class);
+        TokenBuffer tbuf = mapper.readValue("--- !impl\na: 13\n", TokenBuffer.class);
         assertNotNull(tbuf);
         Base result = mapper.readValue(tbuf.asParser(), Base.class);
+        tbuf.close();
         _verify(result);
     }
 
