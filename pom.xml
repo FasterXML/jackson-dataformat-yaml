@@ -27,7 +27,7 @@ abstractions.
 
   <properties>
     <jackson.core.version>2.2.3</jackson.core.version>
-    <jackson.annotations.version>2.2.2</jackson.annotations.version>
+    <jackson.annotations.version>2.2.3</jackson.annotations.version>
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
 
