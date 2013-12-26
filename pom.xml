@@ -10,10 +10,10 @@
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
   <version>2.3.1-SNAPSHOT</version>
+  <packaging>bundle</packaging>
 
   <name>Jackson-dataformat-YAML</name>
-  <description>Support for reading and writing YAML-encoded data via Jackson
-abstractions.
+  <description>Support for reading and writing YAML-encoded data via Jackson abstractions.
   </description>
   <url>http://wiki.fasterxml.com/JacksonExtensionYAML</url>
 

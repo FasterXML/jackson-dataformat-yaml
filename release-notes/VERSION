@@ -1,15 +1,17 @@
 Project: jackson-dataformat-yaml
-Version: 2.3.0 (14-Nov-2013)
+Version: 2.3.1 (xx-Dec-2013)
+
+------------------------------------------------------------------------
+=== History: ===
+------------------------------------------------------------------------
+
+2.3.0 (14-Nov-2013)
 
 #3: Support YAML-specific object ids ("anchors", "aliases").
 #17: Support YAML-specific type ids ("tags")
  (requested by cemo@github)
 - Add support for `JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN`
 - Upgrade to SnakeYAML 1.12
-
-------------------------------------------------------------------------
-=== History: ===
-------------------------------------------------------------------------
 
 2.2.2 (27-May-2013)
 
