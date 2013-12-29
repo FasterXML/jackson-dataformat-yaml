@@ -327,6 +327,8 @@ public final class UTF8Reader
     /**
      * Method for reading as many bytes from the underlying stream as possible
      * (that fit in the buffer), to the beginning of the buffer.
+     * 
+     * @return Number of bytes read, if any; -1 for end-of-input.
      */
     protected final int readBytes()
         throws IOException
