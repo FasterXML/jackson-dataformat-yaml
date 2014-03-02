@@ -25,8 +25,8 @@
   </scm>
 
   <properties>
-    <jackson.version.annotations>2.3.0</jackson.version.annotations>
-    <jackson.version.core>2.3.1</jackson.version.core>
+    <version.jackson.annotations>2.3.0</version.jackson.annotations>
+    <version.jackson.core>2.3.2</version.jackson.core>
 
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
@@ -54,7 +54,7 @@ com.fasterxml.jackson.core.util,
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson.version.core}</version>
+      <version>${version.jackson.core}</version>
     </dependency>
 
     <dependency>
@@ -73,13 +73,13 @@ com.fasterxml.jackson.core.util,
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version.annotations}</version>
+      <version>${version.jackson.annotations}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version.core}</version>
+      <version>${version.jackson.core}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
