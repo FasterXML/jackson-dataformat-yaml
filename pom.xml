@@ -2,21 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion> 
   <parent>
-    <groupId>com.fasterxml</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>12</version>
+    <groupId>com.fasterxml.jackson</groupId>
+    <artifactId>jackson-parent</artifactId>
+    <version>2.4</version>
   </parent>
 
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
-  <version>2.3.3-SNAPSHOT</version>
+  <version>2.4.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
-
   <name>Jackson-dataformat-YAML</name>
   <description>Support for reading and writing YAML-encoded data via Jackson abstractions.
   </description>
   <url>http://wiki.fasterxml.com/JacksonExtensionYAML</url>
-
   <scm>
     <connection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</connection>
     <developerConnection>scm:git:git@github.com:FasterXML/jackson-dataformat-yaml.git</developerConnection>
@@ -25,8 +23,8 @@
   </scm>
 
   <properties>
-    <version.jackson.annotations>2.3.0</version.jackson.annotations>
-    <version.jackson.core>2.3.2</version.jackson.core>
+    <version.jackson.annotations>2.4.0-SNAPSHOT</version.jackson.annotations>
+    <version.jackson.core>2.4.0-SNAPSHOT</version.jackson.core>
 
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
@@ -63,13 +61,7 @@ com.fasterxml.jackson.core.util,
       <version>1.12</version>
     </dependency>
 
-     <!-- and for testing, JUnit (or TestNG?) is needed; as well as databinder, annotatons -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
+     <!-- and for testing, need databind, annotatons -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
@@ -116,7 +108,7 @@ com.fasterxml.jackson.core.util,
         <!--  We will shade SnakeYAML, to simplify deployment, avoid version conflicts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
+        <version>2.2</version>
         <executions>
           <execution>
             <phase>package</phase>

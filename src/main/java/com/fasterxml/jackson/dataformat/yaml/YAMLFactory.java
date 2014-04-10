@@ -533,30 +533,6 @@ public class YAMLFactory extends JsonFactory
     }
 
     @Override
-    @Deprecated
-    protected YAMLParser _createJsonParser(InputStream in, IOContext ctxt)
-        throws IOException, JsonParseException
-    {
-        return _createParser(in, ctxt);
-    }
-
-    @Override
-    @Deprecated
-    protected JsonParser _createJsonParser(Reader r, IOContext ctxt)
-        throws IOException, JsonParseException
-    {
-        return _createParser(r, ctxt);
-    }
-
-    @Override
-    @Deprecated
-    protected YAMLParser _createJsonParser(byte[] data, int offset, int len, IOContext ctxt)
-        throws IOException, JsonParseException
-    {
-        return _createParser(data, offset, len, ctxt);
-    }
-
-    @Override
     protected YAMLGenerator _createGenerator(Writer out, IOContext ctxt)
         throws IOException
     {
@@ -565,27 +541,6 @@ public class YAMLFactory extends JsonFactory
                 _objectCodec, out, _version);
         // any other initializations? No?
         return gen;
-    }
-
-    @Override
-    @Deprecated
-    protected YAMLGenerator _createJsonGenerator(Writer out, IOContext ctxt)
-        throws IOException
-    {
-        return _createGenerator(out, ctxt);
-    }
-
-    @SuppressWarnings("resource")
-    @Deprecated
-    @Override
-    protected YAMLGenerator _createUTF8Generator(OutputStream out, IOContext ctxt) throws IOException {
-        return _createGenerator(new UTF8Writer(out), ctxt);
-    }
-
-    @Override
-    @Deprecated
-    protected YAMLGenerator _createUTF8JsonGenerator(OutputStream out, IOContext ctxt) throws IOException {
-        return _createUTF8Generator(out, ctxt);
     }
     
     @Override
