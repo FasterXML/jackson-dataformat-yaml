@@ -123,6 +123,16 @@ public class YAMLFactory extends JsonFactory
     public Version version() {
         return PackageVersion.VERSION;
     }
+
+    /*
+    /**********************************************************
+    /* Capability introspection
+    /**********************************************************
+     */
+
+    // No, we can't make use of char[] optimizations
+    @Override
+    public boolean canUseCharArrays() { return false; }
     
     /*
     /**********************************************************
