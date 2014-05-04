@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.util.TokenBuffer;
 public class TypeIdTest extends ModuleTestBase
 {
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY,
-            property = "id")
+            property = "TYPE")
     @JsonSubTypes({ @JsonSubTypes.Type(Impl.class) })
     static abstract class Base {
         public int a;
@@ -49,6 +49,10 @@ public class TypeIdTest extends ModuleTestBase
         for (String typeId : new String[] {
                 "--- !<impl>",
                 "--- !impl",
+                "!<impl>",
+                "!impl",
+                // 04-May-2014, tatu: I _think_ we should support this too but...
+//                "---\nTYPE: impl\n",
             }) {
             final String input = typeId + "\na: 13";
             Base result = mapper.readValue(input, Base.class);

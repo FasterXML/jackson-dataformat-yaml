@@ -15,14 +15,14 @@ public class PolymorphicIdTest extends ModuleTestBase
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @JsonSubTypes({ @JsonSubTypes.Type(value = NestedImpl.class) })
-    public interface Nested { }
+    static interface Nested { }
 
     @JsonTypeName("single")
     static class NestedImpl implements Nested { }
 
     @Test
     public void testPolymorphicType() throws Exception {
-        final String YAML = "nested: \n    type: single\n";
+        final String YAML = "--- nested: \n    type: single\n";
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         SingleNesting top = mapper.readValue(YAML, SingleNesting.class);
         assertNotNull(top);
@@ -30,7 +30,7 @@ public class PolymorphicIdTest extends ModuleTestBase
 
     @Test
     public void testNativePolymorphicType() throws Exception {
-        String YAML = "nested: !single";
+        String YAML = "--- nested: !single";
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         SingleNesting top = mapper.readValue(YAML, SingleNesting.class);
         assertNotNull(top);
