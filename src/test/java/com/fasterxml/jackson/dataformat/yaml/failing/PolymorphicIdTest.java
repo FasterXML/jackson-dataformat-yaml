@@ -9,7 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 public class PolymorphicIdTest extends ModuleTestBase
 {
-    static class SingleNesting {
+    static class Wrapper {
         public Nested nested;
     }
 
@@ -18,21 +18,31 @@ public class PolymorphicIdTest extends ModuleTestBase
     static interface Nested { }
 
     @JsonTypeName("single")
-    static class NestedImpl implements Nested { }
+    static class NestedImpl implements Nested {
+        public String value;
+    }
 
     @Test
     public void testPolymorphicType() throws Exception {
-        final String YAML = "--- nested: \n    type: single\n";
+        final String YAML = "nested:\n"
+                +"  type: single\n"
+                +"  value: whatever"
+                ;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        SingleNesting top = mapper.readValue(YAML, SingleNesting.class);
+        Wrapper top = mapper.readValue(YAML, Wrapper.class);
         assertNotNull(top);
     }
 
     @Test
     public void testNativePolymorphicType() throws Exception {
-        String YAML = "--- nested: !single";
+        String YAML = "nested: !single\n"
+                +"  value: foobar\n"
+                ;
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        SingleNesting top = mapper.readValue(YAML, SingleNesting.class);
+        Wrapper top = mapper.readValue(YAML, Wrapper.class);
         assertNotNull(top);
+        assertNotNull(top.nested);
+        assertEquals(NestedImpl.class, top.nested.getClass());
+        assertEquals("foobar", ((NestedImpl) top.nested).value);
     }
 }
