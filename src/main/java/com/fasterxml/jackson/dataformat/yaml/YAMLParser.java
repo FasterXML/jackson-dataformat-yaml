@@ -361,7 +361,9 @@ public class YAMLParser extends ParserBase
 
             // scalar values are probably the commonest:
             if (evt.is(Event.ID.Scalar)) {
-                return (_currToken = _decodeScalar((ScalarEvent) evt));
+                JsonToken t = _decodeScalar((ScalarEvent) evt);
+                _currToken = t;
+                return t;
             }
 
             // followed by maps, then arrays
@@ -397,6 +399,7 @@ public class YAMLParser extends ParserBase
                 return (_currToken = null);
             }
             if (evt.is(Event.ID.DocumentStart)) {
+//                DocumentStartEvent dd = (DocumentStartEvent) evt;
                 // does this matter? Shouldn't, should it?
                 continue;
             }
@@ -737,18 +740,23 @@ public class YAMLParser extends ParserBase
     @Override
     public String getTypeId() throws IOException, JsonGenerationException
     {
+        String tag;
         if (_lastEvent instanceof CollectionStartEvent) {
-            String tag = ((CollectionStartEvent) _lastEvent).getTag();
-            if (tag != null) {
-                /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
-                 *   somewhat exotic ways sometimes. So let's prepare to peel off
-                 *   some wrappings:
-                 */
-                while (tag.startsWith("!")) {
-                    tag = tag.substring(1);
-                }
-                return tag;
+            tag = ((CollectionStartEvent) _lastEvent).getTag();
+        } else if (_lastEvent instanceof ScalarEvent) {
+            tag = ((ScalarEvent) _lastEvent).getTag();
+        } else {
+            return null;
+        }
+        if (tag != null) {
+            /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
+             *   somewhat exotic ways sometimes. So let's prepare to peel off
+             *   some wrappings:
+             */
+            while (tag.startsWith("!")) {
+                tag = tag.substring(1);
             }
+            return tag;
         }
         return null;
     }
