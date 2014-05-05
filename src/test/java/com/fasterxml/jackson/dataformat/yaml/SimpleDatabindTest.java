@@ -18,6 +18,15 @@ public class SimpleDatabindTest extends ModuleTestBase
     // to try to reproduce [Issue#15]
     static class EmptyBean {
     }
+
+    static class Outer {
+        public Name name;
+        public int age;
+    }
+
+    static class Name {
+        public String first, last;
+    }
     
     /*
     /**********************************************************
@@ -25,6 +34,34 @@ public class SimpleDatabindTest extends ModuleTestBase
     /**********************************************************
      */
 
+    public void testSimpleNested() throws Exception
+    {
+        final String YAML =
+ "name:\n"
++"  first: Bob\n"
++"  last: De Burger\n"
++"age: 28"
+;
+        ObjectMapper mapper = mapperForYAML();
+
+        // first, no doc marker
+        Outer outer = mapper.readValue(YAML, Outer.class);
+        assertNotNull(outer);
+        assertNotNull(outer.name);
+        assertEquals("Bob", outer.name.first);
+        assertEquals("De Burger", outer.name.last);
+        assertEquals(28, outer.age);
+
+        // then with
+        Outer outer2 = mapper.readValue("---\n"+YAML, Outer.class);
+        assertNotNull(outer2);
+        assertNotNull(outer2.name);
+        assertEquals(outer.name.first, outer2.name.first);
+        assertEquals(outer.name.last, outer2.name.last);
+        assertEquals(outer.age, outer2.age);
+        
+    }
+    
     public void testBasicUntyped() throws Exception
     {
         final String YAML =
