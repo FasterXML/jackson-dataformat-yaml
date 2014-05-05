@@ -44,5 +44,13 @@ public class PolymorphicIdTest extends ModuleTestBase
         assertNotNull(top.nested);
         assertEquals(NestedImpl.class, top.nested.getClass());
         assertEquals("foobar", ((NestedImpl) top.nested).value);
+
+        YAML = "nested: !single { }\n"
+                ;
+        top = mapper.readValue(YAML, Wrapper.class);
+        assertNotNull(top);
+        assertNotNull(top.nested);
+        assertEquals(NestedImpl.class, top.nested.getClass());
+        // no value specified, empty
     }
 }
