@@ -27,7 +27,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
-  <version>2.1.3</version>
+  <version>2.4.0</version>
 </dependency>
 ```
 
@@ -54,4 +54,4 @@ while (parser.nextToken() != null) {
 
 # Documentation
 
-* [Documentation](jackson-dataformat-yaml/wiki/Documentation) IS TO BE WRITTEN
+* [Wiki](../../wiki) contains links to Javadocs, external documentation
