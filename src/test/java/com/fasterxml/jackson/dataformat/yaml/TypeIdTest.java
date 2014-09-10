@@ -31,7 +31,7 @@ public class TypeIdTest extends ModuleTestBase
     /**********************************************************
      */
 
-    public void testSerialization() throws Exception
+    public void testNativeSerialization() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
         String yaml = mapper.writeValueAsString(new Impl(13));
@@ -39,6 +39,15 @@ public class TypeIdTest extends ModuleTestBase
         assertEquals("--- !<impl>\na: 13", yaml);
     }
 
+    public void testNonNativeSerialization() throws Exception
+    {
+        YAMLMapper mapper = new YAMLMapper();
+        mapper.disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID);
+        String yaml = mapper.writeValueAsString(new Impl(13));
+        yaml = yaml.trim();
+        assertEquals("--- !<impl>\na: 13", yaml);
+    }
+    
     public void testDeserialization() throws Exception
     {
         /* Looks like there are couple of alternative ways to indicate

@@ -30,6 +30,16 @@ public class YAMLGenerator extends GeneratorBase
          * @since 2.3
          */
         WRITE_DOC_START_MARKER(true),
+        
+        /**
+         * Whether to use YAML native type id construct for indicating type (true);
+         * or "generic" type property (false). Former works better for systems that
+         * are YAML-centric; latter may be better choice for interoperability, when
+         * converting between formats or accepting other formats.
+         * 
+         * @since 2.5
+         */
+        USE_NATIVE_TYPE_ID(true),
 
         /**
          * Do we try to force so-called canonical output or not.
