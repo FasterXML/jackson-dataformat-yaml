@@ -48,10 +48,15 @@ com.fasterxml.jackson.core.util,
   </properties>
 
   <dependencies>
-    <!-- Extends Jackson core; uses SnakeYAML for parsing, generation -->
+    <!-- Extends Jackson core, databind (optional); uses SnakeYAML for parsing, generation -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
+      <version>${version.jackson.core}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
       <version>${version.jackson.core}</version>
     </dependency>
 
@@ -61,17 +66,11 @@ com.fasterxml.jackson.core.util,
       <version>1.12</version>
     </dependency>
 
-     <!-- and for testing, need databind, annotatons -->
+     <!-- and for testing need annotatons -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
       <version>${version.jackson.annotations}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${version.jackson.core}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
