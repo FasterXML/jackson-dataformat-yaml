@@ -8,7 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.ModuleTestBase;
 
 /**
  * Although native Object Ids work in general, Tree Model currently
- * has issues with it.
+ * has issues with it (see [Issue#24])
  */
 public class ObjectIdTest extends ModuleTestBase
 {
@@ -39,6 +39,7 @@ public class ObjectIdTest extends ModuleTestBase
             +"  next: *1"
             ;
 
+    // For issue [#24]
     public void testRoundtripViaTree() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
@@ -61,7 +62,7 @@ public class ObjectIdTest extends ModuleTestBase
         assertEquals("first", first.name);
         assertNotNull(first.next);
         assertEquals("second", first.next.name);
-        assertNotNull(first.next.next);
+        assertNotNull("Should not have null for 'first.next.next'", first.next.next);
         assertSame(first, first.next.next);
     }
 }
