@@ -30,9 +30,19 @@ public class YAMLGenerator extends GeneratorBase
          * @since 2.3
          */
         WRITE_DOC_START_MARKER(true),
+
+        /**
+         * Whether to use YAML native Object Id construct for indicating type (true);
+         * or "generic" Object Id mechanism (false). Former works better for systems that
+         * are YAML-centric; latter may be better choice for interoperability, when
+         * converting between formats or accepting other formats.
+         * 
+         * @since 2.5
+         */
+        USE_NATIVE_OBJECT_ID(true),
         
         /**
-         * Whether to use YAML native type id construct for indicating type (true);
+         * Whether to use YAML native Type Id construct for indicating type (true);
          * or "generic" type property (false). Former works better for systems that
          * are YAML-centric; latter may be better choice for interoperability, when
          * converting between formats or accepting other formats.
@@ -45,7 +55,7 @@ public class YAMLGenerator extends GeneratorBase
          * Do we try to force so-called canonical output or not.
          */
         CANONICAL_OUTPUT(false)
-        
+
         ;
 
         protected final boolean _defaultState;
@@ -567,7 +577,8 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     public boolean canWriteObjectId() {
         // yes, YAML does support Native Type Ids!
-        return true;
+        // 10-Sep-2014, tatu: Except as per [#23] might not want to...
+        return Feature.USE_NATIVE_OBJECT_ID.enabledIn(_yamlFeatures);
     }    
 
     @Override

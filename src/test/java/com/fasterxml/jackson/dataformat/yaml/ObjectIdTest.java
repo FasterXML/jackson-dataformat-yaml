@@ -25,15 +25,25 @@ public class ObjectIdTest extends ModuleTestBase
     /**********************************************************
      */
 
-    private final static String SIMPLE_YAML =
+    private final static String SIMPLE_YAML_NATIVE =
             "---\n"
             +"&1 name: \"first\"\n"
             +"next:\n"
             +"  &2 name: \"second\"\n"
             +"  next: *1"
             ;
+
+    private final static String SIMPLE_YAML_NON_NATIVE =
+            "---\n"
+            +"'@id': 1\n"
+            +"name: \"first\"\n"
+            +"next:\n"
+            +"  '@id': 2\n"
+            +"  name: \"second\"\n"
+            +"  next: 1"
+            ;
     
-    public void testSerialization() throws Exception
+    public void testNativeSerialization() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
         Node first = new Node("first");
@@ -41,20 +51,37 @@ public class ObjectIdTest extends ModuleTestBase
         first.next = second;
         second.next = first;
         String yaml = mapper.writeValueAsString(first);
-        assertYAML(SIMPLE_YAML, yaml);
+        assertYAML(SIMPLE_YAML_NATIVE, yaml);
+    }
+
+    // [Issue#23]
+    public void testNonNativeSerialization() throws Exception
+    {
+        YAMLMapper mapper = new YAMLMapper();
+        mapper.disable(YAMLGenerator.Feature.USE_NATIVE_OBJECT_ID);
+        Node first = new Node("first");
+        Node second = new Node("second");
+        first.next = second;
+        second.next = first;
+        String yaml = mapper.writeValueAsString(first);
+        assertYAML(SIMPLE_YAML_NON_NATIVE, yaml);
     }
 
     public void testDeserialization() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
-        Node first = mapper.readValue(SIMPLE_YAML, Node.class);
+        Node first = mapper.readValue(SIMPLE_YAML_NATIVE, Node.class);
         _verify(first);
+
+        // Also with non-antive
+        Node second = mapper.readValue(SIMPLE_YAML_NON_NATIVE, Node.class);
+        _verify(second);
     }
 
     public void testRoundtripWithBuffer() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
-        TokenBuffer tbuf = mapper.readValue(SIMPLE_YAML, TokenBuffer.class);
+        TokenBuffer tbuf = mapper.readValue(SIMPLE_YAML_NATIVE, TokenBuffer.class);
         assertNotNull(tbuf);
         Node first = mapper.readValue(tbuf.asParser(), Node.class);
         tbuf.close();

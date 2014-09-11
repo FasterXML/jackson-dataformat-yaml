@@ -1,6 +1,8 @@
 Project: jackson-dataformat-yaml
 Version: 2.5.0 (xx-xxx-2014)
 
+#22: Add support for disabling use of YAML native Type Ids 
+#23: Add support for disabling use of YAML native Type Ids
 - Added `YAMLMapper` for convenience
 
 ------------------------------------------------------------------------
