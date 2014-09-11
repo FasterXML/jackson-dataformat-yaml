@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.io.IOContext;
 
 public class YAMLFactory extends JsonFactory
 {
-	private static final long serialVersionUID = 1171663157274350349L;
+	private static final long serialVersionUID = 1L;
 
 	/**
      * Name used to identify YAML format.

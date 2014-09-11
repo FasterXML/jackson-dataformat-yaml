@@ -93,7 +93,6 @@ com.fasterxml.jackson.core.util,
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.version}</version>
           <configuration>
             <excludes>
               <exclude>com/fasterxml/jackson/dataformat/yaml/failing/*.java</exclude>

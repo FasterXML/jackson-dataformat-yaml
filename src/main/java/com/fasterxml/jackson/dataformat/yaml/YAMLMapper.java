@@ -2,9 +2,11 @@ package com.fasterxml.jackson.dataformat.yaml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Convenience version of {@link ObjectMapper} which is configured
- * with {@lunk YAMLFactory}.
+ * with {@link com.fasterxml.jackson.dataformat.yaml.YAMLFactory}.
  */
 public class YAMLMapper extends ObjectMapper
 {

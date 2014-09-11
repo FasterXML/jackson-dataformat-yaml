@@ -72,6 +72,7 @@ public class YAMLGenerator extends GeneratorBase
         }
         
         public boolean enabledByDefault() { return _defaultState; }
+        public boolean enabledIn(int flags) { return (flags & _mask) != 0; }        
         public int getMask() { return _mask; }
     };
 
@@ -572,7 +573,8 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     public boolean canWriteTypeId() {
         // yes, YAML does support Native Type Ids!
-        return true;
+        // 10-Sep-2014, tatu: Except as per [#22] might not want to...
+        return Feature.USE_NATIVE_TYPE_ID.enabledIn(_yamlFeatures);
     }    
 
     @Override
