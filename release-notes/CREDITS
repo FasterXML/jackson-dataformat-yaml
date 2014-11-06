@@ -8,5 +8,9 @@ Tatu Saloranta, tatu.saloranta@iki.fi: author
 
 Shawn Smith:
 
-- Contibuted [Issue-14]: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
+- Contributed [Issue-14]: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
  (2.1.4)
+
+Łukasz Dywicki
+- Fixed #19: Change build to avoid OSGi	dep to SnakeYAML (which	is instead shaded in)
+ (2.5.0)
