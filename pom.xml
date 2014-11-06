@@ -31,12 +31,6 @@
 
     <osgi.export>${project.groupId}.yaml;version=${project.version}</osgi.export>
     <osgi.import>
-org.yaml.snakeyaml,
-org.yaml.snakeyaml.emitter,
-org.yaml.snakeyaml.error,
-org.yaml.snakeyaml.events,
-org.yaml.snakeyaml.parser,
-org.yaml.snakeyaml.reader,
 com.fasterxml.jackson.core,
 com.fasterxml.jackson.core.base,
 com.fasterxml.jackson.core.format,
