@@ -45,8 +45,10 @@ com.fasterxml.jackson.core.json,
 com.fasterxml.jackson.core.type,
 com.fasterxml.jackson.core.util,
 </osgi.import>
+    <pax.url.version>1.2.8</pax.url.version>
+    <pax.exam.version>4.3.0</pax.exam.version>
+    <felix.version>4.0.3</felix.version>
   </properties>
-
   <dependencies>
     <!-- Extends Jackson core; uses SnakeYAML for parsing, generation -->
     <dependency>
@@ -73,6 +75,43 @@ com.fasterxml.jackson.core.util,
       <artifactId>jackson-databind</artifactId>
       <version>${version.jackson.core}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-container-native</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-junit4</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-link-mvn</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.url</groupId>
+      <artifactId>pax-url-aether</artifactId>
+      <version>2.2.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.framework</artifactId>
+      <version>${felix.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.6.6</version>
+        <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -116,6 +155,7 @@ com.fasterxml.jackson.core.util,
               <goal>shade</goal>
             </goals>
             <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>x
               <artifactSet>
                 <includes>
                   <include>org.yaml:snakeyaml</include>
@@ -131,6 +171,34 @@ com.fasterxml.jackson.core.util,
           </execution>
         </executions>
       </plugin>
+            <plugin>
+                <groupId>org.apache.servicemix.tooling</groupId>
+                <artifactId>depends-maven-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>generate-depends-file</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.18</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
     </plugins>
   </build>
 
