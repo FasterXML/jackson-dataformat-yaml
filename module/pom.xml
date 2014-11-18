@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion> 
+  <parent>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml-parent</artifactId>
+    <version>2.4.4-SNAPSHOT</version>
+  </parent>
+  <artifactId>jackson-dataformat-yaml</artifactId>
+  <packaging>bundle</packaging>
+  <name>Jackson-dataformat-YAML</name>
+
+  <properties>
+    <version.jackson.annotations>2.4.0</version.jackson.annotations>
+    <version.jackson.core>2.4.3</version.jackson.core>
+
+    <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
+    <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
+
+    <osgi.export>${project.groupId}.yaml;version=${project.version}</osgi.export>
+    <osgi.import>
+com.fasterxml.jackson.core,
+com.fasterxml.jackson.core.base,
+com.fasterxml.jackson.core.format,
+com.fasterxml.jackson.core.io,
+com.fasterxml.jackson.core.json,
+com.fasterxml.jackson.core.type,
+com.fasterxml.jackson.core.util,
+</osgi.import>
+    <pax.url.version>1.2.8</pax.url.version>
+    <pax.exam.version>4.3.0</pax.exam.version>
+    <felix.version>4.0.3</felix.version>
+  </properties>
+  <dependencies>
+    <!-- Extends Jackson core; uses SnakeYAML for parsing, generation -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${version.jackson.core}</version>
+    </dependency>
+
+    <dependency>
+     <groupId>com.fasterxml.jackson.dataformat</groupId>
+     <artifactId>shaded-snake-yaml</artifactId>
+     <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.12</version>
+      <scope>test</scope>
+    </dependency>
+      <!-- and for testing, need databind, annotatons -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${version.jackson.annotations}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${version.jackson.core}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-container-native</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-junit4</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.exam</groupId>
+      <artifactId>pax-exam-link-mvn</artifactId>
+      <version>${pax.exam.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.url</groupId>
+      <artifactId>pax-url-aether</artifactId>
+      <version>2.2.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.framework</artifactId>
+      <version>${felix.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.6.6</version>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+  <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>${bundle.version}</version>
+          <configuration>
+            <instructions>
+              <!--
+               | stops the "uses" clauses being added to "Export-Package" manifest entry
+              -->
+              <_nouses>true</_nouses>
+              <!--
+               | Stop the JAVA_1_n_HOME variables from being treated as headers by Bnd
+              -->
+              <_removeheaders>Include-Resource,JAVA_1_3_HOME,JAVA_1_4_HOME,JAVA_1_5_HOME,JAVA_1_6_HOME,JAVA_1_7_HOME</_removeheaders>
+              <Embed-Dependency>shaded-snake-yaml;inline=true</Embed-Dependency>
+              <_versionpolicy>${osgi.versionpolicy}</_versionpolicy>
+              <Bundle-Name>${project.name}</Bundle-Name>
+              <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+              <Bundle-Description>${project.description}</Bundle-Description>
+              <Export-Package>${osgi.export}</Export-Package>
+              <Private-Package>${osgi.private}</Private-Package>
+              <Import-Package>${osgi.import}</Import-Package>
+              <DynamicImport-Package>${osgi.dynamicImport}</DynamicImport-Package>
+              <Bundle-DocURL>${project.url}</Bundle-DocURL>
+              <Bundle-RequiredExecutionEnvironment>${osgi.requiredExecutionEnvironment}</Bundle-RequiredExecutionEnvironment>
+
+              <Implementation-Build-Date>${maven.build.timestamp}</Implementation-Build-Date>
+              <X-Compile-Source-JDK>${javac.src.version}</X-Compile-Source-JDK>
+              <X-Compile-Target-JDK>${javac.target.version}</X-Compile-Target-JDK>
+
+              <Implementation-Title>${project.name}</Implementation-Title>
+              <Implementation-Version>${project.version}</Implementation-Version>
+              <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+              <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+
+              <Specification-Title>${project.name}</Specification-Title>
+              <Specification-Version>${project.version}</Specification-Version>
+              <Specification-Vendor>${project.organization.name}</Specification-Vendor>
+            </instructions>
+          </configuration>
+        </plugin>      <plugin>
+        <!-- Inherited from oss-base. Generate PackageVersion.java.-->
+        <groupId>com.google.code.maven-replacer-plugin</groupId>
+        <artifactId>replacer</artifactId>
+        <executions>
+          <execution>
+            <id>process-packageVersion</id>
+            <phase>generate-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <!--  Need to skip known-failing tests for build... -->
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>com/fasterxml/jackson/dataformat/yaml/failing/*.java</exclude>
+            </excludes>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/Test*.java</include>
+            </includes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.servicemix.tooling</groupId>
+          <artifactId>depends-maven-plugin</artifactId>
+          <version>1.2</version>
+          <executions>
+              <execution>
+                  <id>generate-depends-file</id>
+                  <phase>generate-test-resources</phase>
+                  <goals>
+                      <goal>generate-depends-file</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.18</version>
+          <executions>
+            <execution>
+             <goals>
+               <goal>integration-test</goal>
+               <goal>verify</goal>
+             </goals>
+            </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
