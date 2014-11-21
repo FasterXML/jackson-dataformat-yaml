@@ -31,6 +31,23 @@ To use this extension on Maven-based projects, use following dependency:
 </dependency>
 ```
 
+## Dependency on snakeYAML
+
+The ordinary artifact here has a dependency on 
+
+```xml
+<dependency>
+    <groupId>org.yaml</groupId>
+    <artifactId>snakeyaml</artifactId>
+    <version>1.12</version>
+</dependency>
+```
+
+This artifact is available from Central and has OSGi metadata. There
+is also a '-shaded' classifier variation that uses the
+maven-shade-plugin to incorporate this with renamed classes.
+
+
 # Usage
 
 ## Simple usage

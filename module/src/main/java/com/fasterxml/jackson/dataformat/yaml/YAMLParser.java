@@ -5,10 +5,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.regex.Pattern;
 
-import org.yaml.snakeyaml.error.Mark;
-import org.yaml.snakeyaml.events.*;
-import org.yaml.snakeyaml.parser.ParserImpl;
-import org.yaml.snakeyaml.reader.StreamReader;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.AliasEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.CollectionStartEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.Event;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.MappingStartEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.NodeEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.ScalarEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.Mark;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.parser.ParserImpl;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.reader.StreamReader;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.ParserBase;

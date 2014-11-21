@@ -7,15 +7,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.DumperOptions.FlowStyle;
-import org.yaml.snakeyaml.emitter.Emitter;
-import org.yaml.snakeyaml.events.*;
-
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.GeneratorBase;
 import com.fasterxml.jackson.core.json.JsonWriteContext;
 import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.DumperOptions;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.emitter.Emitter;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.AliasEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.DocumentEndEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.DocumentStartEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.ImplicitTuple;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.MappingEndEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.MappingStartEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.ScalarEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.SequenceEndEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.SequenceStartEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.StreamEndEvent;
+import com.fasterxml.jackson.dataformat.yaml.snakeyaml.events.StreamStartEvent;
+
 
 public class YAMLGenerator extends GeneratorBase
 {
@@ -126,7 +135,7 @@ public class YAMLGenerator extends GeneratorBase
 
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out,
-            org.yaml.snakeyaml.DumperOptions.Version version
+            com.fasterxml.jackson.dataformat.yaml.snakeyaml.DumperOptions.Version version
             ) throws IOException
     {
         super(jsonFeatures, codec);
@@ -649,7 +658,7 @@ public class YAMLGenerator extends GeneratorBase
             } else {
                 opt.setCanonical(false);
                 // if not, MUST specify flow styles
-                opt.setDefaultFlowStyle(FlowStyle.BLOCK);
+                opt.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
             }
             _outputOptions = opt;
         }
