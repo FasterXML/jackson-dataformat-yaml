@@ -29,6 +29,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemPackages;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.url;
 
 /**
  * Created by benson on 11/16/14.
@@ -42,8 +43,7 @@ public class OSGiIT {
                 mavenBundle("com.fasterxml.jackson.core", "jackson-core").versionAsInProject(),
                 mavenBundle("com.fasterxml.jackson.core", "jackson-annotations").versionAsInProject(),
                 mavenBundle("com.fasterxml.jackson.core", "jackson-databind").versionAsInProject(),
-                mavenBundle("org.yaml", "snakeyaml").versionAsInProject(),
-                mavenBundle("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml").versionAsInProject(),
+                url(String.format("file:%s/jackson-dataformat-yaml-%s.jar", System.getProperty("project.build.directory"), System.getProperty("project.version"))),
                 systemPackages(
                         "javax.annotation"),
                 junitBundles(),
