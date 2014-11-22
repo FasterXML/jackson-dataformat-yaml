@@ -39,7 +39,8 @@ import static org.ops4j.pax.exam.CoreOptions.url;
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class OSGiIT {
+public class OSGiTest
+{
     @Configuration
     public Option[] config() {
         return options(
