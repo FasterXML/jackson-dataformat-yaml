@@ -14,3 +14,10 @@ Shawn Smith:
 Łukasz Dywicki
 - Fixed #19: Change build to avoid OSGi	dep to SnakeYAML (which	is instead shaded in)
  (2.5.0)
+- Contributed [#14]: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
+ (2.1.4)
+
+Benson Margulies (benson-basis@github)
+
+- Fixed [#27]: OSGI bundle does not work due to shading
+ (2.4.4)

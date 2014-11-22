@@ -18,12 +18,29 @@ public class YAMLMapper extends ObjectMapper
         super(f);
     }
 
+    /**
+     * @since 2.5
+     */
+    public YAMLMapper(YAMLMapper base) {
+        super(base);
+    }
+
+    /**
+     * @since 2.5
+     */
+    @Override
+    public YAMLMapper copy()
+    {
+        _checkInvalidCopy(YAMLMapper.class);
+        return new YAMLMapper(this);
+    }
+
     /*
     /**********************************************************************
     /* Configuration
     /**********************************************************************
      */
-    
+
     public YAMLMapper configure(YAMLGenerator.Feature f, boolean state) {
         return state ? enable(f) : disable(f);
     }
