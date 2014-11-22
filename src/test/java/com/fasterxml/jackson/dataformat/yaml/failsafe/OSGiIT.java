@@ -12,9 +12,11 @@
  ** 7-104.9(a).
  ******************************************************************************/
 
-package com.fasterxml.jackson.dataformat.yaml;
+package com.fasterxml.jackson.dataformat.yaml.failsafe;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -23,7 +25,6 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import static org.ops4j.pax.exam.CoreOptions.bundle;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
@@ -35,11 +36,13 @@ import static org.ops4j.pax.exam.CoreOptions.url;
  * PAX-EXAM test that proves that the OSGi bundle works. This test is magically transformed into
  * an OSGi bundle, and additional bundles are loaded into the container as specified in
  * {@link #config()}.
- *
+ *<p>
+ * NOTE: named specifically so as NOT to run as a unit test, as this is an integration test
+ * to run after build
  */
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class OSGiTest
+public class OSGiIT
 {
     @Configuration
     public Option[] config() {
@@ -62,6 +65,7 @@ public class OSGiTest
     @Test
     public void onceOver() throws Exception {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.writeValueAsString("Hello");
+        String yaml = mapper.writeValueAsString("Hello");
+        System.out.println("OSGi verification successful, result: '"+yaml+"'");
     }
 }
