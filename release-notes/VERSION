@@ -12,7 +12,7 @@ Project: jackson-dataformat-yaml
 #23: Add support for disabling use of YAML native Type Ids
 - Added `YAMLMapper` for convenience
 
-2.4.4 (not yet released)
+2.4.4 (24-Nov-2014)
 
 #27: OSGI bundle does not work due to shading
  (fix contributed by Benson M)
