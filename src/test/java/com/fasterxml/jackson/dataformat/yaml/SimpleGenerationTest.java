@@ -2,10 +2,12 @@ package com.fasterxml.jackson.dataformat.yaml;
 
 import java.io.*;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeSet;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SimpleGenerationTest extends ModuleTestBase
 {
@@ -90,6 +92,21 @@ public class SimpleGenerationTest extends ModuleTestBase
         f.delete();
     }
 
+    public void testWithFile2() throws Exception
+    {
+        File f = File.createTempFile("test", ".yml");
+        f.deleteOnExit();
+        ObjectMapper mapper = mapperForYAML();
+        ObjectNode root = mapper.createObjectNode();
+        root.put("name", "Foobar");
+        mapper.writeValue(f, root);
+
+        // and get it back
+        Map<?,?> result = mapper.readValue(f, Map.class);
+        assertEquals(1, result.size());
+        assertEquals("Foobar", result.get("name"));
+    }
+    
     @SuppressWarnings("resource")
     public void testStartMarker() throws Exception
     {
