@@ -12,6 +12,11 @@ Project: jackson-dataformat-yaml
 #23: Add support for disabling use of YAML native Type Ids
 - Added `YAMLMapper` for convenience
 
+2.4.5 (not yet released)
+
+#30: `YamlFactory.writeValue(File, Object)` busted
+ (reported by Benson M)
+
 2.4.4 (24-Nov-2014)
 
 #27: OSGI bundle does not work due to shading
