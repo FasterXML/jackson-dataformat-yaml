@@ -8,10 +8,12 @@ Tatu Saloranta, tatu.saloranta@iki.fi: author
 
 Shawn Smith:
 
-- Contributed [#14]: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
+- Contributed #14: Fix parsing of longs near MIN/MAX_INT, parsing of BigIntegers.
  (2.1.4)
 
 Benson Margulies (benson-basis@github)
 
-- Fixed [#27]: OSGI bundle does not work due to shading
+- Fixed #27: OSGI bundle does not work due to shading
  (2.4.4)
+- Reported #30: `YamlFactory.writeValue(File, Object)` busted
+ (2.4.5)

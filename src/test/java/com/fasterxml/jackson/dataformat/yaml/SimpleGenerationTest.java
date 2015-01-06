@@ -1,8 +1,7 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,7 +74,9 @@ public class SimpleGenerationTest extends ModuleTestBase
         File f = File.createTempFile("test", ".yml");
         f.deleteOnExit();
         ObjectMapper mapper = mapperForYAML();
-        mapper.writeValue(f, "Foobar");
+        Map<String,Integer> map = new HashMap<String,Integer>();
+        map.put("a", 3);
+        mapper.writeValue(f, map);
         assertTrue(f.canRead());
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
                 f), "UTF-8"));
@@ -85,7 +86,7 @@ public class SimpleGenerationTest extends ModuleTestBase
             doc += "\n" + str;
         }
         doc = trimDocMarker(doc);
-        assertEquals("\"Foobar\"", doc);
+        assertEquals("a: 3", doc);
         br.close();
         f.delete();
     }

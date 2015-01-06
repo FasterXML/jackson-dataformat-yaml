@@ -387,11 +387,12 @@ public class YAMLFactory extends JsonFactory
     {
         // false -> we won't manage the stream unless explicitly directed to
         IOContext ctxt = _createContext(out, false);
+        ctxt.setEncoding(enc);
         // [JACKSON-512]: allow wrapping with _outputDecorator
         if (_outputDecorator != null) {
             out = _outputDecorator.decorate(ctxt, out);
         }
-        return _createGenerator(_createWriter(out, JsonEncoding.UTF8, ctxt), ctxt);
+        return _createGenerator(_createWriter(out, enc, ctxt), ctxt);
     }
 
     @SuppressWarnings("resource")
@@ -418,6 +419,19 @@ public class YAMLFactory extends JsonFactory
         }
         return _createGenerator(out, ctxt);
     }
+
+    @Override
+    public JsonGenerator createGenerator(File f, JsonEncoding enc) throws IOException
+    {
+        OutputStream out = new FileOutputStream(f);
+        // true -> yes, we have to manage the stream since we created it
+        IOContext ctxt = _createContext(out, true);
+        ctxt.setEncoding(enc);
+        if (_outputDecorator != null) {
+            out = _outputDecorator.decorate(ctxt, out);
+        }
+        return _createGenerator(_createWriter(out, enc, ctxt), ctxt);
+    }    
 
     /*
     /******************************************************
@@ -460,6 +474,12 @@ public class YAMLFactory extends JsonFactory
                 _objectCodec, out, _version);
         // any other initializations? No?
         return gen;
+    }
+
+    @Override
+    protected YAMLGenerator _createUTF8Generator(OutputStream out, IOContext ctxt) throws IOException {
+        // should never get called; ensure
+        throw new IllegalStateException();
     }
     
     @Override
