@@ -64,7 +64,7 @@ public final class UTF8Reader
     
     public UTF8Reader(InputStream in, boolean autoClose)
     {
-        super(in);
+        super((in == null) ? new Object() : in);
         _inputSource = in;
         _bufferHolder = _findBufferHolder();
         byte[] buffer = _bufferHolder[0];
@@ -79,7 +79,7 @@ public final class UTF8Reader
 
     public UTF8Reader(byte[] buf, int ptr, int len, boolean autoClose)
     {
-        super(bogusStream());
+        super(new Object());
         _inputSource = null;
         _inputBuffer = buf;
         _inputPtr = ptr;
@@ -88,15 +88,6 @@ public final class UTF8Reader
         _bufferHolder = null;
     }
 
-    private static InputStream bogusStream() {
-        return new InputStream() {
-            @Override
-            public int read() throws IOException {
-                return -1;
-            }
-        };
-    }
-    
     private static byte[][] _findBufferHolder()
     {
         byte[][] bufs = null;
