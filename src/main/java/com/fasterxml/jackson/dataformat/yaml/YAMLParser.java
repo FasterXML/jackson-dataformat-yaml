@@ -5,10 +5,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.regex.Pattern;
 
-import org.yaml.snakeyaml.error.Mark;
-import org.yaml.snakeyaml.events.*;
-import org.yaml.snakeyaml.parser.ParserImpl;
-import org.yaml.snakeyaml.reader.StreamReader;
+import com.esotericsoftware.yamlbeans.tokenizer.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.ParserBase;
@@ -27,8 +24,6 @@ public class YAMLParser extends ParserBase
      * Enumeration that defines all togglable features for YAML parsers.
      */
     public enum Feature {
-        
-        BOGUS(false)
         ;
 
         final boolean _defaultState;
@@ -93,7 +88,7 @@ public class YAMLParser extends ParserBase
      */
     protected final Reader _reader;
 
-    protected final ParserImpl _yamlParser;
+    protected final Tokenizer _tokenizer;
 
     /*
     /**********************************************************************
@@ -101,11 +96,8 @@ public class YAMLParser extends ParserBase
     /**********************************************************************
      */
 
-    /**
-     * Keep track of the last event read, to get access to Location info
-     */
-    protected Event _lastEvent;
-
+    protected String _lastTag;
+    
     /**
      * We need to keep track of text values.
      */
@@ -144,9 +136,8 @@ public class YAMLParser extends ParserBase
         _objectCodec = codec;
         _yamlFeatures = csvFeatures;
         _reader = reader;
-        _yamlParser = new ParserImpl(new StreamReader(reader));
+        _tokenizer = new Tokenizer(reader);
     }
-
 
     @Override
     public ObjectCodec getCodec() {
@@ -282,31 +273,16 @@ public class YAMLParser extends ParserBase
     @Override
     public JsonLocation getTokenLocation()
     {
-        if (_lastEvent == null) {
-            return JsonLocation.NA;
-        }
-        return _locationFor(_lastEvent.getStartMark());
+        // !!! TODO: retain token location
+        return getCurrentLocation();
     }
 
     @Override
     public JsonLocation getCurrentLocation() {
-        // can assume we are at the end of token now...
-        if (_lastEvent == null) {
-            return JsonLocation.NA;
-        }
-        return _locationFor(_lastEvent.getEndMark());
-    }
-    
-    protected JsonLocation _locationFor(Mark m)
-    {
-        if (m == null) {
-            return new JsonLocation(_ioContext.getSourceReference(),
-                    -1, -1, -1);
-        }
         return new JsonLocation(_ioContext.getSourceReference(),
                 -1,
-                m.getLine() + 1, // from 0- to 1-based
-                m.getColumn() + 1); // ditto
+                _tokenizer.getLineNumber() + 1, // from 0- to 1-based
+                _tokenizer.getColumn() + 1); // ditto
     }
 
     // Note: SHOULD override 'getTokenLineNr', 'getTokenColumnNr', but those are final in 2.0
@@ -316,6 +292,33 @@ public class YAMLParser extends ParserBase
     /* Parsing
     /**********************************************************
      */
+
+    protected Token _nextToken() {
+        Token t = _tokenizer.getNextToken();
+        TokenType type = t.type;
+        if (type == TokenType.ANCHOR || type == TokenType.TAG) {
+            return _nextToken2(t);
+        }
+        return t;
+    }
+
+    private Token _nextToken2(Token t)
+    {
+        do {
+            TokenType type = t.type;
+            if (type == TokenType.ANCHOR) {
+                // I assume anchors are fine to be found about anywhere, so:
+                _currentAnchor = ((AnchorToken) t).getInstanceName();
+            } else if (type == TokenType.TAG) {
+                // handle vs suffix?
+                _lastTag = ((TagToken) t).getSuffix();
+            } else {
+                break;
+            }
+            t = _tokenizer.getNextToken();
+        } while (t != null);
+        return t;
+    }
     
     @Override
     public JsonToken nextToken() throws IOException, JsonParseException
@@ -323,109 +326,118 @@ public class YAMLParser extends ParserBase
         _currentIsAlias = false;
         _binaryValue = null;
         _currentAnchor = null;
+
         if (_closed) {
             return null;
         }
-        
+
+        _lastTag = null;
+
         while (true) {
-            Event evt = _yamlParser.getEvent();
+            Token t = _nextToken();
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
-            if (evt == null) {
+            if (t == null) {
                 return (_currToken = null);
             }
-            _lastEvent = evt;
-            
+            TokenType type = t.type;
+
             /* One complication: field names are only inferred from the
              * fact that we are in Object context...
              */
             if (_parsingContext.inObject() && _currToken != JsonToken.FIELD_NAME) {
-                if (!evt.is(Event.ID.Scalar)) {
+                if (type == TokenType.KEY) {
+                    t = _nextToken();
+                    type = t.type;
+                } else {
                     // end is fine
-                    if (evt.is(Event.ID.MappingEnd)) {
+                    if (type == TokenType.BLOCK_END || type == TokenType.FLOW_MAPPING_END) {
                         if (!_parsingContext.inObject()) { // sanity check is optional, but let's do it for now
                             _reportMismatchedEndMarker('}', ']');
                         }
                         _parsingContext = _parsingContext.getParent();
                         return (_currToken = JsonToken.END_OBJECT);
                     }
-                    _reportError("Expected a field name (Scalar value in YAML), got this instead: "+evt);
+                    _reportError("Expected a field name (Scalar value in YAML), got this instead: "+type);
                 }
-                ScalarEvent scalar = (ScalarEvent) evt;
+                if (t.type != TokenType.SCALAR) {
+                    _reportError("Expected a field name (Scalar value in YAML), got this instead: "+type);
+                }
+                ScalarToken scalar = (ScalarToken) t;
                 String name = scalar.getValue();
                 _currentFieldName = name;
                 _parsingContext.setCurrentName(name);
-                _currentAnchor = scalar.getAnchor();
                 return (_currToken = JsonToken.FIELD_NAME);
             }
-            // Ugh. Why not expose id, to be able to Switch?
-
-            // scalar values are probably the commonest:
-            if (evt.is(Event.ID.Scalar)) {
-                JsonToken t = _decodeScalar((ScalarEvent) evt);
-                _currToken = t;
-                return t;
+            // why do we get useless VALUE token?
+            while (type == TokenType.VALUE || type == TokenType.BLOCK_ENTRY || type == TokenType.FLOW_ENTRY) {
+                t = _nextToken();
+                type = t.type;
             }
 
-            // followed by maps, then arrays
-            if (evt.is(Event.ID.MappingStart)) {
-                Mark m = evt.getStartMark();
-                MappingStartEvent map = (MappingStartEvent) evt;
-                _currentAnchor = map.getAnchor();
-                _parsingContext = _parsingContext.createChildObjectContext(m.getLine(), m.getColumn());
+            switch (type) {
+            case SCALAR:
+                JsonToken jt = _decodeScalar((ScalarToken) t, _lastTag);
+                _currToken = jt;
+                return jt;
+            case BLOCK_MAPPING_START:
+            case FLOW_MAPPING_START:
+                _parsingContext = _parsingContext.createChildObjectContext(_tokenizer.getLineNumber(),
+                        _tokenizer.getColumn());
                 return (_currToken = JsonToken.START_OBJECT);
-            }
-            if (evt.is(Event.ID.MappingEnd)) { // actually error; can not have map-end here
+            case BLOCK_END:
+            case FLOW_MAPPING_END:
                 _reportError("Not expecting END_OBJECT but a value");
-            }
-            if (evt.is(Event.ID.SequenceStart)) {
-                Mark m = evt.getStartMark();
-                _currentAnchor = ((NodeEvent)evt).getAnchor();
-                _parsingContext = _parsingContext.createChildArrayContext(m.getLine(), m.getColumn());
+            case BLOCK_SEQUENCE_START:
+            case FLOW_SEQUENCE_START:
+                _parsingContext = _parsingContext.createChildArrayContext(_tokenizer.getLineNumber(),
+                        _tokenizer.getColumn());
                 return (_currToken = JsonToken.START_ARRAY);
-            }
-            if (evt.is(Event.ID.SequenceEnd)) {
+            case FLOW_SEQUENCE_END:
                 if (!_parsingContext.inArray()) { // sanity check is optional, but let's do it for now
                     _reportMismatchedEndMarker(']', '}');
                 }
                 _parsingContext = _parsingContext.getParent();
                 return (_currToken = JsonToken.END_ARRAY);
-            }
 
-            // after this, less common tokens:
-            
-            if (evt.is(Event.ID.DocumentEnd)) {
+            case DOCUMENT_END:
                 // logical end of doc; fine. Two choices; either skip, or
                 // return null as marker. Do latter, for now. But do NOT close.
                 return (_currToken = null);
-            }
-            if (evt.is(Event.ID.DocumentStart)) {
+            case DOCUMENT_START:
 //                DocumentStartEvent dd = (DocumentStartEvent) evt;
                 // does this matter? Shouldn't, should it?
                 continue;
-            }
-            if (evt.is(Event.ID.Alias)) {
-                AliasEvent alias = (AliasEvent) evt;
+            case ALIAS:
                 _currentIsAlias = true;
-                _textValue = alias.getAnchor();
+                _textValue = ((AliasToken) t).getInstanceName();
                 // for now, nothing to do: in future, maybe try to expose as ObjectIds?
                 return (_currToken = JsonToken.VALUE_STRING);
-            }
-            if (evt.is(Event.ID.StreamEnd)) { // end-of-input; force closure
+            case STREAM_END:
                 close();
                 return (_currToken = null);
-            }
-            if (evt.is(Event.ID.StreamStart)) { // useless, skip
+            case STREAM_START: // useless, skip
                 continue;
+
+                // These should have been processed already:
+            case ANCHOR:
+            case TAG:
+
+                // Not sure what to do with these however
+            case BLOCK_ENTRY:
+            case DIRECTIVE:
+            case FLOW_ENTRY:
+            case KEY:
+            default:
+                _reportError("Unexpected token type; expected a value, tag or anchor, got: "+type);
+                break;
             }
         }
     }
     
-    protected JsonToken _decodeScalar(ScalarEvent scalar)
+    protected JsonToken _decodeScalar(ScalarToken scalar, String typeTag)
     {
         String value = scalar.getValue();
         _textValue = value;
-        // we may get an explicit tag, if so, use for corroborating...
-        String typeTag = scalar.getTag();
         final int len = value.length();
 
         if (typeTag == null) { // no, implicit
@@ -740,14 +752,7 @@ public class YAMLParser extends ParserBase
     @Override
     public String getTypeId() throws IOException, JsonGenerationException
     {
-        String tag;
-        if (_lastEvent instanceof CollectionStartEvent) {
-            tag = ((CollectionStartEvent) _lastEvent).getTag();
-        } else if (_lastEvent instanceof ScalarEvent) {
-            tag = ((ScalarEvent) _lastEvent).getTag();
-        } else {
-            return null;
-        }
+        String tag = _lastTag;
         if (tag != null) {
             /* 04-Aug-2013, tatu: Looks like YAML parser's expose these in...
              *   somewhat exotic ways sometimes. So let's prepare to peel off

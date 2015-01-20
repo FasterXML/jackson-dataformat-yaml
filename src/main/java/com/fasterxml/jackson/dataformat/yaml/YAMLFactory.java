@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import org.yaml.snakeyaml.DumperOptions;
+import com.esotericsoftware.yamlbeans.YamlConfig;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.format.InputAccessor;
@@ -53,8 +53,6 @@ public class YAMLFactory extends JsonFactory
     /**********************************************************************
      */
 
-    protected DumperOptions.Version _version;
-    
     /**
      * Default constructor used to create factory instances.
      * Creation of a factory instance is a light-weight operation,
@@ -72,11 +70,6 @@ public class YAMLFactory extends JsonFactory
         super(oc);
         _yamlParserFeatures = DEFAULT_YAML_PARSER_FEATURE_FLAGS;
         _yamlGeneratorFeatures = DEFAULT_YAML_GENERATOR_FEATURE_FLAGS;
-        /* 26-Jul-2013, tatu: Seems like we should force output as 1.1 but
-         *   that adds version declaration which looks ugly...
-         */
-        //_version = DumperOptions.Version.V1_1;
-        _version = null;
     }
 
     /**
@@ -85,7 +78,6 @@ public class YAMLFactory extends JsonFactory
     public YAMLFactory(YAMLFactory src, ObjectCodec oc)
     {
         super(src, oc);
-        _version = src._version;
         _yamlParserFeatures = src._yamlParserFeatures;
         _yamlGeneratorFeatures = src._yamlGeneratorFeatures;
     }
@@ -431,7 +423,7 @@ public class YAMLFactory extends JsonFactory
     protected YAMLGenerator _createGenerator(Writer out, IOContext ctxt) throws IOException {
         int feats = _yamlGeneratorFeatures;
         YAMLGenerator gen = new YAMLGenerator(ctxt, _generatorFeatures, feats,
-                _objectCodec, out, _version);
+                _objectCodec, out);
         // any other initializations? No?
         return gen;
     }

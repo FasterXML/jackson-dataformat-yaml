@@ -9,9 +9,10 @@ import java.util.Map;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
-import org.yaml.snakeyaml.emitter.Emitter;
+import org.yaml.snakeyaml.emitter.*;
 import org.yaml.snakeyaml.events.*;
 
+import com.esotericsoftware.yamlbeans.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.base.GeneratorBase;
 import com.fasterxml.jackson.core.json.JsonWriteContext;
@@ -106,8 +107,6 @@ public class YAMLGenerator extends GeneratorBase
 
     protected Writer _writer;
 
-    protected DumperOptions _outputOptions;
-
     // for field names, leave out quotes
     private final static Character STYLE_NAME = null;
     
@@ -145,10 +144,10 @@ public class YAMLGenerator extends GeneratorBase
     /**********************************************************
      */
 
+    protected DumperOptions _outputOptions;
+
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
-            ObjectCodec codec, Writer out,
-            org.yaml.snakeyaml.DumperOptions.Version version
-            ) throws IOException
+            ObjectCodec codec, Writer out) throws IOException
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
@@ -163,7 +162,8 @@ public class YAMLGenerator extends GeneratorBase
         boolean startMarker = (Feature.WRITE_DOC_START_MARKER.getMask() & yamlFeatures) != 0;
         
         _emitter.emit(new DocumentStartEvent(null, null, startMarker,
-                version, // for 1.10 was: ((version == null) ? null : version.getArray()),
+//                version, // for 1.10 was: ((version == null) ? null : version.getArray()),
+                null,
                 noTags));
     }
 
@@ -174,7 +174,7 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     @Override
-    public Version version() {
+    public com.fasterxml.jackson.core.Version version() {
         return PackageVersion.VERSION;
     }
 
