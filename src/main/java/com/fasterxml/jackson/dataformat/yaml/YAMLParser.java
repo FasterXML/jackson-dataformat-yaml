@@ -648,13 +648,12 @@ public class YAMLParser extends ParserBase
 
     /*
     /**********************************************************************
-    /* Number accessors
+    /* Number accessor overrides
     /**********************************************************************
      */
     
     @Override
-    protected void _parseNumericValue(int expType)
-        throws IOException, JsonParseException
+    protected void _parseNumericValue(int expType) throws IOException
     {
         // Int or float?
         if (_currToken == JsonToken.VALUE_NUMBER_INT) {
@@ -725,6 +724,26 @@ public class YAMLParser extends ParserBase
             return;
         }
         _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
+    }
+
+    @Override
+    protected int _parseIntValue() throws IOException
+    {
+        if (_currToken == JsonToken.VALUE_NUMBER_INT) {
+            int len = _textValue.length();
+            if (_numberNegative) {
+                len--;
+            }
+            if (len <= 9) { // definitely fits in int
+                _numTypesValid = NR_INT;
+                return (_numberInt = Integer.parseInt(_textValue));
+            }
+        }
+        _parseNumericValue(NR_INT);
+        if ((_numTypesValid & NR_INT) == 0) {
+            convertNumberToInt();
+        }
+        return _numberInt;
     }
 
     /*

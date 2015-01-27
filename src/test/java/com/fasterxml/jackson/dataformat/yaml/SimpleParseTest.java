@@ -11,16 +11,17 @@ import java.math.BigInteger;
  */
 public class SimpleParseTest extends ModuleTestBase
 {
+    final YAMLFactory YAML_F = new YAMLFactory();
+
     // Parsing large numbers around the transition from int->long and long->BigInteger
     public void testIntParsing() throws Exception
     {
-        YAMLFactory f = new YAMLFactory();
         String YAML;
         JsonParser jp;
 
         // Test positive max-int
         YAML = "num: 2147483647";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -32,7 +33,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test negative max-int
         YAML = "num: -2147483648";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -44,7 +45,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test positive max-int + 1
         YAML = "num: 2147483648";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -56,7 +57,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test negative max-int - 1
         YAML = "num: -2147483649";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -68,7 +69,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test positive max-long
         YAML = "num: 9223372036854775807";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -80,7 +81,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test negative max-long
         YAML = "num: -9223372036854775808";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -92,7 +93,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test positive max-long + 1
         YAML = "num: 9223372036854775808";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -104,7 +105,7 @@ public class SimpleParseTest extends ModuleTestBase
 
         // Test negative max-long - 1
         YAML = "num: -9223372036854775809";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("num", jp.getCurrentName());
@@ -118,13 +119,11 @@ public class SimpleParseTest extends ModuleTestBase
     // [Issue-4]: accidental recognition as double, with multiple dots
     public void testDoubleParsing() throws Exception
     {
-        YAMLFactory f = new YAMLFactory();
-
         // First, test out valid use case.
         String YAML;
 
         YAML = "num: +1_000.25"; // note underscores; legal in YAML apparently
-        JsonParser jp = f.createParser(YAML);
+        JsonParser jp = YAML_F.createParser(YAML);
 
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
@@ -140,7 +139,7 @@ public class SimpleParseTest extends ModuleTestBase
         
         final String IP = "10.12.45.127";
         YAML = "ip: "+IP+"\n";
-        jp = f.createParser(YAML);
+        jp = YAML_F.createParser(YAML);
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("ip", jp.getCurrentName());
@@ -154,12 +153,10 @@ public class SimpleParseTest extends ModuleTestBase
     // looks like colons in content can be problematic, if unquoted
     public void testColons() throws Exception
     {
-        YAMLFactory f = new YAMLFactory();
-
         // First, test out valid use case. NOTE: spaces matter!
         String YAML = "section:\n"
                     +"  text: foo:bar\n";
-        JsonParser jp = f.createParser(YAML);
+        JsonParser jp = YAML_F.createParser(YAML);
 
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
@@ -189,8 +186,7 @@ public class SimpleParseTest extends ModuleTestBase
                 +"    name: Bill\n"
                 +"    parentRef: *id1"
                 ;
-        YAMLFactory f = new YAMLFactory();
-        YAMLParser yp = f.createParser(YAML);
+        YAMLParser yp = YAML_F.createParser(YAML);
 
         assertToken(JsonToken.START_OBJECT, yp.nextToken());
         assertFalse(yp.isCurrentAlias());
@@ -238,10 +234,8 @@ public class SimpleParseTest extends ModuleTestBase
     // Scalars should not be parsed when not in the plain flow style.
     public void testQuotedStyles() throws Exception
     {
-        YAMLFactory f = new YAMLFactory();
-
         String YAML = "strings: [\"true\", 'false']";
-        JsonParser jp = f.createParser(YAML);
+        JsonParser jp = YAML_F.createParser(YAML);
 
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
@@ -261,10 +255,8 @@ public class SimpleParseTest extends ModuleTestBase
     // Scalars should be parsed when in the plain flow style.
     public void testUnquotedStyles() throws Exception
     {
-        YAMLFactory f = new YAMLFactory();
-
         String YAML = "booleans: [true, false]";
-        JsonParser jp = f.createParser(YAML);
+        JsonParser jp = YAML_F.createParser(YAML);
 
         assertToken(JsonToken.START_OBJECT, jp.nextToken());
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
@@ -273,6 +265,47 @@ public class SimpleParseTest extends ModuleTestBase
         assertToken(JsonToken.VALUE_TRUE, jp.nextToken());
         assertToken(JsonToken.VALUE_FALSE, jp.nextToken());
         assertToken(JsonToken.END_ARRAY, jp.nextToken());
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
+        assertNull(jp.nextToken());
+
+        jp.close();
+    }
+
+    public void testObjectWithNumbers() throws Exception
+    {
+        String YAML = "---\n"
++"content:\n"
++"  uri: \"http://javaone.com/keynote.mpg\"\n"
++"  title: \"Javaone Keynote\"\n"
++"  width: 640\n"
++"  height: 480\n"
+;
+
+        JsonParser jp = YAML_F.createParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("content", jp.getCurrentName());
+
+        assertToken(JsonToken.START_OBJECT, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("uri", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("title", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("width", jp.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("height", jp.getCurrentName());
+        
+        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+
+        assertToken(JsonToken.END_OBJECT, jp.nextToken());
         assertToken(JsonToken.END_OBJECT, jp.nextToken());
         assertNull(jp.nextToken());
 
