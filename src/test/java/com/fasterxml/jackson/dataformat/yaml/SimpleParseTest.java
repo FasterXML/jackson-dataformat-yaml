@@ -279,6 +279,9 @@ public class SimpleParseTest extends ModuleTestBase
 +"  title: \"Javaone Keynote\"\n"
 +"  width: 640\n"
 +"  height: 480\n"
++"  persons:\n"
++"  - \"Foo Bar\"\n"
++"  - \"Max Power\"\n"
 ;
 
         JsonParser jp = YAML_F.createParser(YAML);
@@ -299,11 +302,22 @@ public class SimpleParseTest extends ModuleTestBase
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("width", jp.getCurrentName());
         assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(640, jp.getIntValue());
 
         assertToken(JsonToken.FIELD_NAME, jp.nextToken());
         assertEquals("height", jp.getCurrentName());
-        
         assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
+        assertEquals(480, jp.getIntValue());
+
+        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
+        assertEquals("persons", jp.getCurrentName());
+
+        assertToken(JsonToken.START_ARRAY, jp.nextToken());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals("Foo Bar", jp.getText());
+        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertEquals("Max Power", jp.getText());
+        assertToken(JsonToken.END_ARRAY, jp.nextToken());
 
         assertToken(JsonToken.END_OBJECT, jp.nextToken());
         assertToken(JsonToken.END_OBJECT, jp.nextToken());
