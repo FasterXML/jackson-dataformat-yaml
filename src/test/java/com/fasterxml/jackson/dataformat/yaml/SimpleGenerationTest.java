@@ -31,7 +31,6 @@ public class SimpleGenerationTest extends ModuleTestBase
     {
         YAMLFactory f = new YAMLFactory();
         StringWriter w = new StringWriter();
-        @SuppressWarnings("resource")
         JsonGenerator gen = f.createGenerator(w);
         _writeBradDoc(gen);
         String yaml = w.toString();
@@ -41,6 +40,39 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("name: \"Brad\"\nage: 39", yaml);
     }
     
+    public void testStreamingNested() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        StringWriter w = new StringWriter();
+        JsonGenerator gen = f.createGenerator(w);
+
+        gen.writeStartObject();
+        gen.writeFieldName("ob");
+        gen.writeStartArray();
+        gen.writeString("a");
+        gen.writeString("b");
+        gen.writeEndArray();
+        gen.writeEndObject();
+        
+        gen.close();
+        
+        String yaml = w.toString();
+
+        // note: 1.12 uses more compact notation; 1.10 has prefix
+        yaml = trimDocMarker(yaml).trim();
+
+        BufferedReader br = new BufferedReader(new StringReader(yaml));
+        assertEquals("ob:", br.readLine());
+
+        /* 27-Jan-2015, tatu: Not 100% if those items ought to (or not) be indented.
+         *   SnakeYAML doesn't do that; yet some libs expect it. Strange.
+         */
+        assertEquals("- \"a\"", br.readLine());
+        assertEquals("- \"b\"", br.readLine());
+        assertNull(br.readLine());
+        br.close();
+    }
+
     public void testBasicPOJO() throws Exception
     {
         ObjectMapper mapper = mapperForYAML();
