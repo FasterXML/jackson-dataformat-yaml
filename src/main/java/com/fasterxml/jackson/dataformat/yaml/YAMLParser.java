@@ -714,7 +714,7 @@ public class YAMLParser extends ParserBase
         _reportError("Current token ("+_currToken+") not numeric, can not use numeric value accessors");
     }
 
-    // future-proofing: will be added in jackson-core 2.6.0
+    @Override
     protected int _parseIntValue() throws IOException
     {
         if (_currToken == JsonToken.VALUE_NUMBER_INT) {
