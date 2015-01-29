@@ -121,6 +121,12 @@ public class YAMLParser extends ParserBase
      * structured types, value whose first token current token is.
      */
     protected String _currentAnchor;
+
+    /**
+     * Looks like we need to materialize matching end-array (and maybe object?)
+     * tokens to compensate for implicitly injected start-array tokens.
+     */
+    protected Token _pendingToken;
     
     /*
     /**********************************************************************
@@ -137,6 +143,14 @@ public class YAMLParser extends ParserBase
         _yamlFeatures = csvFeatures;
         _reader = reader;
         _tokenizer = new Tokenizer(reader);
+
+        // simplify a bit by skipping fluff
+        TokenType t = _tokenizer.peekNextTokenType();
+        while ((t == TokenType.DOCUMENT_START)
+                    || (t == TokenType.STREAM_START)) {
+            _tokenizer.getNextToken();
+            t = _tokenizer.peekNextTokenType();
+        }
     }
 
     @Override
@@ -321,7 +335,16 @@ public class YAMLParser extends ParserBase
     }
     
     @Override
-    public JsonToken nextToken() throws IOException, JsonParseException
+    public JsonToken nextToken() throws IOException
+    /*
+    {
+        JsonToken t = nextToken0();
+        System.out.println("JSON: "+t);
+        return t;
+    }
+
+    JsonToken nextToken0() throws IOException
+    */
     {
         _currentIsAlias = false;
         _binaryValue = null;
@@ -333,105 +356,130 @@ public class YAMLParser extends ParserBase
 
         _lastTag = null;
 
-        while (true) {
-            Token t = _nextToken();
+        Token t = _pendingToken;
+        if (t == null) {
+            t = _nextToken();
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
             if (t == null) {
+                // TODO: verify it's fine
+                close();
                 return (_currToken = null);
             }
-            TokenType type = t.type;
+        } else {
+            _pendingToken = null;
+        }
+        TokenType type = t.type;
 
-            /* One complication: field names are only inferred from the
-             * fact that we are in Object context...
-             */
-            if (_parsingContext.inObject() && _currToken != JsonToken.FIELD_NAME) {
-                if (type == TokenType.KEY) {
-                    t = _nextToken();
-                    type = t.type;
-                } else {
-                    // end is fine
-                    if (type == TokenType.BLOCK_END || type == TokenType.FLOW_MAPPING_END) {
-                        if (!_parsingContext.inObject()) { // sanity check is optional, but let's do it for now
-                            _reportMismatchedEndMarker('}', ']');
-                        }
-                        _parsingContext = _parsingContext.getParent();
-                        return (_currToken = JsonToken.END_OBJECT);
-                    }
-                    _reportError("Expected a field name (Scalar value in YAML), got this instead: "+type);
-                }
-                if (t.type != TokenType.SCALAR) {
-                    _reportError("Expected a field name (Scalar value in YAML), got this instead: "+type);
-                }
-                ScalarToken scalar = (ScalarToken) t;
-                String name = scalar.getValue();
-                _currentFieldName = name;
-                _parsingContext.setCurrentName(name);
-                return (_currToken = JsonToken.FIELD_NAME);
-            }
-            // why do we get useless VALUE token?
-            while (type == TokenType.VALUE || type == TokenType.BLOCK_ENTRY || type == TokenType.FLOW_ENTRY) {
+        /* One complication: field names are only inferred from the
+         * fact that we are in Object context...
+         */
+        if (_parsingContext.inObject() && _currToken != JsonToken.FIELD_NAME) {
+            if (type == TokenType.KEY) {
                 t = _nextToken();
                 type = t.type;
+            } else {
+                // end is fine
+                if (type == TokenType.BLOCK_END || type == TokenType.FLOW_MAPPING_END) {
+                    if (!_parsingContext.inObject()) { // sanity check is optional, but let's do it for now
+                        _reportMismatchedEndMarker('}', ']');
+                    }
+                    _parsingContext = _parsingContext.getParent();
+                    return (_currToken = JsonToken.END_OBJECT);
+                }
             }
+            if (t.type != TokenType.SCALAR) {
+                _reportError("Expected a field name (Scalar value in YAML), got this instead: "+type);
+            }
+            ScalarToken scalar = (ScalarToken) t;
+            String name = scalar.getValue();
+            _currentFieldName = name;
+            _parsingContext.setCurrentName(name);
+            return (_currToken = JsonToken.FIELD_NAME);
+        }
+        // why do we get useless VALUE tokens?
+        boolean gotValue = (type == TokenType.VALUE);
+        if (gotValue) {
+            t = _nextToken();
+            type = t.type;
+        }
 
-            switch (type) {
-            case SCALAR:
-                JsonToken jt = _decodeScalar((ScalarToken) t, _lastTag);
-                _currToken = jt;
-                return jt;
-            case BLOCK_MAPPING_START:
-            case FLOW_MAPPING_START:
-                _parsingContext = _parsingContext.createChildObjectContext(_tokenizer.getLineNumber(),
-                        _tokenizer.getColumn());
-                return (_currToken = JsonToken.START_OBJECT);
-            case BLOCK_END:
-            case FLOW_MAPPING_END:
-                _reportError("Not expecting END_OBJECT but a value");
-            case BLOCK_SEQUENCE_START:
-            case FLOW_SEQUENCE_START:
+        // Looks like these entry markers indicate 'implicit' arrays?
+        if (type == TokenType.BLOCK_ENTRY || type == TokenType.FLOW_ENTRY) {
+            if (!_parsingContext.inArray()) {
                 _parsingContext = _parsingContext.createChildArrayContext(_tokenizer.getLineNumber(),
                         _tokenizer.getColumn());
                 return (_currToken = JsonToken.START_ARRAY);
-            case FLOW_SEQUENCE_END:
-                if (!_parsingContext.inArray()) { // sanity check is optional, but let's do it for now
-                    _reportMismatchedEndMarker(']', '}');
-                }
+            }
+            t = _nextToken();
+            type = t.type;
+        }
+
+        switch (type) {
+        case KEY: // should only get this due to missing END_ARRAY so:
+            if (_parsingContext.inArray()) {
+                _pendingToken = _tokenizer.getNextToken();
                 _parsingContext = _parsingContext.getParent();
                 return (_currToken = JsonToken.END_ARRAY);
-
-            case DOCUMENT_END:
-                // logical end of doc; fine. Two choices; either skip, or
-                // return null as marker. Do latter, for now. But do NOT close.
-                return (_currToken = null);
-            case DOCUMENT_START:
-//                DocumentStartEvent dd = (DocumentStartEvent) evt;
-                // does this matter? Shouldn't, should it?
-                continue;
-            case ALIAS:
-                _currentIsAlias = true;
-                _textValue = ((AliasToken) t).getInstanceName();
-                // for now, nothing to do: in future, maybe try to expose as ObjectIds?
-                return (_currToken = JsonToken.VALUE_STRING);
-            case STREAM_END:
-                close();
-                return (_currToken = null);
-            case STREAM_START: // useless, skip
-                continue;
-
-                // These should have been processed already:
-            case ANCHOR:
-            case TAG:
-
-                // Not sure what to do with these however
-            case BLOCK_ENTRY:
-            case DIRECTIVE:
-            case FLOW_ENTRY:
-            case KEY:
-            default:
-                _reportError("Unexpected token type; expected a value, tag or anchor, got: "+type);
-                break;
             }
+            // otherwise problem
+            break;
+        case SCALAR:
+            JsonToken jt = _decodeScalar((ScalarToken) t, _lastTag);
+            _currToken = jt;
+            return jt;
+        case BLOCK_MAPPING_START:
+        case FLOW_MAPPING_START:
+            _parsingContext = _parsingContext.createChildObjectContext(_tokenizer.getLineNumber(),
+                    _tokenizer.getColumn());
+            return (_currToken = JsonToken.START_OBJECT);
+        case BLOCK_END:
+        case FLOW_MAPPING_END:
+            // Work-around for implicit START-ARRAY
+            if (_parsingContext.inArray()) {
+                _pendingToken = t;
+                return (_currToken = JsonToken.END_ARRAY);
+            }
+            _reportError("Not expecting END_OBJECT but a value");
+        case BLOCK_SEQUENCE_START:
+        case FLOW_SEQUENCE_START:
+            _parsingContext = _parsingContext.createChildArrayContext(_tokenizer.getLineNumber(),
+                    _tokenizer.getColumn());
+            return (_currToken = JsonToken.START_ARRAY);
+        case FLOW_SEQUENCE_END:
+            if (!_parsingContext.inArray()) { // sanity check is optional, but let's do it for now
+                _reportMismatchedEndMarker(']', '}');
+            }
+            _parsingContext = _parsingContext.getParent();
+            return (_currToken = JsonToken.END_ARRAY);
+
+        case ALIAS:
+            _currentIsAlias = true;
+            _textValue = ((AliasToken) t).getInstanceName();
+            // for now, nothing to do: in future, maybe try to expose as ObjectIds?
+            return (_currToken = JsonToken.VALUE_STRING);
+        case STREAM_END:
+            close();
+            return (_currToken = null);
+
+            // These should have been processed already:
+        case ANCHOR:
+        case TAG:
+
+            // Not sure what to do with these however
+        case DOCUMENT_START: // should have been skipped already
+        case STREAM_START: // ditto
+        case DOCUMENT_END: // logical end
+            // but if these encountered, just skip with bit of recursion; they could
+            // occur if stream contains 
+            return nextToken();
+
+        case BLOCK_ENTRY:
+        case FLOW_ENTRY:
+        case DIRECTIVE:
+        default:
         }
+        _reportError("Unexpected token type; expected a value, tag or anchor, got: "+type.name());
+        return null; // never gets here
     }
     
     protected JsonToken _decodeScalar(ScalarToken scalar, String typeTag)
