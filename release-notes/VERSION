@@ -4,6 +4,10 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.5.1 (06-Feb-2015)
+
+No changes since 2.5.0
+
 2.5.0 (01-Jan-2015)
 
 #19: Change build to avoid OSGi dep to SnakeYAML (which is instead shaded in)
