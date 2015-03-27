@@ -164,6 +164,35 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("name: \"Brad\"\nage: 39", yaml);
     }
 
+    public void testSplitLines() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+
+        // Split lines enabled by default:
+        StringWriter w = new StringWriter();
+        assertTrue(f.isEnabled(YAMLGenerator.Feature.SPLIT_LINES));
+        YAMLGenerator gen = f.createGenerator(w);
+        assertTrue(gen.isEnabled(YAMLGenerator.Feature.SPLIT_LINES));
+        _writeLongLineDoc(gen);
+        String yaml = w.toString().trim();
+        assertEquals("---\n" +
+                "- \"1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890\\\n" +
+                "  \\ 1234567890\"",
+                yaml);
+
+        // then disable split lines:
+        f.disable(YAMLGenerator.Feature.SPLIT_LINES);
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.SPLIT_LINES));
+        w = new StringWriter();
+        gen = f.createGenerator(w);
+        assertFalse(gen.isEnabled(YAMLGenerator.Feature.SPLIT_LINES));
+        _writeLongLineDoc(gen);
+        yaml = w.toString().trim();
+        assertEquals("---\n" +
+                "- \"1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890\"",
+                yaml);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods
@@ -177,6 +206,14 @@ public class SimpleGenerationTest extends ModuleTestBase
         gen.writeStringField("name", "Brad");
         gen.writeNumberField("age", 39);
         gen.writeEndObject();
+        gen.close();
+    }
+
+    protected void _writeLongLineDoc(JsonGenerator gen) throws IOException
+    {
+        gen.writeStartArray();
+        gen.writeString("1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890");
+        gen.writeEndArray();
         gen.close();
     }
 }
