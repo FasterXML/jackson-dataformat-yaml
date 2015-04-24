@@ -4,6 +4,10 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.4.6 (23-Apr-2015)
+
+No changes since 2.4.5
+
 2.4.5 (13-Jan-2015)
 
 #30: `YamlFactory.writeValue(File, Object)` busted
