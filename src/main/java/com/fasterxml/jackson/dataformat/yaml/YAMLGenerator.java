@@ -52,6 +52,13 @@ public class YAMLGenerator extends GeneratorBase
         USE_NATIVE_TYPE_ID(true),
 
         /**
+         * Whether values should be split across multiple lines.
+         *
+         * @since 2.6
+         */
+        SPLIT_LINES(true),
+
+        /**
          * Do we try to force so-called canonical output or not.
          */
         CANONICAL_OUTPUT(false)
@@ -674,6 +681,7 @@ public class YAMLGenerator extends GeneratorBase
                 // if not, MUST specify flow styles
                 opt.setDefaultFlowStyle(FlowStyle.BLOCK);
             }
+            opt.setSplitLines(isEnabled(Feature.SPLIT_LINES));
             _outputOptions = opt;
         }
         return _outputOptions;
