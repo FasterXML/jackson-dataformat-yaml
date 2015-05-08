@@ -155,7 +155,18 @@ public class YAMLGenerator extends GeneratorBase
         _yamlFeatures = yamlFeatures;
         _writer = out;
 
-        _emitter = new Emitter(_writer, _outputOptions());
+        DumperOptions opt = new DumperOptions();
+        // would we want canonical?
+        if (isEnabled(Feature.CANONICAL_OUTPUT)) {
+            opt.setCanonical(true);
+        } else {
+            opt.setCanonical(false);
+            // if not, MUST specify flow styles
+            opt.setDefaultFlowStyle(FlowStyle.BLOCK);
+        }
+        _outputOptions = opt;
+        
+        _emitter = new Emitter(_writer, _outputOptions);
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
         Map<String,String> noTags = Collections.emptyMap();
@@ -322,7 +333,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
-        Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
+        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
         String yamlTag = _typeId;
         boolean implicit = (yamlTag == null);
         String anchor = _objectId;
@@ -350,7 +361,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
-        Boolean style = _outputOptions().getDefaultFlowStyle().getStyleBoolean();
+        Boolean style = _outputOptions.getDefaultFlowStyle().getStyleBoolean();
         String yamlTag = _typeId;
         boolean implicit = (yamlTag == null);
         String anchor = _objectId;
@@ -660,22 +671,5 @@ public class YAMLGenerator extends GeneratorBase
         }
         return new ScalarEvent(anchor, yamlTag, DEFAULT_IMPLICIT, value,
                 null, null, style);
-    }
-
-    protected DumperOptions _outputOptions()
-    {
-        if (_outputOptions == null) {
-            DumperOptions opt = new DumperOptions();
-            // would we want canonical?
-            if (isEnabled(Feature.CANONICAL_OUTPUT)) {
-                opt.setCanonical(true);
-            } else {
-                opt.setCanonical(false);
-                // if not, MUST specify flow styles
-                opt.setDefaultFlowStyle(FlowStyle.BLOCK);
-            }
-            _outputOptions = opt;
-        }
-        return _outputOptions;
     }
 }
