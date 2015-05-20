@@ -64,7 +64,7 @@ public class PolymorphicIdTest extends ModuleTestBase
 
         // And third possibility; trickier, since YAML contains empty String,
         // and not Object; so we need to allow coercion
-        ObjectReader r = mapper.reader(Wrapper.class)
+        ObjectReader r = mapper.readerFor(Wrapper.class)
                 .with(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
         YAML = "nested: !single\n";
         top = r.readValue(YAML);
