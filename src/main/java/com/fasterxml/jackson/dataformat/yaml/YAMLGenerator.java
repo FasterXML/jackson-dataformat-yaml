@@ -54,8 +54,19 @@ public class YAMLGenerator extends GeneratorBase
         /**
          * Do we try to force so-called canonical output or not.
          */
-        CANONICAL_OUTPUT(false)
+        CANONICAL_OUTPUT(false),
 
+        /**
+         * Options passed to SnakeYAML that determines whether longer textual content
+         * gets automatically split into multiple lines or not.
+         *<p>
+         * Feature is enabled by default to conform to SnakeYAML defaults as well as
+         * backwards compatibility with 2.5 and earlier versions.
+         *
+         * @since 2.6
+         */
+        SPLIT_LINES(true)
+        
         ;
 
         protected final boolean _defaultState;
@@ -147,35 +158,42 @@ public class YAMLGenerator extends GeneratorBase
 
     public YAMLGenerator(IOContext ctxt, int jsonFeatures, int yamlFeatures,
             ObjectCodec codec, Writer out,
-            org.yaml.snakeyaml.DumperOptions.Version version
-            ) throws IOException
+            org.yaml.snakeyaml.DumperOptions.Version version)
+        throws IOException
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
         _yamlFeatures = yamlFeatures;
         _writer = out;
 
-        DumperOptions opt = new DumperOptions();
-        // would we want canonical?
-        if (isEnabled(Feature.CANONICAL_OUTPUT)) {
-            opt.setCanonical(true);
-        } else {
-            opt.setCanonical(false);
-            // if not, MUST specify flow styles
-            opt.setDefaultFlowStyle(FlowStyle.BLOCK);
-        }
-        _outputOptions = opt;
+        _outputOptions = buildDumperOptions(jsonFeatures, yamlFeatures, version);
         
         _emitter = new Emitter(_writer, _outputOptions);
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
         Map<String,String> noTags = Collections.emptyMap();
         
-        boolean startMarker = (Feature.WRITE_DOC_START_MARKER.getMask() & yamlFeatures) != 0;
+        boolean startMarker = Feature.WRITE_DOC_START_MARKER.enabledIn(yamlFeatures);
         
         _emitter.emit(new DocumentStartEvent(null, null, startMarker,
                 version, // for 1.10 was: ((version == null) ? null : version.getArray()),
                 noTags));
+    }
+
+    protected DumperOptions buildDumperOptions(int jsonFeatures, int yamlFeatures, org.yaml.snakeyaml.DumperOptions.Version version)
+    {
+        DumperOptions opt = new DumperOptions();
+        // would we want canonical?
+        if (Feature.CANONICAL_OUTPUT.enabledIn(_yamlFeatures)) {
+            opt.setCanonical(true);
+        } else {
+            opt.setCanonical(false);
+            // if not, MUST specify flow styles
+            opt.setDefaultFlowStyle(FlowStyle.BLOCK);
+        }
+        // [dataformat#35]: split-lines for text blocks?
+        opt.setSplitLines(Feature.SPLIT_LINES.enabledIn(_yamlFeatures));
+        return opt;
     }
 
     /*                                                                                       
@@ -316,10 +334,12 @@ public class YAMLGenerator extends GeneratorBase
     @Override
     public void close() throws IOException
     {
-        _emitter.emit(new DocumentEndEvent(null, null, false));
-        _emitter.emit(new StreamEndEvent(null, null));
-        super.close();
-        _writer.close();
+        if (!isClosed()) {
+            _emitter.emit(new DocumentEndEvent(null, null, false));
+            _emitter.emit(new StreamEndEvent(null, null));
+            super.close();
+            _writer.close();
+        }
     }
 
     /*

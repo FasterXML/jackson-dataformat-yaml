@@ -23,3 +23,9 @@ Benson Margulies (benson-basis@github)
  (2.4.4)
 - Reported #30: `YamlFactory.writeValue(File, Object)` busted
  (2.4.5)
+
+Ville Koskela (vjkoskela@github)
+
+- Requested #35: Add `YAMLGenerator.Feature.SPLIT_LINES` to allow controlling whether
+  SnakeYAML splits longer text blocks with line	breaks or not.
+ [2.6.0)

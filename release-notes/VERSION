@@ -6,6 +6,9 @@ Project: jackson-dataformat-yaml
 
 2.6.0 (not yet released)
 
+#35: Add `YAMLGenerator.Feature.SPLIT_LINES` to allow controlling whether
+  SnakeYAML splits longer text blocks with line breaks or not
+ (requested by Ville K, vjkoskela@github)
 - Upgrade to SnakeYAML 1.15
 
 2.5.3 (24-Apr-2015)
