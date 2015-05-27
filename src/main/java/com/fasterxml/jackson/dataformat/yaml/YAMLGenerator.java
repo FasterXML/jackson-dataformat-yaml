@@ -236,6 +236,15 @@ public class YAMLGenerator extends GeneratorBase
         return _writer;
     }
 
+    /**
+     * SnakeYAML does not expose buffered content amount, so we can only return
+     * <code>-1</code> from here
+     */
+    @Override
+    public int getOutputBuffered() {
+        return -1;
+    }
+
     @Override
     public boolean canUseSchema(FormatSchema schema) {
         return false;
