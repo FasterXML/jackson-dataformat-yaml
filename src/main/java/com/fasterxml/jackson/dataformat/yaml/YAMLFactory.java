@@ -133,10 +133,24 @@ public class YAMLFactory extends JsonFactory
     // No, we can't make use of char[] optimizations
     @Override
     public boolean canUseCharArrays() { return false; }
+
+    // Add these in 2.7:
+
+    /*
+    @Override
+    public Class<YAMLParser.Feature> getFormatReadFeatureType() {
+        return YAMLParser.Feature.class;
+    }
+
+    @Override
+    public Class<YAMLGenerator.Feature> getFormatWriteFeatureType() {
+        return YAMLGenerator.Feature.class;
+    }
+    */
     
     /*
     /**********************************************************
-    /* Format detection functionality (since 1.8)
+    /* Format detection functionality
     /**********************************************************
      */
     

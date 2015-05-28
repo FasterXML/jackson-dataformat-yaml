@@ -22,7 +22,8 @@ public class YAMLGenerator extends GeneratorBase
     /**
      * Enumeration that defines all togglable features for YAML generators
      */
-    public enum Feature {
+    public enum Feature // implements FormatFeature // for 2.7
+    {
         /**
          * Whether we are to write an explicit document start marker ("---")
          * or not.
@@ -113,7 +114,7 @@ public class YAMLGenerator extends GeneratorBase
      * {@link YAMLGenerator.Feature}s
      * are enabled.
      */
-    protected int _yamlFeatures;
+    protected int _formatFeatures;
 
     protected Writer _writer;
 
@@ -163,7 +164,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         super(jsonFeatures, codec);
         _ioContext = ctxt;
-        _yamlFeatures = yamlFeatures;
+        _formatFeatures = yamlFeatures;
         _writer = out;
 
         _outputOptions = buildDumperOptions(jsonFeatures, yamlFeatures, version);
@@ -184,7 +185,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         DumperOptions opt = new DumperOptions();
         // would we want canonical?
-        if (Feature.CANONICAL_OUTPUT.enabledIn(_yamlFeatures)) {
+        if (Feature.CANONICAL_OUTPUT.enabledIn(_formatFeatures)) {
             opt.setCanonical(true);
         } else {
             opt.setCanonical(false);
@@ -192,7 +193,7 @@ public class YAMLGenerator extends GeneratorBase
             opt.setDefaultFlowStyle(FlowStyle.BLOCK);
         }
         // [dataformat#35]: split-lines for text blocks?
-        opt.setSplitLines(Feature.SPLIT_LINES.enabledIn(_yamlFeatures));
+        opt.setSplitLines(Feature.SPLIT_LINES.enabledIn(_formatFeatures));
         return opt;
     }
 
@@ -236,6 +237,17 @@ public class YAMLGenerator extends GeneratorBase
         return _writer;
     }
 
+    @Override
+    public int getFormatFeatures() {
+        return _formatFeatures;
+    }
+
+    @Override
+    public JsonGenerator overrideFormatFeatures(int values, int mask) {
+        _formatFeatures = (_formatFeatures & ~mask) | (values & mask);
+        return this;
+    }
+    
     @Override
     public boolean canUseSchema(FormatSchema schema) {
         return false;
@@ -297,17 +309,17 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     public YAMLGenerator enable(Feature f) {
-        _yamlFeatures |= f.getMask();
+        _formatFeatures |= f.getMask();
         return this;
     }
 
     public YAMLGenerator disable(Feature f) {
-        _yamlFeatures &= ~f.getMask();
+        _formatFeatures &= ~f.getMask();
         return this;
     }
 
     public final boolean isEnabled(Feature f) {
-        return (_yamlFeatures & f.getMask()) != 0;
+        return (_formatFeatures & f.getMask()) != 0;
     }
 
     public YAMLGenerator configure(Feature f, boolean state) {
@@ -609,14 +621,14 @@ public class YAMLGenerator extends GeneratorBase
     public boolean canWriteObjectId() {
         // yes, YAML does support Native Type Ids!
         // 10-Sep-2014, tatu: Except as per [#23] might not want to...
-        return Feature.USE_NATIVE_OBJECT_ID.enabledIn(_yamlFeatures);
+        return Feature.USE_NATIVE_OBJECT_ID.enabledIn(_formatFeatures);
     }    
 
     @Override
     public boolean canWriteTypeId() {
         // yes, YAML does support Native Type Ids!
         // 10-Sep-2014, tatu: Except as per [#22] might not want to...
-        return Feature.USE_NATIVE_TYPE_ID.enabledIn(_yamlFeatures);
+        return Feature.USE_NATIVE_TYPE_ID.enabledIn(_formatFeatures);
     }    
 
     @Override

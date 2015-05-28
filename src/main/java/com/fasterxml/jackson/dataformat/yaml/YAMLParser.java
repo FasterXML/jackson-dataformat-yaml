@@ -26,9 +26,8 @@ public class YAMLParser extends ParserBase
     /**
      * Enumeration that defines all togglable features for YAML parsers.
      */
-    public enum Feature {
-        
-        BOGUS(false)
+    public enum Feature // implements FormatFeature // in 2.7
+    {
         ;
 
         final boolean _defaultState;
@@ -55,6 +54,7 @@ public class YAMLParser extends ParserBase
         }
         
         public boolean enabledByDefault() { return _defaultState; }
+        public boolean enabledIn(int flags) { return (flags & _mask) != 0; }        
         public int getMask() { return _mask; }
     }
 
@@ -79,7 +79,7 @@ public class YAMLParser extends ParserBase
      */
     protected ObjectCodec _objectCodec;
 
-    protected int _yamlFeatures;
+    protected int _formatFeatures;
 
     /*
     /**********************************************************************
@@ -137,12 +137,12 @@ public class YAMLParser extends ParserBase
      */
     
     public YAMLParser(IOContext ctxt, BufferRecycler br,
-            int parserFeatures, int csvFeatures,
+            int parserFeatures, int formatFeatures,
             ObjectCodec codec, Reader reader)
     {
         super(ctxt, parserFeatures);    
         _objectCodec = codec;
-        _yamlFeatures = csvFeatures;
+        _formatFeatures = formatFeatures;
         _reader = reader;
         _yamlParser = new ParserImpl(new StreamReader(reader));
     }
@@ -219,10 +219,21 @@ public class YAMLParser extends ParserBase
     
     /*
     /**********************************************************                              
-    /* Overridden methods
+    /* FormatFeature support
     /**********************************************************                              
      */
-    
+
+    @Override
+    public int getFormatFeatures() {
+        return _formatFeatures;
+    }
+
+    @Override
+    public JsonParser overrideFormatFeatures(int values, int mask) {
+        _formatFeatures = (_formatFeatures & ~mask) | (values & mask);
+        return this;
+    }
+
     /*
     /***************************************************
     /* Public API, configuration
@@ -235,7 +246,7 @@ public class YAMLParser extends ParserBase
      */
     public JsonParser enable(YAMLParser.Feature f)
     {
-        _yamlFeatures |= f.getMask();
+        _formatFeatures |= f.getMask();
         return this;
     }
 
@@ -245,7 +256,7 @@ public class YAMLParser extends ParserBase
      */
     public JsonParser disable(YAMLParser.Feature f)
     {
-        _yamlFeatures &= ~f.getMask();
+        _formatFeatures &= ~f.getMask();
         return this;
     }
 
@@ -268,7 +279,7 @@ public class YAMLParser extends ParserBase
      * is enabled.
      */
     public boolean isEnabled(YAMLParser.Feature f) {
-        return (_yamlFeatures & f.getMask()) != 0;
+        return (_formatFeatures & f.getMask()) != 0;
     }
 
 //    @Override public CsvSchema getSchema() 
