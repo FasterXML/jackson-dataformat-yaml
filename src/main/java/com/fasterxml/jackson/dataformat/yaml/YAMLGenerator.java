@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.io.IOContext;
 
 public class YAMLGenerator extends GeneratorBase
 {
+
+
     /**
      * Enumeration that defines all togglable features for YAML generators
      */
@@ -66,7 +68,18 @@ public class YAMLGenerator extends GeneratorBase
          *
          * @since 2.6
          */
-        SPLIT_LINES(true)
+        SPLIT_LINES(true),
+
+        /**
+         * Whether strings will be rendered without quotes (true) or
+         * with quotes (false, default).
+         *<p>
+         * Minimized quote usage makes for more human readable output; however, content is
+         * limited to printable characters according to the rules of
+         * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
+         * @since 2.6
+         */
+        MINIMIZE_QUOTES(false)
         
         ;
 
@@ -126,10 +139,14 @@ public class YAMLGenerator extends GeneratorBase
     // numbers, booleans, should use implicit
     private final static Character STYLE_SCALAR = null;
     // Strings quoted for fun
-    private final static Character STYLE_STRING = Character.valueOf('"');
-        
+    private final static Character STYLE_QUOTED = Character.valueOf('"');
+    // Strings in literal (block) style
+    private final static Character STYLE_LITERAL = Character.valueOf('|');
+
     // Which flow style to use for Base64? Maybe basic quoted?
     private final static Character STYLE_BASE64 = Character.valueOf('"');
+
+    private final static Character STYLE_PLAIN = null;
 
     /*
     /**********************************************************
@@ -439,7 +456,16 @@ public class YAMLGenerator extends GeneratorBase
             return;
         }
         _verifyValueWrite("write String value");
-        _writeScalar(text, "string", STYLE_STRING);
+        Character style = STYLE_QUOTED;
+        if (Feature.MINIMIZE_QUOTES.enabledIn(_formatFeatures)) {
+            if (text.contains("\n")) {
+                style = STYLE_LITERAL;
+            }
+            else {
+                style = STYLE_PLAIN;
+            }
+        }
+        _writeScalar(text, "string", style);
     }
 
     @Override
