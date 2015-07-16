@@ -8,16 +8,7 @@ Project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LI
 
 # Status
 
-Project is in its prototype phase, so:
-
-* Basic parsing seems to work, as per basic unit tests
-* Basic generation: not configurable, produces visually ok block format
-* Even format auto-detection works! (can create `ObjectMapper` with multiple `JsonFactory` instances, give an `InputStream`, and it'll figure out what format content is in!)
-
-Missing are:
-
-* Not much configurability: might make sense to esp. allow configuration of generation details
-* Support for YAML tags (which theoretically could help with typing), aliases and anchors (which would be good for Object Id, refs): ideally these would be supported. And it is possible in principle, no fundamental problems.
+As of version 2.5, project is production ready.
 
 ## Maven dependency
 
@@ -27,7 +18,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
-  <version>2.4.0</version>
+  <version>2.5.4/version>
 </dependency>
 ```
 
