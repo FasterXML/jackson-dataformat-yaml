@@ -192,6 +192,42 @@ public class SimpleGenerationTest extends ModuleTestBase
                 yaml);
     }    
 
+    public void testLiteralStringsSingleLine() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+
+        f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("key", "some value");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: some value", yaml);
+    }
+
+    public void testLiteralStringsMultiLine() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+
+        f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("key", "first\nsecond\nthird");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: |-\n  first\n  second\n  third", yaml);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods
