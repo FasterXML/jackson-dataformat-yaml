@@ -28,4 +28,10 @@ Ville Koskela (vjkoskela@github)
 
 - Requested #35: Add `YAMLGenerator.Feature.SPLIT_LINES` to allow controlling whether
   SnakeYAML splits longer text blocks with line	breaks or not.
- [2.6.0)
+ (2.6.0)
+
+Geoff Bourne (itzg@github)
+
+- Contributed #38: Add MINIMIZE_QUOTES generator feature
+ (2.7.0)
+

@@ -4,6 +4,11 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.7.0 (not yet released)
+
+#38: Add MINIMIZE_QUOTES generator feature
+ (contributed by Geoff B, itzg@github)
+
 2.6.1 (09-Aug-2015)
 
 No changes since 2.6.0.
