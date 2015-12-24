@@ -477,6 +477,12 @@ public class YAMLParser extends ParserBase
                 }
             }
         } else { // yes, got type tag
+            if (typeTag.startsWith("tag:yaml.org,2002:")) {
+                typeTag = typeTag.substring("tag:yaml.org,2002:".length());
+                if (typeTag.contains(",")) {
+                    typeTag = typeTag.split(",")[0];
+                }
+            }
             // canonical values by YAML are actually 'y' and 'n'; but plenty more unofficial:
             if ("bool".equals(typeTag)) { // must be "true" or "false"
                 Boolean B = _matchYAMLBoolean(value, len);
