@@ -8,6 +8,8 @@ Project: jackson-dataformat-yaml
 
 #38: Add MINIMIZE_QUOTES generator feature
  (contributed by Geoff B, itzg@github)
+#48: null values aren't mapped to Jackson nulls
+ (reported, contributed by Benson M)
 #50: Lack of SnakeYAML Resolver leaves some missing features
  (contributed by Benson M)
 
