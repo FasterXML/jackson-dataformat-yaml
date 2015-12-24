@@ -23,6 +23,8 @@ Benson Margulies (benson-basis@github)
  (2.4.4)
 - Reported #30: `YamlFactory.writeValue(File, Object)` busted
  (2.4.5)
+- Contributed #50: Lack of SnakeYAML Resolver leaves some missing features
+ (2.7.0)
 
 Ville Koskela (vjkoskela@github)
 

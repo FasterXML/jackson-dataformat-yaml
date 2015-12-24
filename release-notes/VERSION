@@ -8,6 +8,8 @@ Project: jackson-dataformat-yaml
 
 #38: Add MINIMIZE_QUOTES generator feature
  (contributed by Geoff B, itzg@github)
+#50: Lack of SnakeYAML Resolver leaves some missing features
+ (contributed by Benson M)
 
 2.6.2 (15-Sep-2015)
 2.6.1 (09-Aug-2015)
