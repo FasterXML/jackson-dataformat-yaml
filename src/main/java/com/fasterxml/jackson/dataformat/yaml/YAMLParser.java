@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.events.*;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.parser.ParserImpl;
 import org.yaml.snakeyaml.reader.StreamReader;
 
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.core.base.ParserBase;
 import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.core.util.BufferRecycler;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
+import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
  * {@link JsonParser} implementation used to expose YAML documents
@@ -94,6 +97,7 @@ public class YAMLParser extends ParserBase
     protected final Reader _reader;
 
     protected final ParserImpl _yamlParser;
+    protected final Resolver _yamlResolver = new Resolver();
 
     /*
     /**********************************************************************
@@ -439,42 +443,25 @@ public class YAMLParser extends ParserBase
         String typeTag = scalar.getTag();
         final int len = value.length();
 
-        if (typeTag == null) { // no, implicit
-            // We only try to parse the string value if it is in the plain flow style.
-            // The API for ScalarEvent.getStyle() might be read as a null being returned
-            // in the plain flow style, but debugging shows the null-byte character, so
-            // we support both.
-            Character style = scalar.getStyle();
-
-            if ((style == null || style == '\u0000') && len > 0) {
-                char c = value.charAt(0);
-                switch (c) {
-                case 'n':
-                    if ("null".equals(value)) {
-                        return JsonToken.VALUE_NULL;
-                    }
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                case '+':
-                case '-':
-                case '.':
-                    JsonToken t = _decodeNumberScalar(value, len);
-                    if (t != null) {
-                        return t;
-                    }
-                }
+        if (typeTag == null || typeTag.equals("!")) { // no, implicit
+            Tag nodeTag = _yamlResolver.resolve(NodeId.scalar, value, scalar.getImplicit().canOmitTagInPlainScalar());
+            if (nodeTag == Tag.STR) {
+                return (_currToken = JsonToken.VALUE_STRING);
+            } else if (nodeTag == Tag.INT) {
+                return _decodeNumberScalar(value, len);
+            } else if (nodeTag == Tag.FLOAT) {
+                _numTypesValid = 0;
+                return JsonToken.VALUE_NUMBER_FLOAT;
+            } else if (nodeTag == Tag.BOOL) {
                 Boolean B = _matchYAMLBoolean(value, len);
                 if (B != null) {
-                    return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
+                    return B ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
                 }
+            } else if (nodeTag == Tag.NULL) {
+                return JsonToken.VALUE_NULL;
+            } else {
+                // what to do with timestamp and binary and merge etc.
+                return JsonToken.VALUE_STRING;
             }
         } else { // yes, got type tag
             if (typeTag.startsWith("tag:yaml.org,2002:")) {
@@ -487,11 +474,12 @@ public class YAMLParser extends ParserBase
             if ("bool".equals(typeTag)) { // must be "true" or "false"
                 Boolean B = _matchYAMLBoolean(value, len);
                 if (B != null) {
-                    return B.booleanValue() ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
+                    return B ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
                 }
             } else if ("int".equals(typeTag)) {
-                return JsonToken.VALUE_NUMBER_INT;
+                return _decodeNumberScalar(value, len);
             } else if ("float".equals(typeTag)) {
+                _numTypesValid = 0;
                 return JsonToken.VALUE_NUMBER_FLOAT;
             } else if ("null".equals(typeTag)) {
                 return JsonToken.VALUE_NULL;
@@ -499,7 +487,7 @@ public class YAMLParser extends ParserBase
         }
         
         // any way to figure out actual type? No?
-        return (_currToken = JsonToken.VALUE_STRING);
+        return JsonToken.VALUE_STRING;
     }
 
     protected Boolean _matchYAMLBoolean(String value, int len)
