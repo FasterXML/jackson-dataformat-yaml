@@ -24,7 +24,7 @@
 
   <properties>
     <version.jackson.annotations>2.6.0</version.jackson.annotations>
-    <version.jackson.core>2.6.4</version.jackson.core>
+    <version.jackson.core>2.6.5</version.jackson.core>
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
     <osgi.private>org.yaml.snakeyaml.*</osgi.private>
