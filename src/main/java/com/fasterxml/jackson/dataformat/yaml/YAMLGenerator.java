@@ -280,6 +280,35 @@ public class YAMLGenerator extends GeneratorBase
     //@Override public void setSchema(FormatSchema schema)
 
     /*
+    /**********************************************************
+    /* Extended API, configuration
+    /**********************************************************
+     */
+
+    public YAMLGenerator enable(Feature f) {
+        _formatFeatures |= f.getMask();
+        return this;
+    }
+
+    public YAMLGenerator disable(Feature f) {
+        _formatFeatures &= ~f.getMask();
+        return this;
+    }
+
+    public final boolean isEnabled(Feature f) {
+        return (_formatFeatures & f.getMask()) != 0;
+    }
+
+    public YAMLGenerator configure(Feature f, boolean state) {
+        if (state) {
+            enable(f);
+        } else {
+            disable(f);
+        }
+        return this;
+    }
+    
+    /*
     /**********************************************************************
     /* Overridden methods; writing field names
     /**********************************************************************
@@ -324,35 +353,6 @@ public class YAMLGenerator extends GeneratorBase
         throws IOException
     {
         _writeScalar(name, "string", STYLE_NAME);
-    }
-    
-    /*
-    /**********************************************************
-    /* Extended API, configuration
-    /**********************************************************
-     */
-
-    public YAMLGenerator enable(Feature f) {
-        _formatFeatures |= f.getMask();
-        return this;
-    }
-
-    public YAMLGenerator disable(Feature f) {
-        _formatFeatures &= ~f.getMask();
-        return this;
-    }
-
-    public final boolean isEnabled(Feature f) {
-        return (_formatFeatures & f.getMask()) != 0;
-    }
-
-    public YAMLGenerator configure(Feature f, boolean state) {
-        if (state) {
-            enable(f);
-        } else {
-            disable(f);
-        }
-        return this;
     }
 
     /*
