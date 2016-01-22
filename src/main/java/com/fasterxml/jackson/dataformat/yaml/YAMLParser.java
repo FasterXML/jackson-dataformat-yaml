@@ -212,7 +212,7 @@ public class YAMLParser extends ParserBase
     }
 
     @Override
-    protected void _finishString() throws IOException, JsonParseException {
+    protected void _finishString() throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -333,7 +333,7 @@ public class YAMLParser extends ParserBase
      */
     
     @Override
-    public JsonToken nextToken() throws IOException, JsonParseException
+    public JsonToken nextToken() throws IOException
     {
         _currentIsAlias = false;
         _binaryValue = null;
@@ -570,7 +570,7 @@ public class YAMLParser extends ParserBase
     }
     
     @Override
-    public String getText() throws IOException, JsonParseException
+    public String getText() throws IOException
     {
         if (_currToken == JsonToken.VALUE_STRING) {
             return _textValue;
@@ -588,31 +588,31 @@ public class YAMLParser extends ParserBase
     }
 
     @Override
-    public String getCurrentName() throws IOException, JsonParseException
+    public String getCurrentName() throws IOException
     {
         if (_currToken == JsonToken.FIELD_NAME) {
             return _currentFieldName;
         }
         return super.getCurrentName();
     }
-    
+
     @Override
-    public char[] getTextCharacters() throws IOException, JsonParseException {
+    public char[] getTextCharacters() throws IOException {
         String text = getText();
         return (text == null) ? null : text.toCharArray();
     }
 
     @Override
-    public int getTextLength() throws IOException, JsonParseException {
+    public int getTextLength() throws IOException {
         String text = getText();
         return (text == null) ? 0 : text.length();
     }
 
     @Override
-    public int getTextOffset() throws IOException, JsonParseException {
+    public int getTextOffset() throws IOException {
         return 0;
     }
-    
+
     /*
     /**********************************************************************
     /* Binary (base64)
@@ -620,13 +620,14 @@ public class YAMLParser extends ParserBase
      */
 
     @Override
-    public Object getEmbeddedObject() throws IOException, JsonParseException {
+    public Object getEmbeddedObject() throws IOException {
         return null;
     }
-    
+
+    // TODO: can remove from 2.9 or so (base impl added in 2.8)
     @SuppressWarnings("resource")
     @Override
-    public byte[] getBinaryValue(Base64Variant variant) throws IOException, JsonParseException
+    public byte[] getBinaryValue(Base64Variant variant) throws IOException
     {
         if (_binaryValue == null) {
             if (_currToken != JsonToken.VALUE_STRING) {

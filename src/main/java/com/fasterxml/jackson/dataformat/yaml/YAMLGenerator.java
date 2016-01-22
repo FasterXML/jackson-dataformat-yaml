@@ -19,8 +19,6 @@ import com.fasterxml.jackson.core.io.IOContext;
 
 public class YAMLGenerator extends GeneratorBase
 {
-
-
     /**
      * Enumeration that defines all togglable features for YAML generators
      */
@@ -292,7 +290,7 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     @Override
-    public final void writeFieldName(String name) throws IOException, JsonGenerationException
+    public final void writeFieldName(String name) throws IOException
     {
         if (_writeContext.writeFieldName(name) == JsonWriteContext.STATUS_EXPECT_VALUE) {
             _reportError("Can not write a field name, expecting a value");
@@ -302,7 +300,7 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public final void writeFieldName(SerializableString name)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         // Object is a value, need to verify it's allowed
         if (_writeContext.writeFieldName(name.getValue()) == JsonWriteContext.STATUS_EXPECT_VALUE) {
@@ -313,7 +311,7 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public final void writeStringField(String fieldName, String value)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         if (_writeContext.writeFieldName(fieldName) == JsonWriteContext.STATUS_EXPECT_VALUE) {
             _reportError("Can not write a field name, expecting a value");
@@ -323,7 +321,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     private final void _writeFieldName(String name)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         _writeScalar(name, "string", STYLE_NAME);
     }
@@ -387,7 +385,7 @@ public class YAMLGenerator extends GeneratorBase
      */
     
     @Override
-    public final void writeStartArray() throws IOException, JsonGenerationException
+    public final void writeStartArray() throws IOException
     {
         _verifyValueWrite("start an array");
         _writeContext = _writeContext.createChildArrayContext();
@@ -403,7 +401,7 @@ public class YAMLGenerator extends GeneratorBase
     }
     
     @Override
-    public final void writeEndArray() throws IOException, JsonGenerationException
+    public final void writeEndArray() throws IOException
     {
         if (!_writeContext.inArray()) {
             _reportError("Current context not an ARRAY but "+_writeContext.getTypeDesc());
@@ -415,7 +413,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public final void writeStartObject() throws IOException, JsonGenerationException
+    public final void writeStartObject() throws IOException
     {
         _verifyValueWrite("start an object");
         _writeContext = _writeContext.createChildObjectContext();
@@ -431,7 +429,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public final void writeEndObject() throws IOException, JsonGenerationException
+    public final void writeEndObject() throws IOException
     {
         if (!_writeContext.inObject()) {
             _reportError("Current context not an object but "+_writeContext.getTypeDesc());
@@ -469,28 +467,28 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public void writeString(char[] text, int offset, int len) throws IOException, JsonGenerationException
+    public void writeString(char[] text, int offset, int len) throws IOException
     {
         writeString(new String(text, offset, len));
     }
 
     @Override
     public final void writeString(SerializableString sstr)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         writeString(sstr.toString());
     }
 
     @Override
     public void writeRawUTF8String(byte[] text, int offset, int len)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         _reportUnsupportedOperation();
     }
 
     @Override
     public final void writeUTF8String(byte[] text, int offset, int len)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         writeString(new String(text, offset, len, "UTF-8"));
     }
@@ -502,37 +500,37 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     @Override
-    public void writeRaw(String text) throws IOException, JsonGenerationException {
+    public void writeRaw(String text) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRaw(String text, int offset, int len) throws IOException, JsonGenerationException {
+    public void writeRaw(String text, int offset, int len) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRaw(char[] text, int offset, int len) throws IOException, JsonGenerationException {
+    public void writeRaw(char[] text, int offset, int len) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRaw(char c) throws IOException, JsonGenerationException {
+    public void writeRaw(char c) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRawValue(String text) throws IOException, JsonGenerationException {
+    public void writeRawValue(String text) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRawValue(String text, int offset, int len) throws IOException, JsonGenerationException {
+    public void writeRawValue(String text, int offset, int len) throws IOException {
         _reportUnsupportedOperation();
     }
 
     @Override
-    public void writeRawValue(char[] text, int offset, int len) throws IOException, JsonGenerationException {
+    public void writeRawValue(char[] text, int offset, int len) throws IOException {
         _reportUnsupportedOperation();
     }
 
@@ -543,7 +541,7 @@ public class YAMLGenerator extends GeneratorBase
      */
     
     @Override
-    public void writeBinary(Base64Variant b64variant, byte[] data, int offset, int len) throws IOException, JsonGenerationException
+    public void writeBinary(Base64Variant b64variant, byte[] data, int offset, int len) throws IOException
     {
         if (data == null) {
             writeNull();
@@ -565,21 +563,21 @@ public class YAMLGenerator extends GeneratorBase
      */
 
     @Override
-    public void writeBoolean(boolean state) throws IOException, JsonGenerationException
+    public void writeBoolean(boolean state) throws IOException
     {
         _verifyValueWrite("write boolean value");
         _writeScalar(state ? "true" : "false", "bool", STYLE_SCALAR);
     }
 
     @Override
-    public void writeNumber(int i) throws IOException, JsonGenerationException
+    public void writeNumber(int i) throws IOException
     {
         _verifyValueWrite("write number");
         _writeScalar(String.valueOf(i), "int", STYLE_SCALAR);
     }
 
     @Override
-    public void writeNumber(long l) throws IOException, JsonGenerationException
+    public void writeNumber(long l) throws IOException
     {
         // First: maybe 32 bits is enough?
         if (l <= MAX_INT_AS_LONG && l >= MIN_INT_AS_LONG) {
@@ -591,7 +589,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public void writeNumber(BigInteger v) throws IOException, JsonGenerationException
+    public void writeNumber(BigInteger v) throws IOException
     {
         if (v == null) {
             writeNull();
@@ -602,21 +600,21 @@ public class YAMLGenerator extends GeneratorBase
     }
     
     @Override
-    public void writeNumber(double d) throws IOException, JsonGenerationException
+    public void writeNumber(double d) throws IOException
     {
         _verifyValueWrite("write number");
         _writeScalar(String.valueOf(d), "double", STYLE_SCALAR);
     }    
 
     @Override
-    public void writeNumber(float f) throws IOException, JsonGenerationException
+    public void writeNumber(float f) throws IOException
     {
         _verifyValueWrite("write number");
         _writeScalar(String.valueOf(f), "float", STYLE_SCALAR);
     }
 
     @Override
-    public void writeNumber(BigDecimal dec) throws IOException, JsonGenerationException
+    public void writeNumber(BigDecimal dec) throws IOException
     {
         if (dec == null) {
             writeNull();
@@ -639,7 +637,7 @@ public class YAMLGenerator extends GeneratorBase
     }
 
     @Override
-    public void writeNull() throws IOException, JsonGenerationException
+    public void writeNull() throws IOException
     {
         _verifyValueWrite("write null value");
         // no real type for this, is there?
@@ -668,7 +666,7 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public void writeTypeId(Object id)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         // should we verify there's no preceding type id?
         _typeId = String.valueOf(id);
@@ -676,7 +674,7 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public void writeObjectRef(Object id)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         _verifyValueWrite("write Object reference");
         AliasEvent evt = new AliasEvent(String.valueOf(id), null, null);
@@ -685,21 +683,21 @@ public class YAMLGenerator extends GeneratorBase
     
     @Override
     public void writeObjectId(Object id)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         // should we verify there's no preceding id?
         _objectId = String.valueOf(id);
     }
-    
+
     /*
     /**********************************************************
     /* Implementations for methods from base class
     /**********************************************************
      */
-    
+
     @Override
     protected final void _verifyValueWrite(String typeMsg)
-        throws IOException, JsonGenerationException
+        throws IOException
     {
         int status = _writeContext.writeValue();
         if (status == JsonWriteContext.STATUS_EXPECT_NAME) {
