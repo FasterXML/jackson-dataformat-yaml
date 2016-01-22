@@ -439,7 +439,7 @@ public class YAMLGenerator extends GeneratorBase
         _writeContext = _writeContext.getParent();
         _emitter.emit(new MappingEndEvent(null, null));
     }
-    
+
     /*
     /**********************************************************
     /* Output method implementations, textual
@@ -558,7 +558,7 @@ public class YAMLGenerator extends GeneratorBase
 
     /*
     /**********************************************************
-    /* Output method implementations, primitive
+    /* Output method implementations, scalars
     /**********************************************************
      */
 
