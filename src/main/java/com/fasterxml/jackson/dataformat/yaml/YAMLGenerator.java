@@ -75,7 +75,8 @@ public class YAMLGenerator extends GeneratorBase
          * Minimized quote usage makes for more human readable output; however, content is
          * limited to printable characters according to the rules of
          * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
-         * @since 2.6
+         *
+         * @since 2.7
          */
         MINIMIZE_QUOTES(false)
         
