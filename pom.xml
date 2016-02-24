@@ -24,8 +24,14 @@
 
   <properties>
     <version.jackson.core>2.7.1</version.jackson.core>
+
+    <!-- 23-Feb-2016, tatu: Try to keep JDK6 runtime for 2.7 at least -->
+    <javac.src.version>1.6</javac.src.version>
+    <javac.target.version>1.6</javac.target.version>
+
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
+
     <!-- OSGi default import fine, but due to shading, may need to specify export -->
     <osgi.private>org.yaml.snakeyaml.*</osgi.private>
     <osgi.export>${project.groupId}.yaml;version=${project.version}</osgi.export>
