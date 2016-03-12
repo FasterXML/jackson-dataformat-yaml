@@ -4,6 +4,10 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.7.3 (not yet released)
+
+#59: Avoid exposing SnakeYAML exception types (wrap)
+
 2.7.2 (27-Feb-2016)
 
 - Change build to produce JDK6-compatible jar, to allow use on JDK6 runtime

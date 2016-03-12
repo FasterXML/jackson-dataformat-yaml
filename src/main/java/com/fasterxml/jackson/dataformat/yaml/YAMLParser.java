@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.Mark;
+import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.events.*;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -17,6 +18,8 @@ import com.fasterxml.jackson.core.base.ParserBase;
 import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.core.util.BufferRecycler;
 import com.fasterxml.jackson.core.util.ByteArrayBuilder;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import org.yaml.snakeyaml.resolver.Resolver;
 
 /**
@@ -343,7 +346,21 @@ public class YAMLParser extends ParserBase
         }
         
         while (true) {
-            Event evt = _yamlParser.getEvent();
+            Event evt;
+            try {
+                evt = _yamlParser.getEvent();
+            } catch (YAMLException e) {
+                /* 12-Mar-2016, tatu: It may look weird that we do NOT add cause
+                 *    as is, but see issue [dataformat-yaml#31] for details: basically,
+                 *    exposing a SnakeYAML type is leakage that can have nasty side effects
+                 */
+                String msg = String.format("YAML decoding problem: %s", e.getMessage());
+                // !!! TODO: In 2.8. use the new constructor from databind 2.7
+                JsonMappingException e2 = new JsonMappingException(msg);
+                // try to retain stack trace, however, for troubleshooting
+                e2.setStackTrace(e.getStackTrace());
+                throw e2;
+            }
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
             if (evt == null) {
                 return (_currToken = null);

@@ -5,8 +5,6 @@ import java.util.Arrays;
 
 import com.fasterxml.jackson.core.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public abstract class ModuleTestBase extends junit.framework.TestCase
 {
     /**
@@ -70,9 +68,9 @@ public abstract class ModuleTestBase extends junit.framework.TestCase
     /**********************************************************************
      */
     
-    protected ObjectMapper mapperForYAML()
+    protected YAMLMapper mapperForYAML()
     {
-        return new ObjectMapper(new YAMLFactory());
+        return new YAMLMapper();
     }
     
     /*
