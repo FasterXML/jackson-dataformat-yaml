@@ -4,6 +4,14 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.8.0 (not yet released)
+
+No changes since 2.7
+
+2.7.4 (29-Apr-2016)
+
+No changes since 2.7.3
+
 2.7.3 (16-Mar-2016)
 
 #59: Avoid exposing SnakeYAML exception types (wrap)
