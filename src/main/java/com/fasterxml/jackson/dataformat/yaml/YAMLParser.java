@@ -210,16 +210,6 @@ public class YAMLParser extends ParserBase
      */
 
     @Override
-    protected boolean loadMore() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    protected void _finishString() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     protected void _closeInput() throws IOException {
         _reader.close();
     }
@@ -354,9 +344,8 @@ public class YAMLParser extends ParserBase
                  *    as is, but see issue [dataformat-yaml#31] for details: basically,
                  *    exposing a SnakeYAML type is leakage that can have nasty side effects
                  */
-                String msg = String.format("YAML decoding problem: %s", e.getMessage());
-                // !!! TODO: In 2.8. use the new constructor from databind 2.7
-                JsonMappingException e2 = new JsonMappingException(msg);
+                JsonMappingException e2 = JsonMappingException.from(this,
+                        "YAML decoding problem: "+e.getMessage());
                 // try to retain stack trace, however, for troubleshooting
                 e2.setStackTrace(e.getStackTrace());
                 throw e2;
@@ -628,6 +617,17 @@ public class YAMLParser extends ParserBase
     @Override
     public int getTextOffset() throws IOException {
         return 0;
+    }
+
+    @Override // since 2.8
+    public int getText(Writer writer) throws IOException
+    {
+        String str = getText();
+        if (str == null) {
+            return 0;
+        }
+        writer.write(str);
+        return str.length();
     }
 
     /*

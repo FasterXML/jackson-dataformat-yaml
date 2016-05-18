@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.format.InputAccessor;
 import com.fasterxml.jackson.core.format.MatchStrength;
 import com.fasterxml.jackson.core.io.IOContext;
 
+@SuppressWarnings("resource")
 public class YAMLFactory extends JsonFactory
 {
 	private static final long serialVersionUID = 1L;
@@ -351,7 +352,6 @@ public class YAMLFactory extends JsonFactory
         return _createParser(data, 0, data.length, ctxt);
     }
 
-    @SuppressWarnings("resource")
     @Override
     public YAMLParser createParser(byte[] data, int offset, int len) throws IOException
     {
