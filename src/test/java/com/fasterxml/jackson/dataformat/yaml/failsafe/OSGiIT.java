@@ -36,11 +36,15 @@ public class OSGiIT
                 mavenBundle("com.fasterxml.jackson.core", "jackson-core").versionAsInProject(),
                 mavenBundle("com.fasterxml.jackson.core", "jackson-annotations").versionAsInProject(),
                 mavenBundle("com.fasterxml.jackson.core", "jackson-databind").versionAsInProject(),
-                /*
-                 * mavenBundle talks to aether, not the reactor, so we cannot use it to access the
+                // As of Jackson 2.8, will also need SnakeYAML, not shaded in
+                mavenBundle("org.yaml", "snakeyaml").versionAsInProject(),
+                
+                /* mavenBundle talks to aether, not the reactor, so we cannot use it to access the
                  * thing built just now. Instead, we load the file.
                  */
-                url(String.format("file:%s/jackson-dataformat-yaml-%s.jar", System.getProperty("project.build.directory"), System.getProperty("project.version"))),
+                url(String.format("file:%s/jackson-dataformat-yaml-%s.jar",
+                        System.getProperty("project.build.directory"),
+                        System.getProperty("project.version"))),
                 systemPackages(
                         "javax.annotation"),
                 junitBundles(),

@@ -1,6 +1,6 @@
 package com.fasterxml.jackson.dataformat.yaml;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonParseException;
 
 /**
  * Tests to try to ensure that SnakeYAML exceptions are not leaked,
@@ -18,9 +18,9 @@ public class ExceptionConversionTest extends ModuleTestBase
              fail("Should not pass with invalid YAML");
         } catch (org.yaml.snakeyaml.scanner.ScannerException e) {
             fail("Internal exception type: "+e);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-            // good
+        } catch (JsonParseException e) { // as of 2.8, this is the type to expect
+            verifyException(e, "YAML decoding problem");
+            verifyException(e, "mapping values are not allowed here");
         } catch (Exception e) {
             fail("Unknown exception: "+e);
         }

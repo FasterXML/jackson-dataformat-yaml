@@ -6,6 +6,7 @@ Project: jackson-dataformat-yaml
 
 2.8.0 (not yet released)
 
+#31: SnakeYAML is shaded and pulled in transitively
 #60: YAML serializer reports wrong exception
  (suggested by pmogren@github)
 

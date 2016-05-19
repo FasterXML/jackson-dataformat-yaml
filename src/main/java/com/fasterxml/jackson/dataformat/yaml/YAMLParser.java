@@ -344,7 +344,7 @@ public class YAMLParser extends ParserBase
                  *    as is, but see issue [dataformat-yaml#31] for details: basically,
                  *    exposing a SnakeYAML type is leakage that can have nasty side effects
                  */
-                JsonMappingException e2 = JsonMappingException.from(this,
+                JsonParseException e2 = new JsonParseException(this,
                         "YAML decoding problem: "+e.getMessage());
                 // try to retain stack trace, however, for troubleshooting
                 e2.setStackTrace(e.getStackTrace());

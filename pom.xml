@@ -27,9 +27,9 @@
 
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
-
-    <!-- OSGi default import fine, but due to shading, may need to specify export -->
-    <osgi.private>org.yaml.snakeyaml.*</osgi.private>
+    <!-- 18-May-2016, tatu: used to have to specify `osgi.private` to included shaded
+           package; but must NOT when included as regular dependency
+      -->
     <osgi.export>${project.groupId}.yaml;version=${project.version}</osgi.export>
     <pax.url.version>1.2.8</pax.url.version>
     <pax.exam.version>4.3.0</pax.exam.version>
@@ -102,7 +102,7 @@
 
   <build>
     <plugins>
-        <plugin>
+      <plugin>
           <groupId>org.apache.servicemix.tooling</groupId>
           <artifactId>depends-maven-plugin</artifactId>
           <version>1.2</version>
@@ -161,34 +161,6 @@
             </includes>
           </configuration>
         </plugin>
-      <plugin>
-        <!--  We will shade SnakeYAML, to simplify deployment, avoid version conflicts -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.2</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <artifactSet>
-                <includes>
-                  <!-- the bundle plugin already did the pulling-in, all we need is the renaming! -->
-                  <include>null:null</include>
-                </includes>
-              </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>org.yaml.snakeyaml</pattern>
-                  <shadedPattern>com.fasterxml.jackson.dataformat.yaml.snakeyaml</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 
