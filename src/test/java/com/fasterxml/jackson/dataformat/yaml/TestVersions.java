@@ -18,6 +18,26 @@ public class TestVersions extends ModuleTestBase
         assertVersion(jgen);
     }
 
+    public void testDefaults() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        assertFalse(f.canHandleBinaryNatively());
+        assertFalse(f.canUseCharArrays());
+
+        JsonParser p = f.createParser(new StringReader(""));
+        assertTrue(p.canReadObjectId());
+        assertTrue(p.canReadTypeId());
+        p.close();
+
+        @SuppressWarnings("resource")
+        JsonGenerator g = f.createGenerator(new StringWriter());
+        assertTrue(g.canOmitFields());
+        assertTrue(g.canWriteFormattedNumbers());
+        assertTrue(g.canWriteObjectId());
+        assertTrue(g.canWriteTypeId());
+        assertFalse(g.canWriteBinaryNatively());
+    }
+    
     /*
     /**********************************************************
     /* Helper methods

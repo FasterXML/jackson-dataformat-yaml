@@ -277,7 +277,10 @@ public class YAMLGenerator extends GeneratorBase
     public boolean canUseSchema(FormatSchema schema) {
         return false;
     }
-    
+
+    @Override
+    public boolean canWriteFormattedNumbers() { return true; }
+
     //@Override public void setSchema(FormatSchema schema)
 
     /*
