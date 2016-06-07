@@ -408,7 +408,7 @@ public class YAMLGenerator extends GeneratorBase
     public final void writeEndArray() throws IOException
     {
         if (!_writeContext.inArray()) {
-            _reportError("Current context not an ARRAY but "+_writeContext.getTypeDesc());
+            _reportError("Current context not Array but "+_writeContext.typeDesc());
         }
         // just to make sure we don't "leak" type ids
         _typeId = null;        
@@ -436,7 +436,7 @@ public class YAMLGenerator extends GeneratorBase
     public final void writeEndObject() throws IOException
     {
         if (!_writeContext.inObject()) {
-            _reportError("Current context not an object but "+_writeContext.getTypeDesc());
+            _reportError("Current context not Object but "+_writeContext.typeDesc());
         }
         // just to make sure we don't "leak" type ids
         _typeId = null;        
