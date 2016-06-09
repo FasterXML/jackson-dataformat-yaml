@@ -12,7 +12,7 @@ Project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LI
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/)
 [![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/badge.svg)](http://www.javadoc.io/doc/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml)
 
-As of version 2.5, project is production ready.
+Module has been production ready since version 2.5.
 
 ## Maven dependency
 
@@ -22,7 +22,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
-  <version>2.5.4</version>
+  <version>2.7.4</version>
 </dependency>
 ```
 
