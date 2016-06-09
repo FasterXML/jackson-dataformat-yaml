@@ -6,7 +6,6 @@ import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.error.Mark;
-import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.events.*;
 import org.yaml.snakeyaml.nodes.NodeId;
 import org.yaml.snakeyaml.nodes.Tag;
@@ -324,6 +323,7 @@ public class YAMLParser extends ParserBase
     /**********************************************************
      */
     
+    @SuppressWarnings("deprecation")
     @Override
     public JsonToken nextToken() throws IOException
     {
@@ -333,21 +333,17 @@ public class YAMLParser extends ParserBase
         if (_closed) {
             return null;
         }
-        
+
         while (true) {
             Event evt;
             try {
                 evt = _yamlParser.getEvent();
-            } catch (YAMLException e) {
-                /* 12-Mar-2016, tatu: It may look weird that we do NOT add cause
-                 *    as is, but see issue [dataformat-yaml#31] for details: basically,
-                 *    exposing a SnakeYAML type is leakage that can have nasty side effects
-                 */
-                JsonParseException e2 = new JsonParseException(this,
-                        "YAML decoding problem: "+e.getMessage());
-                // try to retain stack trace, however, for troubleshooting
-                e2.setStackTrace(e.getStackTrace());
-                throw e2;
+            } catch (org.yaml.snakeyaml.error.YAMLException e) {
+                if (e instanceof org.yaml.snakeyaml.error.MarkedYAMLException) {
+                    throw com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.MarkedYAMLException.from
+                        (this, (org.yaml.snakeyaml.error.MarkedYAMLException) e);
+                }
+                throw com.fasterxml.jackson.dataformat.yaml.snakeyaml.error.YAMLException.from(this, e);
             }
             // is null ok? Assume it is, for now, consider to be same as end-of-doc
             if (evt == null) {
