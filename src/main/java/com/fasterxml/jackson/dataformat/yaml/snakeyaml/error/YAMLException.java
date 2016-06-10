@@ -17,18 +17,11 @@ public class YAMLException extends JacksonYAMLParseException
 
     public YAMLException(JsonParser p,
             org.yaml.snakeyaml.error.YAMLException src) {
-        super(p, _prefixed(src.getMessage()), src);
+        super(p, src.getMessage(), src);
     }
 
     public static YAMLException from(JsonParser p,
             org.yaml.snakeyaml.error.YAMLException src) {
         return new YAMLException(p, src);
-    }
-
-    private static String _prefixed(String msg) {
-        if (msg == null) {
-            return null;
-        }
-        return "YAML decoding problem: "+msg;
     }
 }
