@@ -10,6 +10,7 @@ Project: jackson-dataformat-yaml
 #60: YAML serializer reports wrong exception
  (suggested by pmogren@github)
 
+2.7.5 (11-Jun-2016)
 2.7.4 (29-Apr-2016)
 
 No changes since 2.7.3
