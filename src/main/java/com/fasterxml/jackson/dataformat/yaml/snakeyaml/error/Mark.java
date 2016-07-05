@@ -5,8 +5,9 @@ package com.fasterxml.jackson.dataformat.yaml.snakeyaml.error;
  *
  * @since 2.8 (as non-shaded); earlier shaded in
  *
- * @Deprecated Should use basic {@link com.fasterxml.jackson.core.JsonLocation} instead
+ * @deprecated Should use basic {@link com.fasterxml.jackson.core.JsonLocation} instead
  */
+@Deprecated // since 2.8
 public class Mark
 {
     protected final org.yaml.snakeyaml.error.Mark _source;
