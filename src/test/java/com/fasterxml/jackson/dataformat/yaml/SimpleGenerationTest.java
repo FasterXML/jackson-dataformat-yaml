@@ -228,6 +228,73 @@ public class SimpleGenerationTest extends ModuleTestBase
                 "key: |-\n  first\n  second\n  third", yaml);
     }
 
+    public void testQuoteNumberStoredAsString() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS));
+
+        f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+        f.configure(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS, true);
+        
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("key", "20");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: \"20\"", yaml);
+        
+        content.clear();
+        content.put("key", "2.0");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: \"2.0\"", yaml);
+        
+        content.clear();
+        content.put("key", "2.0.1.2.3");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: 2.0.1.2.3", yaml);
+    }
+
+    public void testNonQuoteNumberStoredAsString() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS));
+
+        f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
+        
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("key", "20");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: 20", yaml);
+        
+        content.clear();
+        content.put("key", "2.0");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: 2.0", yaml);
+        
+        content.clear();
+        content.put("key", "2.0.1.2.3");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                "key: 2.0.1.2.3", yaml);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods

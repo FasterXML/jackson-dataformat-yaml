@@ -472,7 +472,7 @@ public class YAMLGenerator extends GeneratorBase
         Character style = STYLE_QUOTED;
         if (Feature.MINIMIZE_QUOTES.enabledIn(_formatFeatures)) {
           // If this string could be interpreted as a number, it must be quoted.
-            if (Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS.enabledIn(_formatFeatures) && text.matches("[0-9\\.]+")) {
+            if (Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS.enabledIn(_formatFeatures) && text.matches("[0-9]*(\\.[0-9]*)?")) {
                 style = STYLE_QUOTED;
             }
             else if (text.contains("\n")) {
