@@ -78,8 +78,19 @@ public class YAMLGenerator extends GeneratorBase
          *
          * @since 2.7
          */
-        MINIMIZE_QUOTES(false)
+        MINIMIZE_QUOTES(false),
         
+        /**
+         * Whether numbers stored as strings will be rendered with quotes (true) or
+         * without quotes (false, default) when MINIMIZE_QUOTES is enabled.
+         *<p>
+         * Minimized quote usage makes for more human readable output; however, content is
+         * limited to printable characters according to the rules of
+         * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
+         *
+         * @since 2.8.1
+         */
+        ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false)
         ;
 
         protected final boolean _defaultState;
@@ -460,7 +471,11 @@ public class YAMLGenerator extends GeneratorBase
         _verifyValueWrite("write String value");
         Character style = STYLE_QUOTED;
         if (Feature.MINIMIZE_QUOTES.enabledIn(_formatFeatures)) {
-            if (text.contains("\n")) {
+          // If this string could be interpreted as a number, it must be quoted.
+            if (Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS.enabledIn(_formatFeatures) && text.matches("[0-9]*(\\.[0-9]*)?")) {
+                style = STYLE_QUOTED;
+            }
+            else if (text.contains("\n")) {
                 style = STYLE_LITERAL;
             }
             else {
