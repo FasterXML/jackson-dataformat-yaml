@@ -6,6 +6,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
@@ -88,7 +89,7 @@ public class YAMLGenerator extends GeneratorBase
          * limited to printable characters according to the rules of
          * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
          *
-         * @since 2.8.1
+         * @since 2.8.2
          */
         ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false)
         ;
@@ -119,11 +120,18 @@ public class YAMLGenerator extends GeneratorBase
         public boolean enabledByDefault() { return _defaultState; }
         public boolean enabledIn(int flags) { return (flags & _mask) != 0; }        
         public int getMask() { return _mask; }
-    };
+    }
 
+    /*
+    /**********************************************************
+    /* Internal constants
+    /**********************************************************
+     */
+    
     protected final static long MIN_INT_AS_LONG = (long) Integer.MIN_VALUE;
     protected final static long MAX_INT_AS_LONG = (long) Integer.MAX_VALUE;
-    
+    protected final static Pattern PLAIN_NUMBER_P = Pattern.compile("[0-9]*(\\.[0-9]*)?");
+
     /*
     /**********************************************************
     /* Configuration
@@ -472,13 +480,12 @@ public class YAMLGenerator extends GeneratorBase
         Character style = STYLE_QUOTED;
         if (Feature.MINIMIZE_QUOTES.enabledIn(_formatFeatures)) {
           // If this string could be interpreted as a number, it must be quoted.
-            if (Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS.enabledIn(_formatFeatures) && text.matches("[0-9]*(\\.[0-9]*)?")) {
+            if (Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS.enabledIn(_formatFeatures)
+                    && PLAIN_NUMBER_P.matcher(text).matches()) {
                 style = STYLE_QUOTED;
-            }
-            else if (text.contains("\n")) {
+            } else if (text.indexOf('\n') >= 0) {
                 style = STYLE_LITERAL;
-            }
-            else {
+            } else {
                 style = STYLE_PLAIN;
             }
         }

@@ -37,3 +37,7 @@ Geoff Bourne (itzg@github)
 - Contributed #38: Add MINIMIZE_QUOTES generator feature
  (2.7.0)
 
+Preston Gilchrist (prestongilchrist@github)
+
+- Contributed #65: Feature.MINIMIZE_QUOTES needs to write numbers as strings with quotes
+ (2.8.2)
