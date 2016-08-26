@@ -370,4 +370,20 @@ public class SimpleParseTest extends ModuleTestBase
 
         p.close();
     }
+
+    // for [dataformat-yaml#69]
+    public void testTimeLikeValues() throws Exception
+    {
+          final String YAML = "value: 3:00\n";
+          JsonParser p = YAML_F.createParser(YAML);
+
+          assertToken(JsonToken.START_OBJECT, p.nextToken());
+          assertToken(JsonToken.FIELD_NAME, p.nextToken());
+          assertEquals("value", p.getCurrentName());
+          assertToken(JsonToken.VALUE_STRING, p.nextToken());
+          assertEquals("3:00", p.getText());
+          assertToken(JsonToken.END_OBJECT, p.nextToken());
+          assertNull(p.nextToken());
+          p.close();
+    }
 }

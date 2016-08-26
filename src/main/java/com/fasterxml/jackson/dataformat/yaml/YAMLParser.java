@@ -446,14 +446,18 @@ public class YAMLParser extends ParserBase
 
         if (typeTag == null || typeTag.equals("!")) { // no, implicit
             Tag nodeTag = _yamlResolver.resolve(NodeId.scalar, value, scalar.getImplicit().canOmitTagInPlainScalar());
+
             if (nodeTag == Tag.STR) {
-                return (_currToken = JsonToken.VALUE_STRING);
-            } else if (nodeTag == Tag.INT) {
+                return JsonToken.VALUE_STRING;
+            }
+            if (nodeTag == Tag.INT) {
                 return _decodeNumberScalar(value, len);
-            } else if (nodeTag == Tag.FLOAT) {
+            }
+            if (nodeTag == Tag.FLOAT) {
                 _numTypesValid = 0;
                 return JsonToken.VALUE_NUMBER_FLOAT;
-            } else if (nodeTag == Tag.BOOL) {
+            }
+            if (nodeTag == Tag.BOOL) {
                 Boolean B = _matchYAMLBoolean(value, len);
                 if (B != null) {
                     return B ? JsonToken.VALUE_TRUE : JsonToken.VALUE_FALSE;
@@ -555,7 +559,10 @@ public class YAMLParser extends ParserBase
             _numTypesValid = 0;
             return JsonToken.VALUE_NUMBER_FLOAT;
         }
-        return null;
+        
+        // 25-Aug-2016, tatu: If we can't actually match it to valid number,
+        //    consider String; better than claiming there's not toekn
+        return JsonToken.VALUE_STRING;
     }   
 
     /*
