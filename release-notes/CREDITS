@@ -37,3 +37,7 @@ Geoff Bourne (itzg@github)
 - Contributed #38: Add MINIMIZE_QUOTES generator feature
  (2.7.0)
 
+Sebastian Herold (heroldus@github)
+
+- Reported #69: Problem to parse time values as string
+ (2.7.7)

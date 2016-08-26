@@ -17,103 +17,103 @@ public class SimpleParseTest extends ModuleTestBase
     public void testIntParsing() throws Exception
     {
         String YAML;
-        JsonParser jp;
+        JsonParser p;
 
         // Test positive max-int
         YAML = "num: 2147483647";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Integer.MAX_VALUE, jp.getIntValue());
-        assertEquals(JsonParser.NumberType.INT, jp.getNumberType());
-        assertEquals("2147483647", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Integer.MAX_VALUE, p.getIntValue());
+        assertEquals(JsonParser.NumberType.INT, p.getNumberType());
+        assertEquals("2147483647", p.getText());
+        p.close();
 
         // Test negative max-int
         YAML = "num: -2147483648";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Integer.MIN_VALUE, jp.getIntValue());
-        assertEquals(JsonParser.NumberType.INT, jp.getNumberType());
-        assertEquals("-2147483648", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Integer.MIN_VALUE, p.getIntValue());
+        assertEquals(JsonParser.NumberType.INT, p.getNumberType());
+        assertEquals("-2147483648", p.getText());
+        p.close();
 
         // Test positive max-int + 1
         YAML = "num: 2147483648";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Integer.MAX_VALUE + 1L, jp.getLongValue());
-        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
-        assertEquals("2147483648", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Integer.MAX_VALUE + 1L, p.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, p.getNumberType());
+        assertEquals("2147483648", p.getText());
+        p.close();
 
         // Test negative max-int - 1
         YAML = "num: -2147483649";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Integer.MIN_VALUE - 1L, jp.getLongValue());
-        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
-        assertEquals("-2147483649", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Integer.MIN_VALUE - 1L, p.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, p.getNumberType());
+        assertEquals("-2147483649", p.getText());
+        p.close();
 
         // Test positive max-long
         YAML = "num: 9223372036854775807";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Long.MAX_VALUE, jp.getLongValue());
-        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
-        assertEquals("9223372036854775807", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Long.MAX_VALUE, p.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, p.getNumberType());
+        assertEquals("9223372036854775807", p.getText());
+        p.close();
 
         // Test negative max-long
         YAML = "num: -9223372036854775808";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(Long.MIN_VALUE, jp.getLongValue());
-        assertEquals(JsonParser.NumberType.LONG, jp.getNumberType());
-        assertEquals("-9223372036854775808", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(Long.MIN_VALUE, p.getLongValue());
+        assertEquals(JsonParser.NumberType.LONG, p.getNumberType());
+        assertEquals("-9223372036854775808", p.getText());
+        p.close();
 
         // Test positive max-long + 1
         YAML = "num: 9223372036854775808";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE), jp.getBigIntegerValue());
-        assertEquals(JsonParser.NumberType.BIG_INTEGER, jp.getNumberType());
-        assertEquals("9223372036854775808", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE), p.getBigIntegerValue());
+        assertEquals(JsonParser.NumberType.BIG_INTEGER, p.getNumberType());
+        assertEquals("9223372036854775808", p.getText());
+        p.close();
 
         // Test negative max-long - 1
         YAML = "num: -9223372036854775809";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(BigInteger.valueOf(Long.MIN_VALUE).subtract(BigInteger.ONE), jp.getBigIntegerValue());
-        assertEquals(JsonParser.NumberType.BIG_INTEGER, jp.getNumberType());
-        assertEquals("-9223372036854775809", jp.getText());
-        jp.close();
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(BigInteger.valueOf(Long.MIN_VALUE).subtract(BigInteger.ONE), p.getBigIntegerValue());
+        assertEquals(JsonParser.NumberType.BIG_INTEGER, p.getNumberType());
+        assertEquals("-9223372036854775809", p.getText());
+        p.close();
     }
 
     // [Issue-4]: accidental recognition as double, with multiple dots
@@ -123,30 +123,30 @@ public class SimpleParseTest extends ModuleTestBase
         String YAML;
 
         YAML = "num: +1_000.25"; // note underscores; legal in YAML apparently
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("num", jp.getCurrentName());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("num", p.getCurrentName());
         // should be considered a String...
-        assertToken(JsonToken.VALUE_NUMBER_FLOAT, jp.nextToken());
-        assertEquals(1000.25, jp.getDoubleValue());
+        assertToken(JsonToken.VALUE_NUMBER_FLOAT, p.nextToken());
+        assertEquals(1000.25, p.getDoubleValue());
         // let's retain exact representation text however:
-        assertEquals("+1_000.25", jp.getText());
-        jp.close();
+        assertEquals("+1_000.25", p.getText());
+        p.close();
         
         // and then non-number that may be mistaken
         
         final String IP = "10.12.45.127";
         YAML = "ip: "+IP+"\n";
-        jp = YAML_F.createParser(YAML);
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("ip", jp.getCurrentName());
+        p = YAML_F.createParser(YAML);
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("ip", p.getCurrentName());
         // should be considered a String...
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals(IP, jp.getText());
-        jp.close();
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals(IP, p.getText());
+        p.close();
     }
 
     // [Issue#7]
@@ -156,21 +156,21 @@ public class SimpleParseTest extends ModuleTestBase
         // First, test out valid use case. NOTE: spaces matter!
         String YAML = "section:\n"
                     +"  text: foo:bar\n";
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("section", jp.getCurrentName());
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("text", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals("foo:bar", jp.getText());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("section", p.getCurrentName());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("text", p.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("foo:bar", p.getText());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
     }
     
     /**
@@ -230,45 +230,45 @@ public class SimpleParseTest extends ModuleTestBase
         yp.close();
     }
 
-    // [Issue#10]
+    // [dataformat-yaml#10]
     // Scalars should not be parsed when not in the plain flow style.
     public void testQuotedStyles() throws Exception
     {
         String YAML = "strings: [\"true\", 'false']";
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("strings", jp.getCurrentName());
-        assertToken(JsonToken.START_ARRAY, jp.nextToken());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals("true", jp.getText());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals("false", jp.getText());
-        assertToken(JsonToken.END_ARRAY, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("strings", p.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, p.nextToken());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("true", p.getText());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("false", p.getText());
+        assertToken(JsonToken.END_ARRAY, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
     }
 
     // Scalars should be parsed when in the plain flow style.
     public void testUnquotedStyles() throws Exception
     {
         String YAML = "booleans: [true, false]";
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("booleans", jp.getCurrentName());
-        assertToken(JsonToken.START_ARRAY, jp.nextToken());
-        assertToken(JsonToken.VALUE_TRUE, jp.nextToken());
-        assertToken(JsonToken.VALUE_FALSE, jp.nextToken());
-        assertToken(JsonToken.END_ARRAY, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("booleans", p.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, p.nextToken());
+        assertToken(JsonToken.VALUE_TRUE, p.nextToken());
+        assertToken(JsonToken.VALUE_FALSE, p.nextToken());
+        assertToken(JsonToken.END_ARRAY, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
     }
 
     public void testObjectWithNumbers() throws Exception
@@ -284,79 +284,96 @@ public class SimpleParseTest extends ModuleTestBase
 +"  - \"Max Power\"\n"
 ;
 
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("content", jp.getCurrentName());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("content", p.getCurrentName());
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("uri", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("uri", p.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
 
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("title", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("title", p.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
 
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("width", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(640, jp.getIntValue());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("width", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(640, p.getIntValue());
 
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("height", jp.getCurrentName());
-        assertToken(JsonToken.VALUE_NUMBER_INT, jp.nextToken());
-        assertEquals(480, jp.getIntValue());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("height", p.getCurrentName());
+        assertToken(JsonToken.VALUE_NUMBER_INT, p.nextToken());
+        assertEquals(480, p.getIntValue());
 
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("persons", jp.getCurrentName());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("persons", p.getCurrentName());
 
-        assertToken(JsonToken.START_ARRAY, jp.nextToken());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals("Foo Bar", jp.getText());
-        assertToken(JsonToken.VALUE_STRING, jp.nextToken());
-        assertEquals("Max Power", jp.getText());
-        assertToken(JsonToken.END_ARRAY, jp.nextToken());
+        assertToken(JsonToken.START_ARRAY, p.nextToken());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("Foo Bar", p.getText());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("Max Power", p.getText());
+        assertToken(JsonToken.END_ARRAY, p.nextToken());
 
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
     }
 
     public void testNulls() throws Exception
     {
         String YAML = "nulls: [!!null \"null\" ]";
-        JsonParser jp = YAML_F.createParser(YAML);
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("nulls", jp.getCurrentName());
-        assertToken(JsonToken.START_ARRAY, jp.nextToken());
-        assertToken(JsonToken.VALUE_NULL, jp.nextToken());
-        assertToken(JsonToken.END_ARRAY, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("nulls", p.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, p.nextToken());
+        assertToken(JsonToken.VALUE_NULL, p.nextToken());
+        assertToken(JsonToken.END_ARRAY, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
     }
 
     public void testTildeNulls() throws Exception
     {
-        String YAML = "nulls: [~ ]";
-        JsonParser jp = YAML_F.createParser(YAML);
+        final String YAML = "nulls: [~ ]";
+        JsonParser p = YAML_F.createParser(YAML);
 
-        assertToken(JsonToken.START_OBJECT, jp.nextToken());
-        assertToken(JsonToken.FIELD_NAME, jp.nextToken());
-        assertEquals("nulls", jp.getCurrentName());
-        assertToken(JsonToken.START_ARRAY, jp.nextToken());
-        assertToken(JsonToken.VALUE_NULL, jp.nextToken());
-        assertToken(JsonToken.END_ARRAY, jp.nextToken());
-        assertToken(JsonToken.END_OBJECT, jp.nextToken());
-        assertNull(jp.nextToken());
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("nulls", p.getCurrentName());
+        assertToken(JsonToken.START_ARRAY, p.nextToken());
+        assertToken(JsonToken.VALUE_NULL, p.nextToken());
+        assertToken(JsonToken.END_ARRAY, p.nextToken());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
 
-        jp.close();
+        p.close();
+    }
+
+    // for [dataformat-yaml#69]
+    public void testTimeLikeValues() throws Exception
+    {
+        final String YAML = "value: 3:00\n";
+        JsonParser p = YAML_F.createParser(YAML);
+
+        assertToken(JsonToken.START_OBJECT, p.nextToken());
+        assertToken(JsonToken.FIELD_NAME, p.nextToken());
+        assertEquals("value", p.getCurrentName());
+        assertToken(JsonToken.VALUE_STRING, p.nextToken());
+        assertEquals("3:00", p.getText());
+        assertToken(JsonToken.END_OBJECT, p.nextToken());
+        assertNull(p.nextToken());
+
+        p.close();
     }
 }
