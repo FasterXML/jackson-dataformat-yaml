@@ -69,7 +69,9 @@ public final class UTF8Reader
         _bufferHolder = _findBufferHolder();
         byte[] buffer = _bufferHolder[0];
         if (buffer == null) {
-            _bufferHolder[0] = buffer = new byte[DEFAULT_BUFFER_SIZE];
+            buffer = new byte[DEFAULT_BUFFER_SIZE];
+        } else {
+            _bufferHolder[0] = null;
         }
         _inputBuffer = buffer;
         _inputPtr = 0;
