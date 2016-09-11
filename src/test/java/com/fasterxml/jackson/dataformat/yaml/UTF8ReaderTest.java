@@ -30,5 +30,8 @@ public class UTF8ReaderTest {
         utf8Reader.read(result);
 
         assertEquals(message, new String(result));
+
+        utf8Reader.close();
+        badUtf8Reader.close();
     }
 }

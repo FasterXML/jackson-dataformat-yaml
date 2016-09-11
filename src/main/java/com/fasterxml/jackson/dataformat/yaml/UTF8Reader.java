@@ -104,7 +104,6 @@ public final class UTF8Reader
         return bufs;
     }
 
-
     /*
     /**********************************************************************
     /* Reader API
@@ -112,8 +111,7 @@ public final class UTF8Reader
      */
 
     @Override
-    public void close()
-        throws IOException
+    public void close() throws IOException
     {
         InputStream in = _inputSource;
 
@@ -134,8 +132,7 @@ public final class UTF8Reader
      * efficiently just in case
      */
     @Override
-    public int read()
-        throws IOException
+    public int read() throws IOException
     {
         if (_tmpBuffer == null) {
             _tmpBuffer = new char[1];
@@ -152,8 +149,7 @@ public final class UTF8Reader
     }
     
     @Override
-    public int read(char[] cbuf, int start, int len)
-        throws IOException
+    public int read(char[] cbuf, int start, int len) throws IOException
     {
         // Already EOF?
         if (_inputBuffer == null) {
@@ -323,8 +319,7 @@ public final class UTF8Reader
      * 
      * @return Number of bytes read, if any; -1 for end-of-input.
      */
-    protected final int readBytes()
-        throws IOException
+    protected final int readBytes() throws IOException
     {
         _inputPtr = 0;
         _inputEnd = 0;
@@ -345,8 +340,7 @@ public final class UTF8Reader
      * @return Number of bytes read, if any; -1 to indicate none available
      *  (that is, end of input)
      */
-    protected final int readBytesAt(int offset)
-        throws IOException
+    protected final int readBytesAt(int offset) throws IOException
     {
         // shouldn't modify mBytePtr, assumed to be 'offset'
         if (_inputSource != null) {
@@ -381,8 +375,7 @@ public final class UTF8Reader
     /**********************************************************************
      */
 
-    private void reportInvalidInitial(int mask, int offset)
-        throws IOException
+    private void reportInvalidInitial(int mask, int offset) throws IOException
     {
         // input (byte) ptr has been advanced by one, by now:
         int bytePos = _byteCount + _inputPtr - 1;
@@ -429,8 +422,7 @@ public final class UTF8Reader
      * @return True, if enough bytes were read to allow decoding of at least
      *   one full character; false if EOF was encountered instead.
      */
-    private boolean loadMore(int available)
-        throws IOException
+    private boolean loadMore(int available) throws IOException
     {
         _byteCount += (_inputEnd - available);
 
@@ -446,7 +438,7 @@ public final class UTF8Reader
                     _inputBuffer[i] = _inputBuffer[_inputPtr+i];
                 }
                 _inputPtr = 0;
-		_inputEnd = available;
+                _inputEnd = available;
             }
         } else {
             /* Ok; here we can actually reasonably expect an EOF,
