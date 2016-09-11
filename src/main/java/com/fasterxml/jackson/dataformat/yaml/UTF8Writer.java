@@ -44,6 +44,8 @@ public final class UTF8Writer
         byte[] buffer = _bufferHolder[0];
         if (buffer == null) {
             _bufferHolder[0] = buffer = new byte[DEFAULT_BUFFER_SIZE];
+        } else {
+            _bufferHolder[0] = null;
         }
         _outBuffer = buffer;
         /* Max. expansion for a single char (in unmodified UTF-8) is
@@ -69,16 +71,14 @@ public final class UTF8Writer
     }
     
     @Override
-    public Writer append(char c)
-        throws IOException
+    public Writer append(char c) throws IOException
     {
         write(c);
         return this;
     }
 
     @Override
-    public void close()
-        throws IOException
+    public void close() throws IOException
     {
         if (_out != null) {
             if (_outPtr > 0) {
@@ -88,10 +88,12 @@ public final class UTF8Writer
             OutputStream out = _out;
             _out = null;
 
-            byte[] buf = _outBuffer;
-            if (buf != null) {
-                _outBuffer = null;
-                _bufferHolder[0] = buf;
+            if (_bufferHolder != null) {
+                byte[] buf = _outBuffer;
+                if (buf != null) {
+                    _outBuffer = null;
+                    _bufferHolder[0] = buf;
+                }
             }
             out.close();
 
@@ -107,8 +109,7 @@ public final class UTF8Writer
     }
 
     @Override
-    public void flush()
-        throws IOException
+    public void flush() throws IOException
     {
         if (_out != null) {
             if (_outPtr > 0) {
@@ -120,15 +121,13 @@ public final class UTF8Writer
     }
 
     @Override
-    public void write(char[] cbuf)
-        throws IOException
+    public void write(char[] cbuf) throws IOException
     {
         write(cbuf, 0, cbuf.length);
     }
 
     @Override
-    public void write(char[] cbuf, int off, int len)
-        throws IOException
+    public void write(char[] cbuf, int off, int len) throws IOException
     {
         if (len < 2) {
             if (len == 1) {
@@ -276,7 +275,7 @@ public final class UTF8Writer
     }
 
     @Override
-    public void write(String str, int off, int len)  throws IOException
+    public void write(String str, int off, int len) throws IOException
     {
         if (len < 2) {
             if (len == 1) {

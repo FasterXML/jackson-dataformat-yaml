@@ -19,7 +19,8 @@ public class ExceptionConversionTest extends ModuleTestBase
         } catch (org.yaml.snakeyaml.scanner.ScannerException e) {
             fail("Internal exception type: "+e);
         } catch (JsonMappingException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            verifyException(e, "YAML decoding problem");
             // good
         } catch (Exception e) {
             fail("Unknown exception: "+e);
