@@ -41,3 +41,10 @@ Sebastian Herold (heroldus@github)
 
 - Reported #69: Problem to parse time values as string
  (2.7.7)
+
+James Baker (j-baker@github)
+
+- Reported, contributed fix for #70: UTF8Reader is unsafe if a
+  Jackson-annotated class itself deserialises a Jackson-annotated class
+ (2.7.8)
+

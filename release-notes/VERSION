@@ -8,6 +8,12 @@ Project: jackson-dataformat-yaml
 
 No changes since 2.7
 
+2.7.8 (not yet released)
+
+#70: `UTF8Reader` is unsafe if a Jackson-annotated class itself deserializes
+  a Jackson-annotated class
+ (reported by James B)
+
 2.7.7 (27-Aug-2016)
 
 #69: Problem to parse time values as string
