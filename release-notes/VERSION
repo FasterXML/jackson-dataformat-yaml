@@ -4,6 +4,10 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.8.3 (17-Sep-2016)
+
+No changes since 2.8.2
+
 2.8.2 (30-Aug-2016)
 
 #65: Feature.MINIMIZE_QUOTES needs to write numbers as strings with quotes
