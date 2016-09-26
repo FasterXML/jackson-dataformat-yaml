@@ -8,7 +8,7 @@ Project: jackson-dataformat-yaml
 
 No changes since 2.7
 
-2.7.8 (not yet released)
+2.7.8 (26-Sep-2016)
 
 #70: `UTF8Reader` is unsafe if a Jackson-annotated class itself deserializes
   a Jackson-annotated class
