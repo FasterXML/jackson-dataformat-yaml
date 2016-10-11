@@ -40,7 +40,7 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("name: \"Brad\"\nage: 39", yaml);
         gen.close();
     }
-    
+
     public void testStreamingNested() throws Exception
     {
         YAMLFactory f = new YAMLFactory();
@@ -54,9 +54,9 @@ public class SimpleGenerationTest extends ModuleTestBase
         gen.writeString("b");
         gen.writeEndArray();
         gen.writeEndObject();
-        
+
         gen.close();
-        
+
         String yaml = w.toString();
 
         // note: 1.12 uses more compact notation; 1.10 has prefix
@@ -139,7 +139,7 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals(1, result.size());
         assertEquals("Foobar", result.get("name"));
     }
-    
+
     @SuppressWarnings("resource")
     public void testStartMarker() throws Exception
     {
@@ -190,7 +190,7 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("---\n" +
                 "- \"1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890\"",
                 yaml);
-    }    
+    }
 
     public void testLiteralStringsSingleLine() throws Exception
     {
@@ -237,7 +237,7 @@ public class SimpleGenerationTest extends ModuleTestBase
 
         f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
         f.configure(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS, true);
-        
+
         YAMLMapper mapper = new YAMLMapper(f);
 
         Map<String, Object> content = new HashMap<String, Object>();
@@ -246,14 +246,14 @@ public class SimpleGenerationTest extends ModuleTestBase
 
         assertEquals("---\n" +
                 "key: \"20\"", yaml);
-        
+
         content.clear();
         content.put("key", "2.0");
         yaml = mapper.writeValueAsString(content).trim();
 
         assertEquals("---\n" +
                 "key: \"2.0\"", yaml);
-        
+
         content.clear();
         content.put("key", "2.0.1.2.3");
         yaml = mapper.writeValueAsString(content).trim();
@@ -270,7 +270,7 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertFalse(f.isEnabled(YAMLGenerator.Feature.ALWAYS_QUOTE_NUMBERS_AS_STRINGS));
 
         f.configure(YAMLGenerator.Feature.MINIMIZE_QUOTES, true);
-        
+
         YAMLMapper mapper = new YAMLMapper(f);
 
         Map<String, Object> content = new HashMap<String, Object>();
@@ -279,14 +279,14 @@ public class SimpleGenerationTest extends ModuleTestBase
 
         assertEquals("---\n" +
                 "key: 20", yaml);
-        
+
         content.clear();
         content.put("key", "2.0");
         yaml = mapper.writeValueAsString(content).trim();
 
         assertEquals("---\n" +
                 "key: 2.0", yaml);
-        
+
         content.clear();
         content.put("key", "2.0.1.2.3");
         yaml = mapper.writeValueAsString(content).trim();
@@ -295,13 +295,38 @@ public class SimpleGenerationTest extends ModuleTestBase
                 "key: 2.0.1.2.3", yaml);
     }
 
+    public void testLiteralBlockStyle() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE));
+
+        f.configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true);
+
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("text", "Hello\nWorld");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                     "text: |-\n  Hello\n  World", yaml);
+
+        content.clear();
+        content.put("text", "Hello World");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                     "text: \"Hello World\"", yaml);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods
     /**********************************************************************
      */
-    
-    
+
+
     protected void _writeBradDoc(JsonGenerator gen) throws IOException
     {
         gen.writeStartObject();

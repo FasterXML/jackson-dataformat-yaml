@@ -28,7 +28,7 @@ public class YAMLGenerator extends GeneratorBase
         /**
          * Whether we are to write an explicit document start marker ("---")
          * or not.
-         * 
+         *
          * @since 2.3
          */
         WRITE_DOC_START_MARKER(true),
@@ -38,17 +38,17 @@ public class YAMLGenerator extends GeneratorBase
          * or "generic" Object Id mechanism (false). Former works better for systems that
          * are YAML-centric; latter may be better choice for interoperability, when
          * converting between formats or accepting other formats.
-         * 
+         *
          * @since 2.5
          */
         USE_NATIVE_OBJECT_ID(true),
-        
+
         /**
          * Whether to use YAML native Type Id construct for indicating type (true);
          * or "generic" type property (false). Former works better for systems that
          * are YAML-centric; latter may be better choice for interoperability, when
          * converting between formats or accepting other formats.
-         * 
+         *
          * @since 2.5
          */
         USE_NATIVE_TYPE_ID(true),
@@ -80,7 +80,7 @@ public class YAMLGenerator extends GeneratorBase
          * @since 2.7
          */
         MINIMIZE_QUOTES(false),
-        
+
         /**
          * Whether numbers stored as strings will be rendered with quotes (true) or
          * without quotes (false, default) when MINIMIZE_QUOTES is enabled.
@@ -91,12 +91,21 @@ public class YAMLGenerator extends GeneratorBase
          *
          * @since 2.8.2
          */
-        ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false)
+        ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false),
+
+        /**
+         * Whether for string containing newlines a <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>
+         * should be used. This automatically enabled when {@link #MINIMIZE_QUOTES} is set.
+         * <p>
+         * The content of such strinfs is limited to printable characters according to the rules of
+         * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
+         */
+        LITERAL_BLOCK_STYLE(false)
         ;
 
         protected final boolean _defaultState;
         protected final int _mask;
-        
+
         /**
          * Method that calculates bit set (flags) of all features that
          * are enabled by default.
@@ -111,14 +120,14 @@ public class YAMLGenerator extends GeneratorBase
             }
             return flags;
         }
-        
+
         private Feature(boolean defaultState) {
             _defaultState = defaultState;
             _mask = (1 << ordinal());
         }
-        
+
         public boolean enabledByDefault() { return _defaultState; }
-        public boolean enabledIn(int flags) { return (flags & _mask) != 0; }        
+        public boolean enabledIn(int flags) { return (flags & _mask) != 0; }
         public int getMask() { return _mask; }
     }
 
@@ -127,7 +136,7 @@ public class YAMLGenerator extends GeneratorBase
     /* Internal constants
     /**********************************************************
      */
-    
+
     protected final static long MIN_INT_AS_LONG = (long) Integer.MIN_VALUE;
     protected final static long MAX_INT_AS_LONG = (long) Integer.MAX_VALUE;
     protected final static Pattern PLAIN_NUMBER_P = Pattern.compile("[0-9]*(\\.[0-9]*)?");
@@ -153,7 +162,7 @@ public class YAMLGenerator extends GeneratorBase
 
     // for field names, leave out quotes
     private final static Character STYLE_NAME = null;
-    
+
     // numbers, booleans, should use implicit
     private final static Character STYLE_SCALAR = null;
     // Strings quoted for fun
@@ -185,7 +194,7 @@ public class YAMLGenerator extends GeneratorBase
      * need to output one.
      */
     protected String _typeId;
-    
+
     /*
     /**********************************************************
     /* Life-cycle
@@ -203,14 +212,14 @@ public class YAMLGenerator extends GeneratorBase
         _writer = out;
 
         _outputOptions = buildDumperOptions(jsonFeatures, yamlFeatures, version);
-        
+
         _emitter = new Emitter(_writer, _outputOptions);
         // should we start output now, or try to defer?
         _emitter.emit(new StreamStartEvent(null, null));
         Map<String,String> noTags = Collections.emptyMap();
-        
+
         boolean startMarker = Feature.WRITE_DOC_START_MARKER.enabledIn(yamlFeatures);
-        
+
         _emitter.emit(new DocumentStartEvent(null, null, startMarker,
                 version, // for 1.10 was: ((version == null) ? null : version.getArray()),
                 noTags));
@@ -232,10 +241,10 @@ public class YAMLGenerator extends GeneratorBase
         return opt;
     }
 
-    /*                                                                                       
-    /**********************************************************                              
-    /* Versioned                                                                             
-    /**********************************************************                              
+    /*
+    /**********************************************************
+    /* Versioned
+    /**********************************************************
      */
 
     @Override
@@ -291,7 +300,7 @@ public class YAMLGenerator extends GeneratorBase
         _formatFeatures = (_formatFeatures & ~mask) | (values & mask);
         return this;
     }
-    
+
     @Override
     public boolean canUseSchema(FormatSchema schema) {
         return false;
@@ -330,13 +339,13 @@ public class YAMLGenerator extends GeneratorBase
         }
         return this;
     }
-    
+
     /*
     /**********************************************************************
     /* Overridden methods; writing field names
     /**********************************************************************
      */
-    
+
     /* And then methods overridden to make final, streamline some
      * aspects...
      */
@@ -389,7 +398,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _writer.flush();
     }
-    
+
     @Override
     public void close() throws IOException
     {
@@ -406,7 +415,7 @@ public class YAMLGenerator extends GeneratorBase
     /* Public API: structural output
     /**********************************************************
      */
-    
+
     @Override
     public final void writeStartArray() throws IOException
     {
@@ -422,7 +431,7 @@ public class YAMLGenerator extends GeneratorBase
         _emitter.emit(new SequenceStartEvent(anchor, yamlTag,
                 implicit,  null, null, style));
     }
-    
+
     @Override
     public final void writeEndArray() throws IOException
     {
@@ -430,7 +439,7 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not Array but "+_writeContext.typeDesc());
         }
         // just to make sure we don't "leak" type ids
-        _typeId = null;        
+        _typeId = null;
         _writeContext = _writeContext.getParent();
         _emitter.emit(new SequenceEndEvent(null, null));
     }
@@ -458,7 +467,7 @@ public class YAMLGenerator extends GeneratorBase
             _reportError("Current context not Object but "+_writeContext.typeDesc());
         }
         // just to make sure we don't "leak" type ids
-        _typeId = null;        
+        _typeId = null;
         _writeContext = _writeContext.getParent();
         _emitter.emit(new MappingEndEvent(null, null));
     }
@@ -488,6 +497,8 @@ public class YAMLGenerator extends GeneratorBase
             } else {
                 style = STYLE_PLAIN;
             }
+        } else if (Feature.LITERAL_BLOCK_STYLE.enabledIn(_formatFeatures) && text.indexOf('\n') >= 0) {
+            style = STYLE_LITERAL;
         }
         _writeScalar(text, "string", style);
     }
@@ -565,7 +576,7 @@ public class YAMLGenerator extends GeneratorBase
     /* Output method implementations, base64-encoded binary
     /**********************************************************
      */
-    
+
     @Override
     public void writeBinary(Base64Variant b64variant, byte[] data, int offset, int len) throws IOException
     {
@@ -624,13 +635,13 @@ public class YAMLGenerator extends GeneratorBase
         _verifyValueWrite("write number");
         _writeScalar(String.valueOf(v.toString()), "java.math.BigInteger", STYLE_SCALAR);
     }
-    
+
     @Override
     public void writeNumber(double d) throws IOException
     {
         _verifyValueWrite("write number");
         _writeScalar(String.valueOf(d), "double", STYLE_SCALAR);
-    }    
+    }
 
     @Override
     public void writeNumber(float f) throws IOException
@@ -681,14 +692,14 @@ public class YAMLGenerator extends GeneratorBase
         // yes, YAML does support Native Type Ids!
         // 10-Sep-2014, tatu: Except as per [#23] might not want to...
         return Feature.USE_NATIVE_OBJECT_ID.enabledIn(_formatFeatures);
-    }    
+    }
 
     @Override
     public boolean canWriteTypeId() {
         // yes, YAML does support Native Type Ids!
         // 10-Sep-2014, tatu: Except as per [#22] might not want to...
         return Feature.USE_NATIVE_TYPE_ID.enabledIn(_formatFeatures);
-    }    
+    }
 
     @Override
     public void writeTypeId(Object id)
@@ -706,7 +717,7 @@ public class YAMLGenerator extends GeneratorBase
         AliasEvent evt = new AliasEvent(String.valueOf(id), null, null);
         _emitter.emit(evt);
     }
-    
+
     @Override
     public void writeObjectId(Object id)
         throws IOException
@@ -749,7 +760,7 @@ public class YAMLGenerator extends GeneratorBase
     {
         _emitter.emit(_scalarEvent(value, style));
     }
-    
+
     protected ScalarEvent _scalarEvent(String value, Character style)
     {
         String yamlTag = _typeId;
