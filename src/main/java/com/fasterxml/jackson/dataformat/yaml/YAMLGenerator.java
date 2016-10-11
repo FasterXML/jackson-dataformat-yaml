@@ -97,7 +97,7 @@ public class YAMLGenerator extends GeneratorBase
          * Whether for string containing newlines a <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>
          * should be used. This automatically enabled when {@link #MINIMIZE_QUOTES} is set.
          * <p>
-         * The content of such strinfs is limited to printable characters according to the rules of
+         * The content of such strings is limited to printable characters according to the rules of
          * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
          */
         LITERAL_BLOCK_STYLE(false)
