@@ -52,3 +52,9 @@ Preston Gilchrist (prestongilchrist@github)
 
 - Contributed #65: Feature.MINIMIZE_QUOTES needs to write numbers as strings with quotes
  (2.8.2)
+
+Roland Huss (rhuss@github)
+
+- Reported #77, contributed fix: Boolean-like content of string must never be unquoted
+ (2.8.4)
+
