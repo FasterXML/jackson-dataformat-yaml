@@ -91,7 +91,16 @@ public class YAMLGenerator extends GeneratorBase
          *
          * @since 2.8.2
          */
-        ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false)
+        ALWAYS_QUOTE_NUMBERS_AS_STRINGS(false),
+
+        /**
+         * Whether for string containing newlines a <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>
+         * should be used. This automatically enabled when {@link #MINIMIZE_QUOTES} is set.
+         * <p>
+         * The content of such strings is limited to printable characters according to the rules of
+         * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
+         */
+        LITERAL_BLOCK_STYLE(false)
         ;
 
         protected final boolean _defaultState;
@@ -488,6 +497,8 @@ public class YAMLGenerator extends GeneratorBase
             } else {
                 style = STYLE_PLAIN;
             }
+        } else if (Feature.LITERAL_BLOCK_STYLE.enabledIn(_formatFeatures) && text.indexOf('\n') >= 0) {
+            style = STYLE_LITERAL;
         }
         _writeScalar(text, "string", style);
     }

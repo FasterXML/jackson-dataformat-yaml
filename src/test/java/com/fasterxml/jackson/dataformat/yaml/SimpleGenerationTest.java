@@ -332,6 +332,31 @@ public class SimpleGenerationTest extends ModuleTestBase
                 "key: 2.0.1.2.3", yaml);
     }
 
+    public void testLiteralBlockStyle() throws Exception
+    {
+        YAMLFactory f = new YAMLFactory();
+        // verify default settings
+        assertFalse(f.isEnabled(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE));
+
+        f.configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true);
+
+        YAMLMapper mapper = new YAMLMapper(f);
+
+        Map<String, Object> content = new HashMap<String, Object>();
+        content.put("text", "Hello\nWorld");
+        String yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                     "text: |-\n  Hello\n  World", yaml);
+
+        content.clear();
+        content.put("text", "Hello World");
+        yaml = mapper.writeValueAsString(content).trim();
+
+        assertEquals("---\n" +
+                     "text: \"Hello World\"", yaml);
+    }
+
     /*
     /**********************************************************************
     /* Helper methods
