@@ -57,4 +57,5 @@ Roland Huss (rhuss@github)
 
 - Reported #77, contributed fix: Boolean-like content of string must never be unquoted
  (2.8.4)
-
+- Contributed #76: Add `YAMLGenerator.Feature.LITERAL_BLOCK_STYLE` for String output
+ (2.9.0)

@@ -99,6 +99,8 @@ public class YAMLGenerator extends GeneratorBase
          * <p>
          * The content of such strings is limited to printable characters according to the rules of
          * <a href="http://www.yaml.org/spec/1.2/spec.html#style/block/literal">literal block style</a>.
+         *
+         * @since 2.9
          */
         LITERAL_BLOCK_STYLE(false)
         ;
