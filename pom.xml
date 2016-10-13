@@ -4,12 +4,12 @@
   <parent>
     <groupId>com.fasterxml.jackson</groupId>
     <artifactId>jackson-parent</artifactId>
-    <version>2.8</version>
+    <version>2.9-rc1-SNAPSHOT</version>
   </parent>
 
   <groupId>com.fasterxml.jackson.dataformat</groupId>
   <artifactId>jackson-dataformat-yaml</artifactId>
-  <version>2.8.4-SNAPSHOT</version>
+  <version>2.9.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>Jackson-dataformat-YAML</name>
   <description>Support for reading and writing YAML-encoded data via Jackson abstractions.
@@ -23,7 +23,7 @@
   </scm>
 
   <properties>
-    <version.jackson.core>2.8.3</version.jackson.core>
+    <version.jackson.core>2.9.0-SNAPSHOT</version.jackson.core>
 
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
