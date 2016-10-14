@@ -6,7 +6,7 @@ Project: jackson-dataformat-yaml
 
 2.9.0 (not yet released)
 
-2.8.4 (not yet released)
+2.8.4 (14-Oct-2016)
 
 #77: Boolean-like content of string must never be unquoted
  (reported, contributed fix by Roland H)
