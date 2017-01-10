@@ -48,6 +48,11 @@ James Baker (j-baker@github)
   Jackson-annotated class itself deserialises a Jackson-annotated class
  (2.7.8)
 
+Tanguy Leroux (tlrx@github)
+
+- Reported, contributed test, fix for #80: Fix UTF8Writer when used in same thread
+ (2.7.9)
+
 Preston Gilchrist (prestongilchrist@github)
 
 - Contributed #65: Feature.MINIMIZE_QUOTES needs to write numbers as strings with quotes
@@ -57,4 +62,3 @@ Roland Huss (rhuss@github)
 
 - Reported #77, contributed fix: Boolean-like content of string must never be unquoted
  (2.8.4)
-

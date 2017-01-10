@@ -34,7 +34,12 @@ No changes since 2.8.0.
 #60: YAML serializer reports wrong exception
  (suggested by pmogren@github)
 
-2.7.8 (not yet released)
+2.7.9 (not yet released)
+
+#80: Fix UTF8Writer when used in same thread
+ (contributed by Tanguy L)
+
+2.7.8 (26-Sep-2016)
 
 #70: `UTF8Reader` is unsafe if a Jackson-annotated class itself deserializes
   a Jackson-annotated class
