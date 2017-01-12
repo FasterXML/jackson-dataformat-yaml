@@ -6,6 +6,10 @@ Project: jackson-dataformat-yaml
 
 2.9.0 (not yet released)
 
+2.8.6 (12-Jan-2017)
+
+No changes since 2.8.5
+
 2.8.5 (14-Nov-2016)
 
 - Update SnakeYAML dependency to 1.17
