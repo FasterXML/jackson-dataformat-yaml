@@ -8,7 +8,7 @@ Project: jackson-dataformat-yaml
 
 No changes since 2.7
 
-2.7.9 (not yet released)
+2.7.9 (04-Feb-2017)
 
 #80: Fix UTF8Writer when used in same thread
  (contributed by Tanguy L)
