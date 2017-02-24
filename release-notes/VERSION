@@ -9,6 +9,12 @@ Project: jackson-dataformat-yaml
 #76: Add `YAMLGenerator.Feature.LITERAL_BLOCK_STYLE` for String output
  (contributed by Roland H)
 
+2.8.8 (not yet released)
+
+#72: Multiple documents in a stream
+ (requested by fabriziocucci@github, contributed by xiGUAwanOU@github)
+
+2.8.7 (21-Feb-2017)
 2.8.6 (12-Jan-2017)
 
 No changes since 2.8.5

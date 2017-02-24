@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.ModuleTestBase;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-// for [Issue#26]: not sure if it's an actual bug, but adding for now.
+// for [dataformat-yaml#26]: not sure if it's an actual bug, but adding for now.
 public class CollectionReadTest extends ModuleTestBase
 {
     static class SetBean {
