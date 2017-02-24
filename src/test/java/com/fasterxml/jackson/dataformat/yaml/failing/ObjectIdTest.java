@@ -8,7 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.ModuleTestBase;
 
 /**
  * Although native Object Ids work in general, Tree Model currently
- * has issues with it (see [Issue#24])
+ * has issues with it (see [dataformat-yaml#24])
  */
 public class ObjectIdTest extends ModuleTestBase
 {

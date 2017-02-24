@@ -316,13 +316,13 @@ public class YAMLParser extends ParserBase
     }
 
     // Note: SHOULD override 'getTokenLineNr', 'getTokenColumnNr', but those are final in 2.0
-    
+
     /*
     /**********************************************************
     /* Parsing
     /**********************************************************
      */
-    
+
     @SuppressWarnings("deprecation")
     @Override
     public JsonToken nextToken() throws IOException
@@ -408,11 +408,13 @@ public class YAMLParser extends ParserBase
             }
 
             // after this, less common tokens:
-            
+
             if (evt.is(Event.ID.DocumentEnd)) {
-                // logical end of doc; fine. Two choices; either skip, or
-                // return null as marker. Do latter, for now. But do NOT close.
-                return (_currToken = null);
+                // [dataformat-yaml#72]: logical end of doc; fine. Two choices; either skip,
+                // or return null as marker (but do NOT close). Earlier returned `null`, but
+                // to allow multi-document reading should actually just skip.
+//                return (_currToken = null);
+                continue;
             }
             if (evt.is(Event.ID.DocumentStart)) {
 //                DocumentStartEvent dd = (DocumentStartEvent) evt;
@@ -435,7 +437,7 @@ public class YAMLParser extends ParserBase
             }
         }
     }
-    
+
     protected JsonToken _decodeScalar(ScalarEvent scalar)
     {
         String value = scalar.getValue();
