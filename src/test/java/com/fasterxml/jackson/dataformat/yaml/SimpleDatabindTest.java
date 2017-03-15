@@ -15,7 +15,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class SimpleDatabindTest extends ModuleTestBase
 {
-    // to try to reproduce [Issue#15]
     static class EmptyBean {
     }
 
@@ -27,13 +26,15 @@ public class SimpleDatabindTest extends ModuleTestBase
     static class Name {
         public String first, last;
     }
-    
+
     /*
     /**********************************************************
     /* Test methods
     /**********************************************************
      */
 
+    private final ObjectMapper MAPPER = mapperForYAML();
+    
     public void testSimpleNested() throws Exception
     {
         final String YAML =
@@ -42,10 +43,8 @@ public class SimpleDatabindTest extends ModuleTestBase
 +"  last: De Burger\n"
 +"age: 28"
 ;
-        ObjectMapper mapper = mapperForYAML();
-
         // first, no doc marker
-        Outer outer = mapper.readValue(YAML, Outer.class);
+        Outer outer = MAPPER.readValue(YAML, Outer.class);
         assertNotNull(outer);
         assertNotNull(outer.name);
         assertEquals("Bob", outer.name.first);
@@ -53,7 +52,7 @@ public class SimpleDatabindTest extends ModuleTestBase
         assertEquals(28, outer.age);
 
         // then with
-        Outer outer2 = mapper.readValue("---\n"+YAML, Outer.class);
+        Outer outer2 = MAPPER.readValue("---\n"+YAML, Outer.class);
         assertNotNull(outer2);
         assertNotNull(outer2.name);
         assertEquals(outer.name.first, outer2.name.first);
@@ -72,8 +71,7 @@ public class SimpleDatabindTest extends ModuleTestBase
 +"  password: tiger\n"
 +"  extra: [1,2]"
 ;
-        ObjectMapper mapper = mapperForYAML();
-        Map<?,?> result = mapper.readValue(YAML, Map.class);
+        Map<?,?> result = MAPPER.readValue(YAML, Map.class);
         // sanity check first:
         assertEquals(2, result.size());
         // then literal comparison; easiest to just write as JSON...
@@ -87,7 +85,6 @@ public class SimpleDatabindTest extends ModuleTestBase
 
     public void testBasicPOJO() throws Exception
     {
-        ObjectMapper mapper = mapperForYAML();
         final String YAML =
 "firstName: Billy\n"
 +"lastName: Baggins\n"                
@@ -95,7 +92,7 @@ public class SimpleDatabindTest extends ModuleTestBase
 +"verified: true\n"
 +"userImage: AQIDBAU=" // [1,2,3,4,5]
 ;
-        FiveMinuteUser user = mapper.readValue(YAML, FiveMinuteUser.class);
+        FiveMinuteUser user = MAPPER.readValue(YAML, FiveMinuteUser.class);
         assertEquals("Billy", user.firstName);
         assertEquals("Baggins", user.lastName);
         assertEquals(FiveMinuteUser.Gender.MALE, user.getGender());
@@ -107,32 +104,28 @@ public class SimpleDatabindTest extends ModuleTestBase
 
     public void testIssue1() throws Exception
     {
-        ObjectMapper mapper = mapperForYAML();
         final byte[] YAML = "firstName: Billy".getBytes("UTF-8");
         FiveMinuteUser user = new FiveMinuteUser();
         user.firstName = "Bubba";
-        mapper.readerForUpdating(user).readValue(new ByteArrayInputStream(YAML));
+        MAPPER.readerForUpdating(user).readValue(new ByteArrayInputStream(YAML));
         assertEquals("Billy", user.firstName);
     }
 
-    // [Issue-2]
     public void testUUIDs() throws Exception
     {
-        ObjectMapper mapper = mapperForYAML();
         UUID uuid = new UUID(0, 0);
-        String yaml = mapper.writeValueAsString(uuid);
+        String yaml = MAPPER.writeValueAsString(uuid);
         
-        UUID result = mapper.readValue(yaml, UUID.class);
+        UUID result = MAPPER.readValue(yaml, UUID.class);
         
         assertEquals(uuid, result);
     }
-    
-    // [Issue#15]
+
     public void testEmptyBean() throws Exception
     {
-        ObjectMapper mapper = mapperForYAML();
-        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        String yaml = mapper.writeValueAsString(new EmptyBean());
+        String yaml = MAPPER.writer()
+                .without(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .writeValueAsString(new EmptyBean());
         yaml = yaml.trim();
         
         // let's be bit more robust; may or may not get doc marker

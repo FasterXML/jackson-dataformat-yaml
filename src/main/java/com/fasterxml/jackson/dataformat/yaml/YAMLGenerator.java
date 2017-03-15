@@ -23,7 +23,7 @@ public class YAMLGenerator extends GeneratorBase
     /**
      * Enumeration that defines all togglable features for YAML generators
      */
-    public enum Feature // implements FormatFeature // for 2.7
+    public enum Feature implements FormatFeature // since 2.9
     {
         /**
          * Whether we are to write an explicit document start marker ("---")
@@ -102,7 +102,17 @@ public class YAMLGenerator extends GeneratorBase
          *
          * @since 2.9
          */
-        LITERAL_BLOCK_STYLE(false)
+        LITERAL_BLOCK_STYLE(false),
+
+        /**
+         * Feature enabling of which adds indentation for array entry generation
+         * (default indentation being 2 spaces).
+         *<p>
+         * Default value is `false` for backwards compatibility
+         *
+         * @since 2.9
+         */
+        INDENT_ARRAYS(false)
         ;
 
         protected final boolean _defaultState;
@@ -128,8 +138,11 @@ public class YAMLGenerator extends GeneratorBase
             _mask = (1 << ordinal());
         }
 
+        @Override
         public boolean enabledByDefault() { return _defaultState; }
+        @Override
         public boolean enabledIn(int flags) { return (flags & _mask) != 0; }
+        @Override
         public int getMask() { return _mask; }
     }
 
@@ -227,7 +240,8 @@ public class YAMLGenerator extends GeneratorBase
                 noTags));
     }
 
-    protected DumperOptions buildDumperOptions(int jsonFeatures, int yamlFeatures, org.yaml.snakeyaml.DumperOptions.Version version)
+    protected DumperOptions buildDumperOptions(int jsonFeatures, int yamlFeatures,
+            org.yaml.snakeyaml.DumperOptions.Version version)
     {
         DumperOptions opt = new DumperOptions();
         // would we want canonical?
@@ -238,8 +252,12 @@ public class YAMLGenerator extends GeneratorBase
             // if not, MUST specify flow styles
             opt.setDefaultFlowStyle(FlowStyle.BLOCK);
         }
-        // [dataformat#35]: split-lines for text blocks?
+        // [dataformat-yaml#35]: split-lines for text blocks?
         opt.setSplitLines(Feature.SPLIT_LINES.enabledIn(_formatFeatures));
+        // [dataformat-yaml#67]: array indentation?
+        if (Feature.INDENT_ARRAYS.enabledIn(_formatFeatures)) {
+            opt.setIndicatorIndent(2);
+        }
         return opt;
     }
 
@@ -299,6 +317,8 @@ public class YAMLGenerator extends GeneratorBase
 
     @Override
     public JsonGenerator overrideFormatFeatures(int values, int mask) {
+        // 14-Mar-2016, tatu: Should re-configure, but unfortunately most
+        //    settings passed via options passed to constructor of Emitter
         _formatFeatures = (_formatFeatures & ~mask) | (values & mask);
         return this;
     }

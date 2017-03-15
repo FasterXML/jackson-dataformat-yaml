@@ -102,7 +102,6 @@ public class SimpleGenerationTest extends ModuleTestBase
         assertEquals("verified: false", it.next());
     }
 
-    // Issue#12:
     public void testWithFile() throws Exception
     {
         File f = File.createTempFile("test", ".yml");

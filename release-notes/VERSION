@@ -6,6 +6,7 @@ Project: jackson-dataformat-yaml
 
 2.9.0 (not yet released)
 
+#67: Add `YAMLGenerator.Feature.INDENT_ARRAYS`
 #76: Add `YAMLGenerator.Feature.LITERAL_BLOCK_STYLE` for String output
  (contributed by Roland H)
 

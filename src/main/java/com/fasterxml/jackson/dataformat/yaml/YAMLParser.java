@@ -30,7 +30,7 @@ public class YAMLParser extends ParserBase
     /**
      * Enumeration that defines all togglable features for YAML parsers.
      */
-    public enum Feature // implements FormatFeature // in 2.7
+    public enum Feature implements FormatFeature // in 2.9
     {
         ;
 
@@ -57,8 +57,11 @@ public class YAMLParser extends ParserBase
             _mask = (1 << ordinal());
         }
         
+        @Override
         public boolean enabledByDefault() { return _defaultState; }
+        @Override
         public boolean enabledIn(int flags) { return (flags & _mask) != 0; }        
+        @Override
         public int getMask() { return _mask; }
     }
 
