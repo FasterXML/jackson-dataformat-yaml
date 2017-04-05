@@ -23,7 +23,7 @@
   </scm>
 
   <properties>
-    <version.jackson.core>2.8.7</version.jackson.core>
+    <version.jackson.core>2.8.8</version.jackson.core>
 
     <packageVersion.dir>com/fasterxml/jackson/dataformat/yaml</packageVersion.dir>
     <packageVersion.package>${project.groupId}.yaml</packageVersion.package>
