@@ -4,6 +4,10 @@ Project: jackson-dataformat-yaml
 = Releases
 ------------------------------------------------------------------------
 
+2.8.9 (12-Jun-2017)
+
+No changes since 2.8.8
+
 2.8.8 (05-Apr-2017)
 
 #72: Multiple documents in a stream
